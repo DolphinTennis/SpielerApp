@@ -7,6 +7,6 @@ export const OVERVIEW_ITEMS = [
   { key: 'trainingsplan', icon: '📋', title: 'Trainingsplan', desc: 'Wochenplan & Trainingsschwerpunkte.', implemented: false },
   { key: 'matchanalyse', icon: '🎾', title: 'Matchanalyse', desc: 'Spiele auswerten & reflektieren.', implemented: true, badge: 'ready' },
   { key: 'videos', icon: '🎬', title: 'Videos', desc: 'Match- & Trainingsaufnahmen.', implemented: false },
-  { key: 'dateien', icon: '📁', title: 'Meine Dateien', desc: 'Dokumente, Statistiken, Sonstiges.', implemented: false, badge: 'ready' },
+  { key: 'dateien', icon: '📁', title: 'Meine Dateien', desc: 'Dokumente, Statistiken, Sonstiges.', implemented: true, badge: 'ready' },
   { key: 'liveticker', icon: '📡', title: 'Liveticker aktuelles Match', desc: 'Punktestand live verfolgen.', implemented: true, badge: 'live' },
 ]

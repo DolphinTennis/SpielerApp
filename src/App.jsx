@@ -10,6 +10,7 @@ import Placeholder from './pages/Placeholder'
 import MatchList from './pages/MatchList'
 import MatchEditor from './pages/MatchEditor'
 import LiveTicker from './pages/LiveTicker'
+import Files from './pages/Files'
 
 const PLAYER = 'Naila Wieland'
 
@@ -34,6 +35,9 @@ function AppShell() {
   function goLiveTicker() {
     setView('liveticker')
   }
+  function goFiles() {
+    setView('dateien')
+  }
 
   let crumbs = []
   if (view === 'matchanalyse-list') {
@@ -50,8 +54,11 @@ function AppShell() {
   function handleOverviewNavigate(key) {
     if (key === 'matchanalyse') goMatchList()
     else if (key === 'liveticker') goLiveTicker()
+    else if (key === 'dateien') goFiles()
     else setView(key)
   }
+
+  const KNOWN_VIEWS = ['overview', 'matchanalyse-list', 'matchanalyse-editor', 'liveticker', 'dateien']
 
   return (
     <div id="app-shell">
@@ -60,9 +67,8 @@ function AppShell() {
       {view === 'matchanalyse-list' && <MatchList onOpenMatch={openMatch} onNewMatch={newMatch} />}
       {view === 'matchanalyse-editor' && <MatchEditor matchId={editorMatchId} onBack={goMatchList} />}
       {view === 'liveticker' && <LiveTicker onMatchCreated={openMatch} />}
-      {!['overview', 'matchanalyse-list', 'matchanalyse-editor', 'liveticker'].includes(view) && (
-        <Placeholder viewKey={view} />
-      )}
+      {view === 'dateien' && <Files />}
+      {!KNOWN_VIEWS.includes(view) && <Placeholder viewKey={view} />}
     </div>
   )
 }

@@ -4,6 +4,7 @@ import './styles/theme.css'
 import './styles/layout.css'
 import './styles/matches.css'
 import './styles/live.css'
+import './styles/files.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
