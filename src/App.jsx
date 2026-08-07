@@ -9,6 +9,7 @@ import Overview from './pages/Overview'
 import Placeholder from './pages/Placeholder'
 import MatchList from './pages/MatchList'
 import MatchEditor from './pages/MatchEditor'
+import LiveTicker from './pages/LiveTicker'
 
 const PLAYER = 'Naila Wieland'
 
@@ -30,6 +31,9 @@ function AppShell() {
     setEditorMatchId(null)
     setView('matchanalyse-editor')
   }
+  function goLiveTicker() {
+    setView('liveticker')
+  }
 
   let crumbs = []
   if (view === 'matchanalyse-list') {
@@ -43,15 +47,20 @@ function AppShell() {
     crumbs = [{ label: '← Übersicht', onClick: goOverview }]
   }
 
+  function handleOverviewNavigate(key) {
+    if (key === 'matchanalyse') goMatchList()
+    else if (key === 'liveticker') goLiveTicker()
+    else setView(key)
+  }
+
   return (
     <div id="app-shell">
       <TopBar playerName={PLAYER} crumbs={crumbs} />
-      {view === 'overview' && (
-        <Overview onNavigate={(key) => (key === 'matchanalyse' ? goMatchList() : setView(key))} />
-      )}
+      {view === 'overview' && <Overview onNavigate={handleOverviewNavigate} />}
       {view === 'matchanalyse-list' && <MatchList onOpenMatch={openMatch} onNewMatch={newMatch} />}
       {view === 'matchanalyse-editor' && <MatchEditor matchId={editorMatchId} onBack={goMatchList} />}
-      {view !== 'overview' && view !== 'matchanalyse-list' && view !== 'matchanalyse-editor' && (
+      {view === 'liveticker' && <LiveTicker onMatchCreated={openMatch} />}
+      {!['overview', 'matchanalyse-list', 'matchanalyse-editor', 'liveticker'].includes(view) && (
         <Placeholder viewKey={view} />
       )}
     </div>

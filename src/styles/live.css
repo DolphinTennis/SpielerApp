@@ -1,0 +1,224 @@
+.live-setup-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  max-width: 560px;
+}
+.live-setup-card .grid-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 14px 0 18px;
+}
+.live-hero {
+  background: linear-gradient(160deg, var(--ink) 0%, #081b2e 100%);
+  border-radius: var(--radius);
+  color: #fff;
+  padding: 22px;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+.live-hero::before {
+  content: '● LIVE';
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ball);
+}
+.live-hero .matchup {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 14px;
+}
+.live-score {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 10px 0;
+}
+.live-score .side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.live-score .side .label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+}
+.live-score .num {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 800;
+  font-size: 56px;
+  line-height: 1;
+  color: var(--ball);
+}
+.live-score .sep {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-size: 40px;
+  color: rgba(255, 255, 255, 0.4);
+}
+.point-buttons {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 420px;
+  margin-top: 8px;
+}
+.point-btn {
+  flex: 1;
+  padding: 14px 10px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.12s ease;
+}
+.point-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.18);
+}
+.point-btn.opp {
+  border-color: rgba(181, 80, 46, 0.5);
+}
+.live-subtools {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.live-progress-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 18px 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.live-progress-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  min-height: 56px;
+}
+.live-progress-chip {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--chalk);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 5px 10px;
+}
+.live-progress-chip.leading-a {
+  border-color: var(--ball-dark);
+  color: var(--court-dark);
+}
+.live-progress-chip.leading-b {
+  border-color: var(--clay);
+  color: var(--clay);
+}
+.live-empty-note {
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.sets-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.set-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  padding: 6px 12px;
+  min-width: 54px;
+}
+.set-chip .set-label {
+  font-size: 9.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: 'IBM Plex Mono', monospace;
+}
+.set-chip .set-score {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+}
+.set-chip.current {
+  border-color: var(--ball);
+}
+.set-chip.won-a .set-score {
+  color: var(--ball);
+}
+.set-chip.won-b {
+  opacity: 0.85;
+}
+.live-score-caption {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: -6px;
+  letter-spacing: 0.5px;
+}
+.live-decided-banner {
+  background: rgba(215, 242, 29, 0.15);
+  border: 1px solid var(--ball);
+  color: var(--ball);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  margin-top: 6px;
+}
+.live-tiebreak-badge {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-weight: 700;
+  font-size: 12.5px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  margin-top: 2px;
+  letter-spacing: 0.3px;
+}
+.set-chip .set-tb {
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: 'IBM Plex Mono', monospace;
+  margin-top: 1px;
+}
+.point-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.point-btn:disabled:hover {
+  background: rgba(255, 255, 255, 0.08);
+}

@@ -8,5 +8,5 @@ export const OVERVIEW_ITEMS = [
   { key: 'matchanalyse', icon: '🎾', title: 'Matchanalyse', desc: 'Spiele auswerten & reflektieren.', implemented: true, badge: 'ready' },
   { key: 'videos', icon: '🎬', title: 'Videos', desc: 'Match- & Trainingsaufnahmen.', implemented: false },
   { key: 'dateien', icon: '📁', title: 'Meine Dateien', desc: 'Dokumente, Statistiken, Sonstiges.', implemented: false, badge: 'ready' },
-  { key: 'liveticker', icon: '📡', title: 'Liveticker aktuelles Match', desc: 'Punktestand live verfolgen.', implemented: false, badge: 'live' },
+  { key: 'liveticker', icon: '📡', title: 'Liveticker aktuelles Match', desc: 'Punktestand live verfolgen.', implemented: true, badge: 'live' },
 ]
