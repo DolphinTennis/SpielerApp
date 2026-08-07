@@ -1,0 +1,130 @@
+:root {
+  --ink: #0f2740;
+  --court: #1c63b7;
+  --court-dark: #123f73;
+  --chalk: #f4f7fb;
+  --paper: #ffffff;
+  --ball: #d7f23d;
+  --ball-dark: #afc81c;
+  --clay: #c0392b;
+  --line: #d7dee6;
+  --text: #16232e;
+  --text-soft: #5b6875;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(15, 39, 64, 0.06), 0 8px 24px rgba(15, 39, 64, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+body {
+  background: var(--chalk);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 700;
+  margin: 0;
+}
+
+input,
+textarea,
+select {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 9px 11px;
+  background: var(--chalk);
+  color: var(--text);
+  width: 100%;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid var(--court);
+  outline-offset: 1px;
+  background: #fff;
+}
+
+.btn {
+  border: none;
+  border-radius: 9px;
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+  transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--ball);
+  color: var(--ink);
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--court);
+  border: 1.5px solid var(--court);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--court);
+  color: #fff;
+}
+
+.btn-ghost {
+  background: var(--chalk);
+  color: var(--text);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--line);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-soft);
+  font-weight: 600;
+}

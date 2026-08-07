@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk '{ print length, NR }' \"/Users/dwholzbau/Downloads/NW-Tennis-App.html\")",
+      "Bash(awk 'NR==434{print substr\\($0,1,300\\)}' \"/Users/dwholzbau/Downloads/NW-Tennis-App.html\")",
+      "Bash(awk 'NR==434{print \" <div class=\\\\\"brand-logo\\\\\"><img src=\\\\\"[LOGO_BASE64_PNG]\\\\\" alt=\\\\\"NW Tennis Logo\\\\\"></div>\"; next} {print}' \"/Users/dwholzbau/Downloads/NW-Tennis-App.html\")",
+      "Bash(awk 'NR==434' \"/Users/dwholzbau/Downloads/NW-Tennis-App.html\")",
+      "Bash(npm -v)",
+      "Bash(npm create *)",
+      "Bash(npm install *)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}
