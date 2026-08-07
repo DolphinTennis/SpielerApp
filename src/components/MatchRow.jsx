@@ -1,6 +1,6 @@
 import { formatDate } from '../lib/format'
 
-export default function MatchRow({ match, onClick }) {
+export default function MatchRow({ match, onClick, onDelete }) {
   return (
     <div className="match-row" onClick={onClick}>
       <div className="score-chip">{match.ergebnis || '–'}</div>
@@ -12,6 +12,17 @@ export default function MatchRow({ match, onClick }) {
         </div>
       </div>
       {match.filed && <span className="filed-tag">Abgelegt</span>}
+      <button
+        type="button"
+        className="row-delete"
+        title="Matchanalyse löschen"
+        onClick={(e) => {
+          e.stopPropagation()
+          onDelete()
+        }}
+      >
+        🗑️
+      </button>
     </div>
   )
 }

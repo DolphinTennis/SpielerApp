@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import MatchRow from '../components/MatchRow'
-import { listMatches } from '../lib/matchesApi'
+import { deleteMatch, listMatches } from '../lib/matchesApi'
 import { useToast } from '../lib/ToastContext'
 
 export default function MatchList({ onOpenMatch, onNewMatch }) {
@@ -38,6 +38,19 @@ export default function MatchList({ onOpenMatch, onNewMatch }) {
       })
       .sort((a, b) => (b.datum || '').localeCompare(a.datum || ''))
   }, [matches, filters])
+
+  async function handleDelete(match) {
+    const label = 'vs. ' + (match.gegner || 'Unbekannt') + (match.datum ? ' (' + match.datum + ')' : '')
+    if (!window.confirm('Matchanalyse „' + label + '" wirklich löschen? Das kann nicht rückgängig gemacht werden.')) return
+    try {
+      await deleteMatch(match.id)
+      setMatches((prev) => prev.filter((m) => m.id !== match.id))
+      toast('Matchanalyse gelöscht.')
+    } catch (err) {
+      console.error(err)
+      toast('Löschen fehlgeschlagen.')
+    }
+  }
 
   return (
     <div className="view">
@@ -100,7 +113,7 @@ export default function MatchList({ onOpenMatch, onNewMatch }) {
 
       <div className="match-list">
         {filtered.map((m) => (
-          <MatchRow key={m.id} match={m} onClick={() => onOpenMatch(m.id)} />
+          <MatchRow key={m.id} match={m} onClick={() => onOpenMatch(m.id)} onDelete={() => handleDelete(m)} />
         ))}
       </div>
     </div>
