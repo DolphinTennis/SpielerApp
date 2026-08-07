@@ -21,23 +21,27 @@ export const FORM1_CARDS = [
     num: 2,
     blocks: [
       {
-        type: 'subgroup',
-        title: 'Taktik',
-        fields: [
-          { key: 'taktik1', label: 'Was war meine taktische Ausrichtung?' },
-          { key: 'taktik2', label: 'Wie gut konnte ich diese umsetzen?' },
-        ],
-      },
-      {
-        type: 'fields',
-        fields: [{ key: 'schlaege', label: 'Wie waren meine Schläge (Vorhand, Rückhand, Aufschlag, Volley …)?' }],
-      },
-      {
-        type: 'subgroup',
-        title: 'Feeling',
-        fields: [
-          { key: 'feeling1', label: 'Wie habe ich mich körperlich auf dem Platz gefühlt? (Energie, Beweglichkeit …)' },
-          { key: 'feeling2', label: 'Wie habe ich mich mental auf dem Platz gefühlt? (Fokus, Selbstvertrauen …)' },
+        // A single continuous bordered block spanning Taktik → Schläge → Feeling,
+        // so the left rule doesn't break between sections.
+        type: 'boundedGroup',
+        sections: [
+          {
+            title: 'Taktik',
+            fields: [
+              { key: 'taktik1', label: 'Was war meine taktische Ausrichtung?' },
+              { key: 'taktik2', label: 'Wie gut konnte ich diese umsetzen?' },
+            ],
+          },
+          {
+            fields: [{ key: 'schlaege', label: 'Wie waren meine Schläge (Vorhand, Rückhand, Aufschlag, Volley …)?' }],
+          },
+          {
+            title: 'Feeling',
+            fields: [
+              { key: 'feeling1', label: 'Wie habe ich mich körperlich auf dem Platz gefühlt? (Energie, Beweglichkeit …)' },
+              { key: 'feeling2', label: 'Wie habe ich mich mental auf dem Platz gefühlt? (Fokus, Selbstvertrauen …)' },
+            ],
+          },
         ],
       },
     ],

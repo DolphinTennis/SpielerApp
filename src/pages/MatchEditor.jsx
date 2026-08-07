@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import FormCard from '../components/FormCard'
 import { FORM1_CARDS, FORM2_FIELDS } from '../config/matchFormFields'
 import { blankMatch, createMatch, getMatch, updateMatch } from '../lib/matchesApi'
-import { buildMailBody, printRecord } from '../lib/matchExport'
+import { buildMailBody, printInPage } from '../lib/matchExport'
 import { formatDate } from '../lib/format'
 import { useToast } from '../lib/ToastContext'
 import { useAuth } from '../lib/AuthContext'
@@ -76,10 +76,10 @@ export default function MatchEditor({ matchId, onBack }) {
     }
   }
 
-  async function handlePrint() {
+  async function handlePrint(formNumber) {
     try {
       const saved = await persist(record, true)
-      printRecord(saved)
+      printInPage(saved, formNumber)
       toast('Druckdialog wird geöffnet — dort „Als PDF speichern" wählen.')
     } catch (err) {
       if (err?.message) toast(err.message)
@@ -211,8 +211,11 @@ export default function MatchEditor({ matchId, onBack }) {
           <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
             💾 Speichern
           </button>
-          <button className="btn btn-outline" onClick={handlePrint} disabled={saving}>
-            🖨️ Als PDF drucken
+          <button className="btn btn-outline" onClick={() => handlePrint(1)} disabled={saving}>
+            🖨️ Formular 1 als PDF
+          </button>
+          <button className="btn btn-outline" onClick={() => handlePrint(2)} disabled={saving}>
+            🖨️ Formular 2 als PDF
           </button>
           <button className="btn btn-outline" onClick={handleMail} disabled={saving}>
             ✉️ Per E-Mail senden
