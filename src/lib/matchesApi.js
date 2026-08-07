@@ -31,14 +31,20 @@ export async function getMatch(id) {
   return data
 }
 
+// Postgres `date` columns reject "" (only null or a real date), but the
+// editor and the live-ticker handoff both leave datum as "" when unset.
+function normalizeDate(record) {
+  return record.datum === '' ? { ...record, datum: null } : record
+}
+
 export async function createMatch(record) {
-  const { data, error } = await supabase.from('matches').insert(record).select().single()
+  const { data, error } = await supabase.from('matches').insert(normalizeDate(record)).select().single()
   if (error) throw error
   return data
 }
 
 export async function updateMatch(id, patch) {
-  const { data, error } = await supabase.from('matches').update(patch).eq('id', id).select().single()
+  const { data, error } = await supabase.from('matches').update(normalizeDate(patch)).eq('id', id).select().single()
   if (error) throw error
   return data
 }
