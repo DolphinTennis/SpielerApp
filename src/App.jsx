@@ -1,15 +1,31 @@
+import { useState } from 'react'
 import { isSupabaseConfigured } from './lib/supabaseClient'
 import { AuthProvider, useAuth } from './lib/AuthContext'
+import { ToastProvider } from './lib/ToastContext'
 import ConfigWarning from './components/ConfigWarning'
 import Login from './components/Login'
+import TopBar from './components/TopBar'
+import Overview from './pages/Overview'
+import Placeholder from './pages/Placeholder'
 
-function AuthedPlaceholder() {
-  const { session, signOut } = useAuth()
+const PLAYER = 'Naila Wieland'
+
+function AppShell() {
+  const [view, setView] = useState('overview')
+
+  const crumbs =
+    view === 'overview'
+      ? []
+      : [{ label: '← Übersicht', onClick: () => setView('overview') }]
+
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 14 }}>
-      <h2 style={{ color: 'var(--ink)' }}>Eingeloggt als {session.user.email}</h2>
-      <p style={{ color: 'var(--text-soft)' }}>Die Übersichtsseite folgt im nächsten Schritt.</p>
-      <button className="btn btn-outline" onClick={signOut}>Abmelden</button>
+    <div id="app-shell">
+      <TopBar playerName={PLAYER} crumbs={crumbs} />
+      {view === 'overview' ? (
+        <Overview onNavigate={setView} />
+      ) : (
+        <Placeholder viewKey={view} />
+      )}
     </div>
   )
 }
@@ -19,7 +35,11 @@ function AppInner() {
 
   if (loading) return null
   if (!session) return <Login />
-  return <AuthedPlaceholder />
+  return (
+    <ToastProvider>
+      <AppShell />
+    </ToastProvider>
+  )
 }
 
 export default function App() {
