@@ -156,7 +156,7 @@ export default function LiveTicker({ onMatchCreated }) {
   if (inMatchTiebreak) {
     numA = liveMatch.matchTiebreak.pointsA
     numB = liveMatch.matchTiebreak.pointsB
-    caption = 'Punkte im Match-Tiebreak (bis 11, 2 Punkte Vorsprung)'
+    caption = 'Punkte im Match-Tiebreak (bis 10, 2 Punkte Vorsprung)'
   } else if (inTiebreak) {
     numA = liveMatch.tiebreak.pointsA
     numB = liveMatch.tiebreak.pointsB
@@ -233,7 +233,7 @@ export default function LiveTicker({ onMatchCreated }) {
 
         {inTiebreak && !liveMatch.decided && <div className="live-tiebreak-badge">🎾 Tiebreak bei 6:6</div>}
         {inMatchTiebreak && !liveMatch.decided && (
-          <div className="live-tiebreak-badge">🎾 Match-Tiebreak entscheidet (bis 11, 2 Punkte Vorsprung)</div>
+          <div className="live-tiebreak-badge">🎾 Match-Tiebreak entscheidet (bis 10, 2 Punkte Vorsprung)</div>
         )}
         {liveMatch.decided && (
           <div className="live-decided-banner">

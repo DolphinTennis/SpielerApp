@@ -9,9 +9,9 @@ export function isSetOver(a, b) {
 export function isTiebreakOver(a, b) {
   return (a >= 7 || b >= 7) && Math.abs(a - b) >= 2
 }
-// Match tiebreak (played instead of a 3rd set): first to 11 points, win by 2.
+// Match tiebreak (played instead of a 3rd set): first to 10 points, win by 2.
 export function isMatchTiebreakOver(a, b) {
-  return (a >= 11 || b >= 11) && Math.abs(a - b) >= 2
+  return (a >= 10 || b >= 10) && Math.abs(a - b) >= 2
 }
 
 export function formatSetScore(s) {
@@ -76,7 +76,7 @@ function finalizeSet(m, setEntry) {
     message = 'Match entschieden: ' + formatSetScore(setEntry) + ' im letzten Satz.'
   } else if (next.mode === 'matchtiebreak' && next.sets.length === 2 && setsWonA === 1 && setsWonB === 1) {
     next = { ...next, matchTiebreak: { pointsA: 0, pointsB: 0, history: [] } }
-    message = 'Sätze stehen 1:1 — Match-Tiebreak entscheidet (bis 11, 2 Punkte Vorsprung)!'
+    message = 'Sätze stehen 1:1 — Match-Tiebreak entscheidet (bis 10, 2 Punkte Vorsprung)!'
   } else {
     message = 'Satz beendet: ' + formatSetScore(setEntry) + ' — neuer Satz gestartet.'
   }
