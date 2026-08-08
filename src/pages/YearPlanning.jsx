@@ -155,11 +155,13 @@ export default function YearPlanning() {
                   const date = dateStr(year, monthIndex, day)
                   const entry = dayMap[date]
                   const cat = entry ? CATEGORY_BY_KEY[entry.category] : null
+                  const weekday = new Date(year, monthIndex, day).getDay()
+                  const isWeekend = weekday === 0 || weekday === 6
                   return (
                     <div className="yearplan-cell-wrap" key={i}>
                       <button
                         type="button"
-                        className={`yearplan-cell${entry ? ' filled' : ''}${entry?.status === 'proposed' ? ' proposed' : ''}`}
+                        className={`yearplan-cell${isWeekend ? ' weekend' : ''}${entry ? ' filled' : ''}${entry?.status === 'proposed' ? ' proposed' : ''}`}
                         style={entry ? { background: cat.color } : undefined}
                         title={
                           entry

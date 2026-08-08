@@ -126,6 +126,12 @@
 .yearplan-cell.filled {
   border-color: transparent;
 }
+.yearplan-cell.weekend {
+  background: color-mix(in srgb, var(--chalk) 60%, var(--ink) 18%);
+}
+.yearplan-cell.weekend.filled {
+  filter: brightness(0.8) saturate(1.15);
+}
 .yearplan-cell.proposed {
   opacity: 0.5;
   border: 1.5px dashed var(--ink);
