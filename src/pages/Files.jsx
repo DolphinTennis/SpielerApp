@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import FileRow from '../components/FileRow'
 import FilePreviewModal from '../components/FilePreviewModal'
 import { useAuth } from '../lib/AuthContext'
+import { useOrg } from '../lib/OrgContext'
 import { useToast } from '../lib/ToastContext'
 import {
   assignFileToFolder,
@@ -41,6 +42,7 @@ function sortFiles(list, sort) {
 
 export default function Files() {
   const { session } = useAuth()
+  const { orgId } = useOrg()
   const toast = useToast()
   const userId = session.user.id
   const fileInputRef = useRef(null)
@@ -59,7 +61,7 @@ export default function Files() {
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([listFolders(), listFiles()])
+    Promise.all([listFolders(orgId), listFiles(orgId)])
       .then(([f, fl]) => {
         if (cancelled) return
         setFolders(f)
@@ -74,7 +76,7 @@ export default function Files() {
       cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [orgId])
 
   const folderCounts = useMemo(() => {
     const counts = {}
@@ -106,7 +108,7 @@ export default function Files() {
       return
     }
     try {
-      const folder = await createFolder(userId, name)
+      const folder = await createFolder(orgId, name)
       setFolders((prev) => [...prev, folder].sort((a, b) => a.name.localeCompare(b.name, 'de')))
       setNewFolderName('')
       toast('Ordner „' + name + '" angelegt.')
@@ -145,7 +147,7 @@ export default function Files() {
     if (!file) return
     setUploading(true)
     try {
-      const saved = await uploadFile(userId, file, currentFolderId)
+      const saved = await uploadFile(userId, orgId, file, currentFolderId)
       setFiles((prev) => [saved, ...prev])
       toast('Datei „' + file.name + '" hochgeladen.')
     } catch (err) {

@@ -38,7 +38,7 @@ export default function Login() {
 
       <form style={styles.card} onSubmit={handleSubmit}>
         <h2 style={styles.title}>Anmelden</h2>
-        <p style={styles.subtitle}>Naila Wieland</p>
+        <p style={styles.subtitle}>Melde dich mit deinem Team-Konto an</p>
 
         <div className="field" style={{ marginBottom: 14 }}>
           <label htmlFor="login-email">E-Mail</label>

@@ -3,14 +3,14 @@ import { detectFileType, sanitizeFilename } from './fileHelpers'
 
 const BUCKET = 'files'
 
-export async function listFolders() {
-  const { data, error } = await supabase.from('folders').select('id, name').order('name')
+export async function listFolders(orgId) {
+  const { data, error } = await supabase.from('folders').select('id, name').eq('org_id', orgId).order('name')
   if (error) throw error
   return data
 }
 
-export async function createFolder(userId, name) {
-  const { data, error } = await supabase.from('folders').insert({ user_id: userId, name }).select().single()
+export async function createFolder(orgId, name) {
+  const { data, error } = await supabase.from('folders').insert({ org_id: orgId, name }).select().single()
   if (error) throw error
   return data
 }
@@ -20,17 +20,21 @@ export async function deleteFolder(id) {
   if (error) throw error
 }
 
-export async function listFiles() {
+export async function listFiles(orgId) {
   const { data, error } = await supabase
     .from('files')
     .select('id, folder_id, name, type, size_bytes, storage_path, created_at')
+    .eq('org_id', orgId)
     .order('created_at', { ascending: false })
   if (error) throw error
   return data
 }
 
-export async function uploadFile(userId, file, folderId) {
-  const path = `${userId}/${crypto.randomUUID()}-${sanitizeFilename(file.name)}`
+// Storage path is org-scoped (`${orgId}/...`), not per-uploader — the whole
+// team shares one file pool, matching the "Org members can view/upload
+// storage objects" policies in 004_organizations.sql.
+export async function uploadFile(userId, orgId, file, folderId) {
+  const path = `${orgId}/${crypto.randomUUID()}-${sanitizeFilename(file.name)}`
   const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, file, {
     contentType: file.type || undefined,
     upsert: false,
@@ -41,6 +45,7 @@ export async function uploadFile(userId, file, folderId) {
     .from('files')
     .insert({
       user_id: userId,
+      org_id: orgId,
       folder_id: folderId || null,
       name: file.name,
       type: detectFileType(file.type, file.name),

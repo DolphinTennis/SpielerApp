@@ -6,16 +6,16 @@ export async function fetchLiveMatch(userId) {
   return data?.state ?? null
 }
 
-export async function saveLiveMatch(userId, state) {
+export async function saveLiveMatch(userId, orgId, state) {
   const { error } = await supabase
     .from('live_matches')
-    .upsert({ user_id: userId, state, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
+    .upsert({ user_id: userId, org_id: orgId, state, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
   if (error) throw error
 }
 
-export async function clearLiveMatch(userId) {
+export async function clearLiveMatch(userId, orgId) {
   const { error } = await supabase
     .from('live_matches')
-    .upsert({ user_id: userId, state: null, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
+    .upsert({ user_id: userId, org_id: orgId, state: null, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
   if (error) throw error
 }

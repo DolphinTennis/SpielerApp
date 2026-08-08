@@ -6,9 +6,11 @@ import { buildMailBody, printInPage } from '../lib/matchExport'
 import { formatDate } from '../lib/format'
 import { useToast } from '../lib/ToastContext'
 import { useAuth } from '../lib/AuthContext'
+import { useOrg } from '../lib/OrgContext'
 
 export default function MatchEditor({ matchId, onBack }) {
   const { session } = useAuth()
+  const { orgId, playerName } = useOrg()
   const toast = useToast()
   const [record, setRecord] = useState(null)
   const [tab, setTab] = useState(1)
@@ -26,14 +28,14 @@ export default function MatchEditor({ matchId, onBack }) {
           toast('Match konnte nicht geladen werden.')
         })
     } else {
-      setRecord(blankMatch(session.user.id))
+      setRecord(blankMatch(session.user.id, orgId, playerName))
     }
     setTab(1)
     return () => {
       cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [matchId])
+  }, [matchId, orgId, playerName])
 
   function updateField(key, value) {
     setRecord((r) => ({ ...r, [key]: value }))
@@ -110,7 +112,7 @@ export default function MatchEditor({ matchId, onBack }) {
   async function handleNewForm() {
     try {
       await persist(record, true)
-      setRecord(blankMatch(session.user.id))
+      setRecord(blankMatch(session.user.id, orgId, playerName))
       setTab(1)
       toast('Neues Formular angelegt.')
     } catch {
@@ -123,7 +125,7 @@ export default function MatchEditor({ matchId, onBack }) {
   return (
     <div className="view">
       <h1 className="section-title">Matchanalyse</h1>
-      <p className="section-sub">Naila Wieland</p>
+      <p className="section-sub">{playerName}</p>
 
       <div className="editor-header">
         <div className="field">

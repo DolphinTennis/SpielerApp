@@ -1,10 +1,11 @@
 import { supabase } from './supabaseClient'
 import { blankForm1, blankForm2 } from '../config/matchFormFields'
 
-export function blankMatch(userId) {
+export function blankMatch(userId, orgId, spielerName = '') {
   return {
     user_id: userId,
-    spieler: 'Naila Wieland',
+    org_id: orgId,
+    spieler: spielerName,
     datum: '',
     gegner: '',
     ergebnis: '',
@@ -16,10 +17,11 @@ export function blankMatch(userId) {
   }
 }
 
-export async function listMatches() {
+export async function listMatches(orgId) {
   const { data, error } = await supabase
     .from('matches')
     .select('id, datum, gegner, turnier, ergebnis, filed, updated_at')
+    .eq('org_id', orgId)
     .order('datum', { ascending: false, nullsFirst: false })
   if (error) throw error
   return data

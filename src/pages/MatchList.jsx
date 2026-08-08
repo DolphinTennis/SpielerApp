@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import MatchRow from '../components/MatchRow'
 import { deleteMatch, listMatches } from '../lib/matchesApi'
 import { useToast } from '../lib/ToastContext'
+import { useOrg } from '../lib/OrgContext'
 
 export default function MatchList({ onOpenMatch, onNewMatch }) {
+  const { orgId, playerName } = useOrg()
   const [matches, setMatches] = useState([])
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState({ opp: '', date: '', tourn: '' })
@@ -12,7 +14,7 @@ export default function MatchList({ onOpenMatch, onNewMatch }) {
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    listMatches()
+    listMatches(orgId)
       .then((data) => {
         if (!cancelled) setMatches(data)
       })
@@ -26,7 +28,7 @@ export default function MatchList({ onOpenMatch, onNewMatch }) {
     return () => {
       cancelled = true
     }
-  }, [toast])
+  }, [orgId, toast])
 
   const filtered = useMemo(() => {
     return matches
@@ -55,7 +57,7 @@ export default function MatchList({ onOpenMatch, onNewMatch }) {
   return (
     <div className="view">
       <h1 className="section-title">Matchanalyse</h1>
-      <p className="section-sub">Alle erfassten Spiele von Naila Wieland — durchsuchen, filtern, auswerten.</p>
+      <p className="section-sub">Alle erfassten Spiele von {playerName} — durchsuchen, filtern, auswerten.</p>
 
       <div className="filter-bar">
         <div className="field">

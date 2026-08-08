@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { isSupabaseConfigured } from './lib/supabaseClient'
 import { AuthProvider, useAuth } from './lib/AuthContext'
+import { OrgProvider, useOrg } from './lib/OrgContext'
 import { ToastProvider } from './lib/ToastContext'
 import ConfigWarning from './components/ConfigWarning'
 import Login from './components/Login'
@@ -12,9 +13,8 @@ import MatchEditor from './pages/MatchEditor'
 import LiveTicker from './pages/LiveTicker'
 import Files from './pages/Files'
 
-const PLAYER = 'Naila Wieland'
-
 function AppShell() {
+  const { playerName } = useOrg()
   const [view, setView] = useState('overview')
   const [editorMatchId, setEditorMatchId] = useState(null)
 
@@ -62,7 +62,7 @@ function AppShell() {
 
   return (
     <div id="app-shell">
-      <TopBar playerName={PLAYER} crumbs={crumbs} />
+      <TopBar playerName={playerName} crumbs={crumbs} />
       {view === 'overview' && <Overview onNavigate={handleOverviewNavigate} />}
       {view === 'matchanalyse-list' && <MatchList onOpenMatch={openMatch} onNewMatch={newMatch} />}
       {view === 'matchanalyse-editor' && <MatchEditor matchId={editorMatchId} onBack={goMatchList} />}
@@ -73,15 +73,35 @@ function AppShell() {
   )
 }
 
+function OrgGate() {
+  const { loading, orgId } = useOrg()
+
+  if (loading) return null
+  if (!orgId) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <p style={{ color: 'var(--text-soft)', maxWidth: 360, textAlign: 'center' }}>
+          Kein Team gefunden. Falls du gerade registriert hast, versuch es in ein paar Sekunden erneut.
+        </p>
+      </div>
+    )
+  }
+  return (
+    <ToastProvider>
+      <AppShell />
+    </ToastProvider>
+  )
+}
+
 function AppInner() {
   const { session, loading } = useAuth()
 
   if (loading) return null
   if (!session) return <Login />
   return (
-    <ToastProvider>
-      <AppShell />
-    </ToastProvider>
+    <OrgProvider>
+      <OrgGate />
+    </OrgProvider>
   )
 }
 

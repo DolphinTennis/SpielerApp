@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../lib/AuthContext'
+import { useOrg } from '../lib/OrgContext'
 import { useToast } from '../lib/ToastContext'
 import { fetchLiveMatch, saveLiveMatch, clearLiveMatch } from '../lib/liveMatchApi'
 import { blankMatch, createMatch } from '../lib/matchesApi'
@@ -13,6 +14,7 @@ import {
 
 export default function LiveTicker({ onMatchCreated }) {
   const { session } = useAuth()
+  const { orgId, playerName } = useOrg()
   const toast = useToast()
   const userId = session.user.id
 
@@ -43,7 +45,7 @@ export default function LiveTicker({ onMatchCreated }) {
   async function persist(next) {
     setLiveMatch(next)
     try {
-      await saveLiveMatch(userId, next)
+      await saveLiveMatch(userId, orgId, next)
     } catch (err) {
       console.error(err)
       toast('Fehler beim Speichern des Punktes.')
@@ -54,7 +56,7 @@ export default function LiveTicker({ onMatchCreated }) {
     setBusy(true)
     try {
       const next = blankLiveMatch({ datum: setupDate, gegner: setupOpp, turnier: setupTourn, mode: setupMode })
-      await saveLiveMatch(userId, next)
+      await saveLiveMatch(userId, orgId, next)
       setLiveMatch(next)
       toast('Live-Tracking gestartet.')
     } catch (err) {
@@ -84,7 +86,7 @@ export default function LiveTicker({ onMatchCreated }) {
     try {
       const { ergebnis, verlauf } = buildEndedResult(liveMatch)
       const record = {
-        ...blankMatch(userId),
+        ...blankMatch(userId, orgId, playerName),
         datum: liveMatch.datum,
         gegner: liveMatch.gegner,
         turnier: liveMatch.turnier,
@@ -92,7 +94,7 @@ export default function LiveTicker({ onMatchCreated }) {
         verlauf,
       }
       const saved = await createMatch(record)
-      await clearLiveMatch(userId)
+      await clearLiveMatch(userId, orgId)
       setLiveMatch(null)
       toast('Match beendet — Ergebnis wurde in die Matchanalyse übernommen.')
       onMatchCreated(saved.id)
@@ -110,7 +112,7 @@ export default function LiveTicker({ onMatchCreated }) {
     return (
       <div className="view">
         <h1 className="section-title">Liveticker</h1>
-        <p className="section-sub">Verfolge das aktuelle Match von Naila Wieland live mit.</p>
+        <p className="section-sub">Verfolge das aktuelle Match von {playerName} live mit.</p>
 
         <div className="live-setup-card">
           <h3 style={{ fontSize: 19, color: 'var(--ink)', margin: '0 0 4px' }}>Neues Match anlegen</h3>
@@ -175,16 +177,16 @@ export default function LiveTicker({ onMatchCreated }) {
     progressTitle = 'Spielverlauf · Satz ' + (liveMatch.sets.length + (liveMatch.decided ? 0 : 1))
   }
 
-  const winner = liveMatch.decided ? (liveMatch.setsWonA > liveMatch.setsWonB ? 'Naila Wieland' : liveMatch.gegner || 'Gegnerin') : null
+  const winner = liveMatch.decided ? (liveMatch.setsWonA > liveMatch.setsWonB ? playerName : liveMatch.gegner || 'Gegnerin') : null
 
   return (
     <div className="view">
       <h1 className="section-title">Liveticker</h1>
-      <p className="section-sub">Verfolge das aktuelle Match von Naila Wieland live mit.</p>
+      <p className="section-sub">Verfolge das aktuelle Match von {playerName} live mit.</p>
 
       <div className="live-hero">
         <div className="matchup">
-          Naila Wieland vs. {liveMatch.gegner || '—'}
+          {playerName} vs. {liveMatch.gegner || '—'}
           {liveMatch.turnier ? ' · ' + liveMatch.turnier : ''}
         </div>
 
@@ -220,7 +222,7 @@ export default function LiveTicker({ onMatchCreated }) {
 
         <div className="live-score">
           <div className="side">
-            <div className="label">NAILA</div>
+            <div className="label">{(playerName || 'SPIELER:IN').toUpperCase()}</div>
             <div className="num">{numA}</div>
           </div>
           <div className="sep">:</div>
@@ -243,7 +245,7 @@ export default function LiveTicker({ onMatchCreated }) {
 
         <div className="point-buttons">
           <button className="point-btn" disabled={liveMatch.decided} onClick={() => handlePoint('a')}>
-            {pointMode ? '+ Punkt Naila' : '+ Spiel Naila'}
+            {pointMode ? '+ Punkt ' + playerName : '+ Spiel ' + playerName}
           </button>
           <button className="point-btn opp" disabled={liveMatch.decided} onClick={() => handlePoint('b')}>
             {pointMode ? '+ Punkt Gegnerin' : '+ Spiel Gegnerin'}
