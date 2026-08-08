@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 
 export default function Login() {
@@ -71,6 +72,10 @@ export default function Login() {
         <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={submitting}>
           {submitting ? 'Anmelden …' : 'Anmelden'}
         </button>
+
+        <p style={{ fontSize: 13, color: 'var(--text-soft)', marginTop: 14, textAlign: 'center' }}>
+          Noch kein Team? <Link to="/register">Jetzt registrieren</Link>
+        </p>
       </form>
     </div>
   )

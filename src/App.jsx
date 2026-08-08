@@ -4,13 +4,15 @@ import { AuthProvider, useAuth } from './lib/AuthContext'
 import { OrgProvider } from './lib/OrgContext'
 import ConfigWarning from './components/ConfigWarning'
 import Login from './components/Login'
-import RegisterPlaceholder from './components/RegisterPlaceholder'
+import Register from './components/Register'
+import Landing from './pages/Landing'
 import AppShell from './components/AppShell'
 
-function RootRedirect() {
+function RootRoute() {
   const { session, loading } = useAuth()
   if (loading) return null
-  return <Navigate to={session ? '/app' : '/login'} replace />
+  if (session) return <Navigate to="/app" replace />
+  return <Landing />
 }
 
 function PublicOnlyRoute({ children }) {
@@ -30,7 +32,7 @@ function ProtectedRoute({ children }) {
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<RootRedirect />} />
+      <Route path="/" element={<RootRoute />} />
       <Route
         path="/login"
         element={
@@ -43,7 +45,7 @@ function AppRoutes() {
         path="/register"
         element={
           <PublicOnlyRoute>
-            <RegisterPlaceholder />
+            <Register />
           </PublicOnlyRoute>
         }
       />
