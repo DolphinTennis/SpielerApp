@@ -9,4 +9,5 @@ export const OVERVIEW_ITEMS = [
   { key: 'videos', icon: '🎬', title: 'Videos', desc: 'Match- & Trainingsaufnahmen.', implemented: false },
   { key: 'dateien', icon: '📁', title: 'Meine Dateien', desc: 'Dokumente, Statistiken, Sonstiges.', implemented: true, badge: 'ready' },
   { key: 'liveticker', icon: '📡', title: 'Liveticker aktuelles Match', desc: 'Punktestand live verfolgen.', implemented: true, badge: 'live' },
+  { key: 'team', icon: '🧑‍🤝‍🧑', title: 'Team verwalten', desc: 'Mitglieder einsehen & einladen.', implemented: true, adminOnly: true },
 ]

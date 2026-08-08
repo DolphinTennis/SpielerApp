@@ -6,6 +6,7 @@ import ConfigWarning from './components/ConfigWarning'
 import Login from './components/Login'
 import Register from './components/Register'
 import Landing from './pages/Landing'
+import AcceptInvite from './pages/AcceptInvite'
 import AppShell from './components/AppShell'
 
 function RootRoute() {
@@ -49,6 +50,7 @@ function AppRoutes() {
           </PublicOnlyRoute>
         }
       />
+      <Route path="/accept-invite" element={<AcceptInvite />} />
       <Route
         path="/app/*"
         element={

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 import { useAuth } from './AuthContext'
+import { activateOwnMembership } from './teamApi'
 
 const OrgContext = createContext(null)
 
@@ -39,6 +40,7 @@ async function provisionPendingTeam(session) {
     user_id: session.user.id,
     role: meta.pending_role || 'spieler',
     status: 'active',
+    email: session.user.email,
   })
   if (membershipError) throw membershipError
 
@@ -47,6 +49,18 @@ async function provisionPendingTeam(session) {
   })
 
   return fetchMembership(session.user.id)
+}
+
+// Covers the invited-member path: AcceptInvite.jsx already activates the
+// membership right after the password is set, but retrying here on every
+// login is a cheap safety net in case that step got interrupted.
+async function activateInvitedMembership(userId) {
+  try {
+    await activateOwnMembership()
+  } catch {
+    return null // no pending invite for this user — that's fine, not an error
+  }
+  return fetchMembership(userId)
 }
 
 export function OrgProvider({ children }) {
@@ -65,6 +79,7 @@ export function OrgProvider({ children }) {
 
     fetchMembership(session.user.id)
       .then((data) => (data ? data : provisionPendingTeam(session)))
+      .then((data) => (data ? data : activateInvitedMembership(session.user.id)))
       .then((data) => {
         if (!cancelled) setMembership(data)
       })

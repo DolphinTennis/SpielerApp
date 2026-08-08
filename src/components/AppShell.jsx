@@ -7,9 +7,10 @@ import MatchList from '../pages/MatchList'
 import MatchEditor from '../pages/MatchEditor'
 import LiveTicker from '../pages/LiveTicker'
 import Files from '../pages/Files'
+import TeamManage from '../pages/TeamManage'
 import Placeholder from '../pages/Placeholder'
 
-const OVERVIEW_ROUTES = { matchanalyse: 'matchanalyse', liveticker: 'liveticker', dateien: 'dateien' }
+const OVERVIEW_ROUTES = { matchanalyse: 'matchanalyse', liveticker: 'liveticker', dateien: 'dateien', team: 'team' }
 
 function MatchEditorRoute() {
   const { matchId } = useParams()
@@ -56,6 +57,7 @@ function AppShellInner() {
         <Route path="matchanalyse/:matchId" element={<MatchEditorRoute />} />
         <Route path="liveticker" element={<LiveTicker onMatchCreated={(id) => navigate(`/app/matchanalyse/${id}`)} />} />
         <Route path="dateien" element={<Files />} />
+        <Route path="team" element={<TeamManage />} />
         <Route path=":placeholderKey" element={<PlaceholderRoute />} />
       </Routes>
     </div>

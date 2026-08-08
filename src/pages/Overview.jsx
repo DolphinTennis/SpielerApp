@@ -3,13 +3,14 @@ import { OVERVIEW_ITEMS } from '../config/overviewItems'
 import { useOrg } from '../lib/OrgContext'
 
 export default function Overview({ onNavigate }) {
-  const { playerName } = useOrg()
+  const { playerName, isAdmin } = useOrg()
+  const items = OVERVIEW_ITEMS.filter((item) => !item.adminOnly || isAdmin)
   return (
     <div className="view">
       <h1 className="section-title">Übersicht</h1>
       <p className="section-sub">Aktuelle Themen rund um {playerName ? playerName + 's' : 'die'} Saison.</p>
       <div className="grid">
-        {OVERVIEW_ITEMS.map((item) => (
+        {items.map((item) => (
           <OverviewCard
             key={item.key}
             icon={item.icon}
