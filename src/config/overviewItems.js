@@ -1,13 +1,14 @@
-// `implemented` flags flip to true as each feature lands (Matchanalyse in Schritt 5,
-// Liveticker in Schritt 6, Meine Dateien in Schritt 7). Until then every tile opens
-// the "im Aufbau" placeholder.
+// `implemented` flags flip to true as each feature lands. Until then every
+// tile opens the "im Aufbau" placeholder. Keys drive routing (AppShell.jsx /
+// Placeholder.jsx) and are intentionally stable even where the display
+// title was renamed (e.g. `liveticker` -> "Matchticker", `videos` ->
+// "Beispiele") so no routes had to change along with the rename.
 export const OVERVIEW_ITEMS = [
-  { key: 'turniere', icon: '🏆', title: 'Anstehende Turniere', desc: 'Nächste Wettkämpfe im Überblick.', implemented: false },
-  { key: 'turnierplanung', icon: '🗺️', title: 'Turnierplanung', desc: 'Saisonplanung & Meldungen.', implemented: false },
-  { key: 'trainingsplan', icon: '📋', title: 'Trainingsplan', desc: 'Wochenplan & Trainingsschwerpunkte.', implemented: false },
+  { key: 'turnierplanung', icon: '🗺️', title: 'Jahresplanung', desc: 'Übersichtsplanung mit Input von außen.', implemented: false },
+  { key: 'turniere', icon: '🏆', title: 'Anstehende Turniere', desc: 'Gemeldeter Turnierplan.', implemented: false },
+  { key: 'trainingsplan', icon: '📋', title: 'Trainingsplan', desc: 'Trainingszeiten und Entwicklung mit Input von außen.', implemented: false },
+  { key: 'videos', icon: '🎬', title: 'Beispiele', desc: 'Geteilte Medien als Vorbilder, Hilfestellung, etc. …', implemented: false },
+  { key: 'dateien', icon: '📁', title: 'Meine Dateien', desc: 'Alles was mir wichtig ist.', implemented: true, badge: 'ready' },
+  { key: 'liveticker', icon: '📡', title: 'Matchticker', desc: 'Aktuelles Spiel im Blick.', implemented: true, badge: 'live' },
   { key: 'matchanalyse', icon: '🎾', title: 'Matchanalyse', desc: 'Spiele auswerten & reflektieren.', implemented: true, badge: 'ready' },
-  { key: 'videos', icon: '🎬', title: 'Videos', desc: 'Match- & Trainingsaufnahmen.', implemented: false },
-  { key: 'dateien', icon: '📁', title: 'Meine Dateien', desc: 'Dokumente, Statistiken, Sonstiges.', implemented: true, badge: 'ready' },
-  { key: 'liveticker', icon: '📡', title: 'Liveticker aktuelles Match', desc: 'Punktestand live verfolgen.', implemented: true, badge: 'live' },
-  { key: 'team', icon: '🧑‍🤝‍🧑', title: 'Team verwalten', desc: 'Mitglieder einsehen & einladen.', implemented: true, adminOnly: true },
 ]

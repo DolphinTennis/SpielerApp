@@ -111,7 +111,7 @@ export default function LiveTicker({ onMatchCreated }) {
   if (!liveMatch || !liveMatch.active) {
     return (
       <div className="view">
-        <h1 className="section-title">Liveticker</h1>
+        <h1 className="section-title">Matchticker</h1>
         <p className="section-sub">Verfolge das aktuelle Match von {playerName} live mit.</p>
 
         <div className="live-setup-card">
@@ -181,7 +181,7 @@ export default function LiveTicker({ onMatchCreated }) {
 
   return (
     <div className="view">
-      <h1 className="section-title">Liveticker</h1>
+      <h1 className="section-title">Matchticker</h1>
       <p className="section-sub">Verfolge das aktuelle Match von {playerName} live mit.</p>
 
       <div className="live-hero">

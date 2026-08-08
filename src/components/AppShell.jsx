@@ -10,7 +10,7 @@ import Files from '../pages/Files'
 import TeamManage from '../pages/TeamManage'
 import Placeholder from '../pages/Placeholder'
 
-const OVERVIEW_ROUTES = { matchanalyse: 'matchanalyse', liveticker: 'liveticker', dateien: 'dateien', team: 'team' }
+const OVERVIEW_ROUTES = { matchanalyse: 'matchanalyse', liveticker: 'liveticker', dateien: 'dateien' }
 
 function MatchEditorRoute() {
   const { matchId } = useParams()
