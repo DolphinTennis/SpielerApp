@@ -7,6 +7,30 @@ const FEATURES = [
   { icon: '🧑‍🤝‍🧑', title: 'Team & Rollen', desc: 'Spieler:in, Management/Eltern und Trainer — jede:r mit passendem Zugriff.' },
 ]
 
+const PLANS = [
+  {
+    name: 'Basis',
+    price: '5',
+    features: [
+      'Turnierplanung',
+      'Matchübersicht mit Portalverknüpfungen',
+      'Matchanalyse',
+      'Matchtracker',
+      'Meine Datenablage mit 500 MB Speicherplatz',
+    ],
+  },
+  {
+    name: 'Fortgeschritten',
+    price: '8',
+    features: ['Alle Leistungen aus Basis', '3 Teamnutzer (weitere buchbar)', 'Input für Trainer und Teammitglieder'],
+  },
+  {
+    name: 'Pro',
+    price: '10',
+    features: ['Alle Leistungen aus Fortgeschritten', 'Speicherplatzerweiterung durch eigenen Cloudspeicher'],
+  },
+]
+
 export default function Landing() {
   return (
     <div id="app-shell" style={{ paddingBottom: 60 }}>
@@ -53,6 +77,27 @@ export default function Landing() {
             <div className="icon">{f.icon}</div>
             <h3>{f.title}</h3>
             <p>{f.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <h2 className="section-title" style={{ marginTop: 40 }}>
+        Plan und Preise
+      </h2>
+      <p className="section-sub">Für jedes Team die passende Stufe.</p>
+      <div className="pricing-grid">
+        {PLANS.map((plan) => (
+          <div className="pricing-card" key={plan.name}>
+            <h3>{plan.name}</h3>
+            <div className="pricing-price">
+              <span className="amount">{plan.price} €</span>
+              <span className="period">/ Monat</span>
+            </div>
+            <ul>
+              {plan.features.map((f) => (
+                <li key={f}>{f}</li>
+              ))}
+            </ul>
           </div>
         ))}
       </div>
