@@ -14,14 +14,14 @@ export default function Landing() {
         <div className="topbar-inner">
           <div className="brand">
             <div className="brand-logo">
-              <img src="/logo.png" alt="NW Tennis Logo" />
+              <img src="/logo.png" alt="Dolphin Tennis Logo" />
             </div>
             <div className="brand-mark">
-              Tennis<span className="dot">.</span>
+              Dolphin<span className="dot">.</span>
             </div>
           </div>
         </div>
-        <div className="brand-sub">SPIELERPORTAL &amp; MATCHANALYSE</div>
+        <div className="brand-sub">DEIN SPIELERPORTAL</div>
 
         <div style={{ marginTop: 28, marginBottom: 8, position: 'relative' }}>
           <h1 style={{ fontSize: 32, color: '#fff', margin: '0 0 10px', maxWidth: 480 }}>

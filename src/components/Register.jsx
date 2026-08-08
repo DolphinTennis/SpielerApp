@@ -61,9 +61,9 @@ export default function Register() {
       <div style={styles.hero}>
         <div style={styles.heroInner}>
           <div style={styles.brandMark}>
-            Tennis<span style={{ color: 'var(--ball)' }}>.</span>
+            Dolphin<span style={{ color: 'var(--ball)' }}>.</span>
           </div>
-          <div style={styles.brandSub}>SPIELERPORTAL &amp; MATCHANALYSE</div>
+          <div style={styles.brandSub}>DEIN SPIELERPORTAL</div>
         </div>
       </div>
 

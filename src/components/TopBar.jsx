@@ -14,10 +14,10 @@ export default function TopBar({ playerName, crumbs = [] }) {
       <div className="topbar-inner">
         <div className="brand">
           <div className="brand-logo">
-            <img src="/logo.png" alt="NW Tennis Logo" />
+            <img src="/logo.png" alt="Dolphin Tennis Logo" />
           </div>
           <div className="brand-mark">
-            Tennis<span className="dot">.</span>
+            Dolphin<span className="dot">.</span>
           </div>
         </div>
         <div className="player-chip">
@@ -28,7 +28,7 @@ export default function TopBar({ playerName, crumbs = [] }) {
           </button>
         </div>
       </div>
-      <div className="brand-sub">SPIELERPORTAL &amp; MATCHANALYSE</div>
+      <div className="brand-sub">DEIN SPIELERPORTAL</div>
       <div className="breadcrumb">
         {crumbs.map((crumb, i) => (
           <button key={i} type="button" onClick={crumb.onClick}>
