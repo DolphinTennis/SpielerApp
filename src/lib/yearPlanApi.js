@@ -28,3 +28,11 @@ export async function deleteYearPlanDay(id) {
   const { error } = await supabase.from('year_plan_days').delete().eq('id', id)
   if (error) throw error
 }
+
+// Delete by org_id+date instead of id — used by the paint/erase-drag and
+// double-click gestures, which may fire before a just-created row's id has
+// made it back into local state.
+export async function deleteYearPlanDayByDate(orgId, date) {
+  const { error } = await supabase.from('year_plan_days').delete().eq('org_id', orgId).eq('date', date)
+  if (error) throw error
+}

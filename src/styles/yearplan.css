@@ -119,6 +119,9 @@
   border: 1px solid var(--line);
   cursor: pointer;
   padding: 0;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .yearplan-cell:hover {
   filter: brightness(0.96);

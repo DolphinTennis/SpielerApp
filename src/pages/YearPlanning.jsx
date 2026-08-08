@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { useOrg } from '../lib/OrgContext'
 import { useToast } from '../lib/ToastContext'
-import { deleteYearPlanDay, listYearPlanDays, saveYearPlanDay } from '../lib/yearPlanApi'
+import { deleteYearPlanDay, deleteYearPlanDayByDate, listYearPlanDays, saveYearPlanDay } from '../lib/yearPlanApi'
 import { CATEGORIES, CATEGORY_BY_KEY, MONTH_NAMES, daysInMonth } from '../config/yearPlanCategories'
 import YearPlanDayPopover from '../components/YearPlanDayPopover'
+
+const LONG_PRESS_MS = 550
 
 function dateStr(year, monthIndex, day) {
   return `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
@@ -21,6 +23,11 @@ export default function YearPlanning() {
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState(CATEGORIES[0].key)
   const [selected, setSelected] = useState(null)
+
+  // Tracks the current press/drag gesture across pointerdown -> pointerenter
+  // (drag) -> pointerup, plus the long-press timer. A ref (not state) since
+  // it's mutated many times per gesture and should never trigger a render.
+  const dragRef = useRef({ pressed: false, active: false, mode: 'paint', startDate: null, visited: null, timer: null, longPress: false, pointerType: null })
 
   useEffect(() => {
     let cancelled = false
@@ -40,26 +47,125 @@ export default function YearPlanning() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orgId, year])
 
+  useEffect(() => {
+    function resetOnStrayPointerUp() {
+      const d = dragRef.current
+      if (d.pressed) {
+        if (d.timer) clearTimeout(d.timer)
+        d.timer = null
+        d.pressed = false
+        d.active = false
+      }
+    }
+    window.addEventListener('pointerup', resetOnStrayPointerUp)
+    window.addEventListener('pointercancel', resetOnStrayPointerUp)
+    return () => {
+      window.removeEventListener('pointerup', resetOnStrayPointerUp)
+      window.removeEventListener('pointercancel', resetOnStrayPointerUp)
+    }
+  }, [])
+
   const dayMap = useMemo(() => {
     const map = {}
     for (const d of days) map[d.date] = d
     return map
   }, [days])
 
-  async function handleCellClick(monthIndex, day) {
-    const date = dateStr(year, monthIndex, day)
-    const entry = dayMap[date]
-    if (entry) {
-      setSelected({ date, entry })
-      return
-    }
+  async function paintCell(date) {
+    const existing = dayMap[date]
     try {
-      const saved = await saveYearPlanDay({ orgId, date, category: activeCategory, note: '', userLabel: session.user.email })
-      setDays((prev) => [...prev, saved])
+      const saved = await saveYearPlanDay({ orgId, date, category: activeCategory, note: existing?.note || '', userLabel: session.user.email })
+      setDays((prev) => [...prev.filter((d) => d.date !== date), saved])
     } catch (err) {
       console.error(err)
       toast('Eintrag konnte nicht gespeichert werden.')
     }
+  }
+
+  async function eraseCell(date) {
+    try {
+      await deleteYearPlanDayByDate(orgId, date)
+      setDays((prev) => prev.filter((d) => d.date !== date))
+    } catch (err) {
+      console.error(err)
+      toast('Löschen fehlgeschlagen.')
+    }
+  }
+
+  function clearLongPressTimer() {
+    const d = dragRef.current
+    if (d.timer) {
+      clearTimeout(d.timer)
+      d.timer = null
+    }
+  }
+
+  function handleCellPointerDown(e, date) {
+    if (loading) return
+    if (e.pointerType === 'mouse' && e.button !== 0) return
+    const d = dragRef.current
+    d.pressed = true
+    d.active = false
+    d.longPress = false
+    d.startDate = date
+    d.mode = dayMap[date] ? 'erase' : 'paint'
+    d.visited = new Set()
+    d.pointerType = e.pointerType
+    clearLongPressTimer()
+    d.timer = setTimeout(() => {
+      if (d.pressed && !d.active) {
+        d.longPress = true
+        setSelected({ date, entry: dayMap[date] || null })
+      }
+    }, LONG_PRESS_MS)
+  }
+
+  // Only mouse drags paint/erase a range — on touch, a move over the grid
+  // needs to stay a scroll gesture, so touch just gets tap + long-press.
+  function handleCellPointerEnter(date) {
+    const d = dragRef.current
+    if (!d.pressed || d.pointerType !== 'mouse' || date === d.startDate) return
+    if (!d.active) {
+      d.active = true
+      clearLongPressTimer()
+      if (!d.visited.has(d.startDate)) {
+        d.visited.add(d.startDate)
+        if (d.mode === 'paint') paintCell(d.startDate)
+        else eraseCell(d.startDate)
+      }
+    }
+    if (!d.visited.has(date)) {
+      d.visited.add(date)
+      if (d.mode === 'paint') paintCell(date)
+      else eraseCell(date)
+    }
+  }
+
+  function handleCellPointerUp(date) {
+    const d = dragRef.current
+    clearLongPressTimer()
+    if (!d.pressed) return
+    const wasActive = d.active
+    const wasLongPress = d.longPress
+    d.pressed = false
+    d.active = false
+    if (wasLongPress || wasActive) return
+    paintCell(date)
+  }
+
+  function handleCellPointerCancel() {
+    clearLongPressTimer()
+    dragRef.current.pressed = false
+    dragRef.current.active = false
+  }
+
+  function handleCellDoubleClick(e, date) {
+    e.preventDefault()
+    clearLongPressTimer()
+    dragRef.current.pressed = false
+    dragRef.current.active = false
+    dragRef.current.longPress = false
+    eraseCell(date)
   }
 
   async function handlePopoverSave(category, note) {
@@ -124,8 +230,9 @@ export default function YearPlanning() {
         ))}
       </div>
       <p className="yearplan-note">
-        Kategorie auswählen, dann einen leeren Tag antippen, um ihn zu markieren. Auf einen markierten Tag tippen, um
-        ihn zu bearbeiten{isSpieler ? ' oder einen Vorschlag zu bestätigen' : ''}.
+        Kategorie auswählen, dann klicken zum Markieren oder klicken-und-ziehen für einen Zeitraum (z. B. eine
+        Ferienwoche) — genauso funktioniert das Ziehen über bereits markierte Tage zum Entfernen. Doppelklick löscht
+        einen einzelnen Tag. Langes Drücken auf einen Tag öffnet die Detailansicht{isSpieler ? ' zum Bearbeiten oder Bestätigen' : ' zum Bearbeiten'}.
       </p>
 
       <div className="yearplan-scroll">
@@ -168,8 +275,13 @@ export default function YearPlanning() {
                             ? `${cat.label}${entry.note ? ' — ' + entry.note : ''}${entry.status === 'proposed' ? ' (Vorschlag)' : ''}`
                             : `${day}.${monthIndex + 1}.${year}`
                         }
-                        onClick={() => handleCellClick(monthIndex, day)}
                         disabled={loading}
+                        onPointerDown={(e) => handleCellPointerDown(e, date)}
+                        onPointerEnter={() => handleCellPointerEnter(date)}
+                        onPointerUp={() => handleCellPointerUp(date)}
+                        onPointerCancel={handleCellPointerCancel}
+                        onDoubleClick={(e) => handleCellDoubleClick(e, date)}
+                        onContextMenu={(e) => e.preventDefault()}
                       />
                     </div>
                   )
@@ -184,6 +296,7 @@ export default function YearPlanning() {
         <YearPlanDayPopover
           date={selected.date}
           entry={selected.entry}
+          activeCategory={activeCategory}
           isSpieler={isSpieler}
           onClose={() => setSelected(null)}
           onSave={handlePopoverSave}

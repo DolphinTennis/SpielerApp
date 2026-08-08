@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { CATEGORIES } from '../config/yearPlanCategories'
 import { formatDate } from '../lib/format'
 
-export default function YearPlanDayPopover({ date, entry, isSpieler, onClose, onSave, onConfirm, onDelete }) {
-  const [category, setCategory] = useState(entry.category)
-  const [note, setNote] = useState(entry.note || '')
+export default function YearPlanDayPopover({ date, entry, activeCategory, isSpieler, onClose, onSave, onConfirm, onDelete }) {
+  const hasEntry = !!entry
+  const [category, setCategory] = useState(entry?.category || activeCategory)
+  const [note, setNote] = useState(entry?.note || '')
   const [busy, setBusy] = useState(false)
 
   async function run(fn) {
@@ -20,7 +21,7 @@ export default function YearPlanDayPopover({ date, entry, isSpieler, onClose, on
     <div className="yearplan-popover-backdrop" onClick={onClose}>
       <div className="yearplan-popover" onClick={(e) => e.stopPropagation()}>
         <h3>{formatDate(date)}</h3>
-        {entry.status === 'proposed' && <span className="proposed-badge">Vorschlag von {entry.created_by_label || 'Teammitglied'}</span>}
+        {entry?.status === 'proposed' && <span className="proposed-badge">Vorschlag von {entry.created_by_label || 'Teammitglied'}</span>}
 
         <div className="field" style={{ marginBottom: 12 }}>
           <label htmlFor="yp-category">Kategorie</label>
@@ -44,7 +45,7 @@ export default function YearPlanDayPopover({ date, entry, isSpieler, onClose, on
         </div>
 
         <div className="yearplan-popover-actions">
-          {isSpieler && entry.status === 'proposed' && (
+          {isSpieler && entry?.status === 'proposed' && (
             <button type="button" className="btn btn-primary" disabled={busy} onClick={() => run(onConfirm)}>
               ✓ Bestätigen
             </button>
@@ -52,9 +53,11 @@ export default function YearPlanDayPopover({ date, entry, isSpieler, onClose, on
           <button type="button" className="btn btn-outline" disabled={busy} onClick={() => run(() => onSave(category, note))}>
             Speichern
           </button>
-          <button type="button" className="btn btn-clay" disabled={busy} onClick={() => run(onDelete)}>
-            {isSpieler && entry.status === 'proposed' ? 'Ablehnen' : 'Löschen'}
-          </button>
+          {hasEntry && (
+            <button type="button" className="btn btn-clay" disabled={busy} onClick={() => run(onDelete)}>
+              {isSpieler && entry.status === 'proposed' ? 'Ablehnen' : 'Löschen'}
+            </button>
+          )}
           <button type="button" className="btn btn-ghost" disabled={busy} onClick={onClose}>
             Abbrechen
           </button>
