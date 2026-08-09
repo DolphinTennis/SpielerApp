@@ -3,6 +3,7 @@ export const CATEGORIES = [
   { key: 'kondi', label: 'Kondi', color: '#E08E45' },
   { key: 'physio', label: 'Physio', color: '#2FA84F' },
   { key: 'mental', label: 'Mental', color: '#8E5FD1' },
+  { key: 'sonstiges', label: 'Sonstiges', color: '#7A8794' },
 ]
 
 export const CATEGORY_BY_KEY = Object.fromEntries(CATEGORIES.map((c) => [c.key, c]))

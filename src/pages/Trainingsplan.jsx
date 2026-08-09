@@ -20,6 +20,18 @@ import { expandOccurrences, parseOccurrenceId, formatOccurrenceDateShort, format
 import { CATEGORY_BY_KEY, UPCOMING_COUNT_OPTIONS } from '../config/trainingPlanCategories'
 import TrainingSessionEditor from '../components/TrainingSessionEditor'
 
+function renderEventContent(arg) {
+  const { location, note } = arg.event.extendedProps
+  return (
+    <div className="trainingplan-event-content">
+      {arg.timeText && <div className="trainingplan-event-time">{arg.timeText}</div>}
+      <div className="trainingplan-event-title">{arg.event.title}</div>
+      {location && <div className="trainingplan-event-detail">{location}</div>}
+      {note && <div className="trainingplan-event-detail">{note}</div>}
+    </div>
+  )
+}
+
 function addMinutesToTime(hhmm, minutes) {
   const [h, m] = hhmm.split(':').map(Number)
   const total = h * 60 + m + minutes
@@ -305,6 +317,7 @@ export default function Trainingsplan() {
                 </span>
                 {ev.extendedProps.withWhom && <span className="trainingplan-upcoming-detail">mit {ev.extendedProps.withWhom}</span>}
                 {ev.extendedProps.location && <span className="trainingplan-upcoming-detail">{ev.extendedProps.location}</span>}
+                {ev.extendedProps.note && <span className="trainingplan-upcoming-note">{ev.extendedProps.note}</span>}
                 {ev.extendedProps.status === 'proposed' && <span className="trainingplan-upcoming-flag">Vorschlag</span>}
               </li>
             ))}
@@ -327,6 +340,7 @@ export default function Trainingsplan() {
           editable
           eventResizableFromStart
           events={calendarEvents}
+          eventContent={renderEventContent}
           eventClassNames={(arg) => (arg.event.extendedProps.status === 'proposed' ? ['trainingplan-event--proposed'] : [])}
           datesSet={(info) => setVisibleRange({ start: info.startStr.slice(0, 10), end: info.endStr.slice(0, 10) })}
           select={handleSelect}

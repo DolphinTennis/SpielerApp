@@ -89,6 +89,12 @@
 .trainingplan-upcoming-detail {
   color: var(--text-soft);
 }
+.trainingplan-upcoming-note {
+  flex-basis: 100%;
+  color: var(--text-soft);
+  font-style: italic;
+  font-size: 12.5px;
+}
 .trainingplan-upcoming-flag {
   margin-left: auto;
   font-size: 10.5px;
@@ -144,6 +150,29 @@
 }
 .trainingplan-calendar .fc-daygrid-event-dot {
   display: none;
+}
+.trainingplan-event-content {
+  padding: 1px 4px;
+  overflow: hidden;
+  line-height: 1.25;
+}
+.trainingplan-event-time {
+  font-size: 10.5px;
+  font-family: 'IBM Plex Mono', monospace;
+  opacity: 0.85;
+}
+.trainingplan-event-title {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.trainingplan-event-detail {
+  font-size: 10.5px;
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Editor-Popover (Kopie/Anpassung von .yearplan-popover*) */
