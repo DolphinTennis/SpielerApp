@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { useOrg } from '../lib/OrgContext'
 import { useToast } from '../lib/ToastContext'
-import { addMediaExample, checkMailbox, deleteMediaExample, fetchLinkPreview, listMediaExamples } from '../lib/mediaExamplesApi'
+import { addMediaExample, deleteMediaExample, fetchLinkPreview, listMediaExamples } from '../lib/mediaExamplesApi'
 import MediaExampleCard from '../components/MediaExampleCard'
 
 export default function Beispiele() {
@@ -19,20 +19,21 @@ export default function Beispiele() {
   useEffect(() => {
     let cancelled = false
     listMediaExamples(orgId)
-      .then((data) => !cancelled && setItems(data))
+      .then((data) => {
+        if (cancelled) return
+        setItems(data)
+        // The mailbox is checked from the dashboard, not here — this just
+        // marks whatever's currently newest as "seen" so the "neu" badge
+        // on the dashboard tile clears now that someone's actually looked.
+        if (data.length > 0) {
+          localStorage.setItem(`beispiele-last-seen-${orgId}`, data[0].created_at)
+        }
+      })
       .catch((err) => {
         console.error(err)
         toast('Beispiele konnten nicht geladen werden.')
       })
       .finally(() => !cancelled && setLoading(false))
-
-    // Quiet background check — if a link came in by mail since the last
-    // visit, pick it up now instead of waiting for a schedule. Failures
-    // here (e.g. a slow mailbox) shouldn't interrupt the page, so no toast.
-    checkMailbox()
-      .then(() => !cancelled && listMediaExamples(orgId).then((data) => !cancelled && setItems(data)))
-      .catch((err) => console.error(err))
-
     return () => {
       cancelled = true
     }
