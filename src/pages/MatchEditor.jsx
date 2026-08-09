@@ -3,6 +3,7 @@ import FormCard from '../components/FormCard'
 import { FORM1_CARDS, FORM2_FIELDS } from '../config/matchFormFields'
 import { blankMatch, createMatch, getMatch, updateMatch } from '../lib/matchesApi'
 import { buildMailBody, printInPage } from '../lib/matchExport'
+import { syncGoalsForMatch } from '../lib/trainingGoalsApi'
 import { formatDate } from '../lib/format'
 import { useToast } from '../lib/ToastContext'
 import { useAuth } from '../lib/AuthContext'
@@ -21,7 +22,14 @@ export default function MatchEditor({ matchId, onBack }) {
     if (matchId) {
       getMatch(matchId)
         .then((rec) => {
-          if (!cancelled) setRecord(rec)
+          if (cancelled) return
+          // Fall back to the old `ziel` key so matches saved before the
+          // rename still show their existing value — new saves only ever
+          // write zieleMatch going forward.
+          if (rec.form2 && rec.form2.zieleMatch === undefined) {
+            rec.form2 = { ...rec.form2, zieleMatch: rec.form2.ziel || '' }
+          }
+          setRecord(rec)
         })
         .catch((err) => {
           console.error(err)
@@ -60,6 +68,15 @@ export default function MatchEditor({ matchId, onBack }) {
       setRecord(saved)
       if (msg) toast(msg)
       else if (!silent) toast('Matchanalyse gespeichert.')
+      // Keeps the checkable goal list in Terminplanung in sync — doesn't
+      // block the save flow if it fails, just logs it.
+      syncGoalsForMatch({
+        orgId: saved.org_id,
+        matchId: saved.id,
+        zieleMatch: saved.form2?.zieleMatch || '',
+        zieleTraining: saved.form2?.zieleTraining || '',
+        userLabel: session.user.email,
+      }).catch((err) => console.error(err))
       return saved
     } catch (err) {
       console.error(err)
@@ -201,8 +218,12 @@ export default function MatchEditor({ matchId, onBack }) {
             <textarea value={record.form2.warum} onChange={(e) => updateForm2('warum', e.target.value)} />
           </div>
           <div className="qgroup">
-            <label className="qlabel">{FORM2_FIELDS.ziel}</label>
-            <textarea value={record.form2.ziel} onChange={(e) => updateForm2('ziel', e.target.value)} />
+            <label className="qlabel">{FORM2_FIELDS.zieleMatch}</label>
+            <textarea value={record.form2.zieleMatch} onChange={(e) => updateForm2('zieleMatch', e.target.value)} />
+          </div>
+          <div className="qgroup">
+            <label className="qlabel">{FORM2_FIELDS.zieleTraining}</label>
+            <textarea value={record.form2.zieleTraining} onChange={(e) => updateForm2('zieleTraining', e.target.value)} />
           </div>
           <div className="attrib">© Stefanie Sziburies — Triple-A-Analyse</div>
         </div>

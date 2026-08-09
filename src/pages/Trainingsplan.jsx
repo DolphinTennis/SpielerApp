@@ -18,7 +18,9 @@ import {
 } from '../lib/trainingPlanApi'
 import { expandOccurrences, parseOccurrenceId, formatOccurrenceDateShort, formatTimeRange, todayIso, addDaysIso } from '../lib/trainingPlanOccurrences'
 import { CATEGORY_BY_KEY, UPCOMING_COUNT_OPTIONS } from '../config/trainingPlanCategories'
+import { listGoals, deleteGoal } from '../lib/trainingGoalsApi'
 import TrainingSessionEditor from '../components/TrainingSessionEditor'
+import TrainingGoalsPanel from '../components/TrainingGoalsPanel'
 
 function renderEventContent(arg) {
   const { location, note } = arg.event.extendedProps
@@ -49,6 +51,7 @@ export default function Trainingsplan() {
 
   const [sessions, setSessions] = useState([])
   const [exceptions, setExceptions] = useState([])
+  const [goals, setGoals] = useState([])
   const [loading, setLoading] = useState(true)
   const [visibleRange, setVisibleRange] = useState(null)
   const [editingTarget, setEditingTarget] = useState(null)
@@ -57,11 +60,12 @@ export default function Trainingsplan() {
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    Promise.all([listTrainingSessions(orgId), listTrainingSessionExceptions(orgId)])
-      .then(([s, e]) => {
+    Promise.all([listTrainingSessions(orgId), listTrainingSessionExceptions(orgId), listGoals(orgId)])
+      .then(([s, e, g]) => {
         if (!cancelled) {
           setSessions(s)
           setExceptions(e)
+          setGoals(g)
         }
       })
       .catch((err) => {
@@ -74,6 +78,17 @@ export default function Trainingsplan() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orgId])
+
+  async function handleCompleteGoal(goal) {
+    setGoals((prev) => prev.filter((g) => g.id !== goal.id))
+    try {
+      await deleteGoal(goal.id)
+    } catch (err) {
+      console.error(err)
+      toast('Konnte nicht als erledigt markiert werden.')
+      setGoals((prev) => [...prev, goal])
+    }
+  }
 
   const sessionById = useMemo(() => Object.fromEntries(sessions.map((s) => [s.id, s])), [sessions])
   const exceptionByKey = useMemo(() => {
@@ -326,6 +341,8 @@ export default function Trainingsplan() {
           </ul>
         )}
       </div>
+
+      <TrainingGoalsPanel goals={goals} onComplete={handleCompleteGoal} />
 
       <div className="trainingplan-calendar">
         <FullCalendar

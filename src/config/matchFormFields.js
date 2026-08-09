@@ -67,7 +67,8 @@ export const FORM2_FIELDS = {
   nicht: 'Was lief nicht optimal?',
   warum:
     'Warum lief es nicht optimal? (ehrlich, sachlich, objektiv — z. B. Gegnerin kam mit den Bedingungen besser klar, war strategisch stärker …)',
-  ziel: 'Ziel für das nächste Match — was möchtest du besser machen oder ausprobieren?',
+  zieleMatch: 'Ziele fürs nächste Match',
+  zieleTraining: 'Ziele fürs nächste Training',
 }
 
 export function blankForm1() {
@@ -80,5 +81,5 @@ export function blankForm1() {
 }
 
 export function blankForm2() {
-  return { gut: '', nicht: '', warum: '', ziel: '' }
+  return { gut: '', nicht: '', warum: '', zieleMatch: '', zieleTraining: '' }
 }
