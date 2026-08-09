@@ -22,10 +22,18 @@ import TrainingSessionEditor from '../components/TrainingSessionEditor'
 
 function renderEventContent(arg) {
   const { location, note } = arg.event.extendedProps
+  // timeGrid (week/day) already renders the whole event block in the
+  // category color, so the dot is only needed in the list-style dayGrid
+  // (month) and multiMonth (year) views, where events are otherwise plain
+  // text with no color cue at all.
+  const showDot = !arg.view.type.startsWith('timeGrid')
   return (
     <div className="trainingplan-event-content">
-      {arg.timeText && <div className="trainingplan-event-time">{arg.timeText}</div>}
-      <div className="trainingplan-event-title">{arg.event.title}</div>
+      <div className="trainingplan-event-title">
+        {showDot && <span className="trainingplan-event-dot" style={{ background: arg.event.backgroundColor }} />}
+        {arg.timeText && <span className="trainingplan-event-time">{arg.timeText} </span>}
+        {arg.event.title}
+      </div>
       {location && <div className="trainingplan-event-detail">{location}</div>}
       {note && <div className="trainingplan-event-detail">{note}</div>}
     </div>

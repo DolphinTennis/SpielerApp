@@ -156,9 +156,19 @@
   overflow: hidden;
   line-height: 1.25;
 }
+.trainingplan-event-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
 .trainingplan-event-time {
   font-size: 10.5px;
   font-family: 'IBM Plex Mono', monospace;
+  font-weight: 400;
   opacity: 0.85;
 }
 .trainingplan-event-title {
