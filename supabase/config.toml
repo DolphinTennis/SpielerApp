@@ -381,6 +381,11 @@ verify_jwt = false
 [functions.activate-membership]
 verify_jwt = false
 
+[functions.link-preview]
+# Same gateway issue as the functions above — auth is verified manually
+# inside the function via getUser(jwt) instead.
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

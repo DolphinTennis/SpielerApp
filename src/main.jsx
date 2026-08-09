@@ -9,6 +9,7 @@ import './styles/files.css'
 import './styles/print.css'
 import './styles/yearplan.css'
 import './styles/trainingsplan.css'
+import './styles/beispiele.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
