@@ -22,15 +22,9 @@ import TrainingSessionEditor from '../components/TrainingSessionEditor'
 
 function renderEventContent(arg) {
   const { location, note } = arg.event.extendedProps
-  // timeGrid (week/day) already renders the whole event block in the
-  // category color, so the dot is only needed in the list-style dayGrid
-  // (month) and multiMonth (year) views, where events are otherwise plain
-  // text with no color cue at all.
-  const showDot = !arg.view.type.startsWith('timeGrid')
   return (
     <div className="trainingplan-event-content">
       <div className="trainingplan-event-title">
-        {showDot && <span className="trainingplan-event-dot" style={{ background: arg.event.backgroundColor }} />}
         {arg.timeText && <span className="trainingplan-event-time">{arg.timeText} </span>}
         {arg.event.title}
       </div>
@@ -347,6 +341,8 @@ export default function Trainingsplan() {
           selectMirror
           editable
           eventResizableFromStart
+          eventDisplay="block"
+          dayMaxEvents={0}
           events={calendarEvents}
           eventContent={renderEventContent}
           eventClassNames={(arg) => (arg.event.extendedProps.status === 'proposed' ? ['trainingplan-event--proposed'] : [])}
