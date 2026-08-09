@@ -4,12 +4,13 @@
 // pg_cron job definition and here) — deliberately not the service_role
 // key itself, to avoid handing that broader credential to a scheduled job.
 //
-// Polls the shared mailbox via IMAP for unread mail, and for each message
-// whose sender matches an active team membership's email, pulls the first
-// link out of the body and saves it exactly like the "Beispiele" paste-a-
-// link form does (same preview logic, same table). Unknown senders and
-// mails with no link are just marked read and skipped — no bounce, so we
-// don't create spam/backscatter.
+// Polls the shared mailbox via IMAP for unread mail. Anyone can send to
+// this address — instead of checking the sender's identity, a message is
+// only processed if its subject or body contains a team's player's first
+// name (the "Admin"/Spieler role's given name, e.g. "Naila") as a
+// standalone word. Matching that word picks which team the link belongs
+// to. No match → ignored (marked read, not saved, no bounce, so we don't
+// create spam/backscatter).
 import { ImapFlow } from 'npm:imapflow@1'
 import { simpleParser } from 'npm:mailparser@3'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -17,6 +18,23 @@ import { extractFirstUrl, getLinkPreview } from '../_shared/linkPreview.ts'
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+}
+
+function escapeRegex(text: string) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+// Finds an organization whose player's first name appears as a whole word
+// in the given text (case-insensitive) — e.g. "Naila Wieland" matches on
+// the word "Naila", not on "Nailas" or as a substring of something else.
+function matchOrgByPlayerFirstName<T extends { player_name: string | null }>(orgs: T[], text: string): T | null {
+  for (const org of orgs) {
+    const firstName = org.player_name?.trim().split(/\s+/)[0]
+    if (!firstName) continue
+    const re = new RegExp(`\\b${escapeRegex(firstName)}\\b`, 'i')
+    if (re.test(text)) return org
+  }
+  return null
 }
 
 Deno.serve(async (req) => {
@@ -37,6 +55,8 @@ Deno.serve(async (req) => {
     logger: false,
   })
 
+  const { data: orgs } = await admin.from('organizations').select('id, player_name')
+
   const results: unknown[] = []
   try {
     await client.connect()
@@ -51,41 +71,32 @@ Deno.serve(async (req) => {
           const senderEmail = parsed.from?.value?.[0]?.address?.toLowerCase() || null
           entry.sender = senderEmail
 
-          if (senderEmail) {
-            const { data: membership } = await admin
-              .from('memberships')
-              .select('org_id, user_id, email')
-              .eq('email', senderEmail)
-              .eq('status', 'active')
-              .maybeSingle()
+          const bodyText = parsed.text || parsed.html || ''
+          const searchText = `${parsed.subject || ''}\n${bodyText}`
+          const matchedOrg = matchOrgByPlayerFirstName(orgs || [], searchText)
 
-            if (membership) {
-              const bodyText = parsed.text || parsed.html || ''
-              const url = extractFirstUrl(bodyText)
-              if (url) {
-                const preview = await getLinkPreview(url)
-                await admin.from('media_examples').insert({
-                  org_id: membership.org_id,
-                  url,
-                  platform: preview.platform,
-                  title: preview.title,
-                  thumbnail_url: preview.thumbnail_url,
-                  embed_html: preview.embed_html,
-                  created_by: membership.user_id,
-                  created_by_label: senderEmail,
-                })
-                entry.saved = true
-              } else {
-                entry.saved = false
-                entry.reason = 'no_url_found'
-              }
+          if (matchedOrg) {
+            const url = extractFirstUrl(bodyText)
+            if (url) {
+              const preview = await getLinkPreview(url)
+              await admin.from('media_examples').insert({
+                org_id: matchedOrg.id,
+                url,
+                platform: preview.platform,
+                title: preview.title,
+                thumbnail_url: preview.thumbnail_url,
+                embed_html: preview.embed_html,
+                created_by_label: senderEmail || 'Per E-Mail geteilt',
+              })
+              entry.saved = true
+              entry.org_id = matchedOrg.id
             } else {
               entry.saved = false
-              entry.reason = 'unknown_sender'
+              entry.reason = 'no_url_found'
             }
           } else {
             entry.saved = false
-            entry.reason = 'no_sender'
+            entry.reason = 'no_codeword_match'
           }
         } catch (err) {
           entry.saved = false
