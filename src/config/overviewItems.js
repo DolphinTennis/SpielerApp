@@ -6,7 +6,7 @@
 export const OVERVIEW_ITEMS = [
   { key: 'turnierplanung', icon: '🗺️', title: 'Jahresplanung', desc: 'Übersichtsplanung mit Input von außen.', implemented: true, badge: 'ready' },
   { key: 'turniere', icon: '🏆', title: 'Anstehende Turniere', desc: 'Gemeldeter Turnierplan.', implemented: false },
-  { key: 'trainingsplan', icon: '📋', title: 'Trainingsplan', desc: 'Trainingszeiten und Entwicklung mit Input von außen.', implemented: false },
+  { key: 'trainingsplan', icon: '📋', title: 'Trainingsplan', desc: 'Trainingszeiten und Entwicklung mit Input von außen.', implemented: true, badge: 'ready' },
   { key: 'videos', icon: '🎬', title: 'Beispiele', desc: 'Geteilte Medien als Vorbilder, Hilfestellung, etc. …', implemented: false },
   { key: 'dateien', icon: '📁', title: 'Meine Dateien', desc: 'Alles was mir wichtig ist.', implemented: true, badge: 'ready' },
   { key: 'liveticker', icon: '📡', title: 'Matchticker', desc: 'Aktuelles Spiel im Blick.', implemented: true, badge: 'live' },

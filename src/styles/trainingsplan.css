@@ -1,0 +1,234 @@
+/* Nächste Termine */
+.trainingplan-upcoming {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+.trainingplan-upcoming-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.trainingplan-upcoming-header h2 {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-size: 18px;
+  color: var(--ink);
+  margin: 0;
+}
+.trainingplan-count-picker {
+  display: flex;
+  gap: 4px;
+  background: var(--chalk);
+  border-radius: 999px;
+  padding: 3px;
+}
+.trainingplan-count-picker button {
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  width: 30px;
+  height: 26px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+.trainingplan-count-picker button.active {
+  background: var(--court);
+  color: #fff;
+}
+.trainingplan-upcoming-empty {
+  color: var(--text-soft);
+  font-size: 13.5px;
+  margin: 4px 0 0;
+}
+.trainingplan-upcoming-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.trainingplan-upcoming-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--chalk);
+  font-size: 13.5px;
+  color: var(--text);
+}
+.trainingplan-upcoming-list li.proposed {
+  border: 1.5px dashed var(--line);
+  background: transparent;
+}
+.trainingplan-upcoming-date {
+  font-weight: 700;
+  color: var(--ink);
+  min-width: 150px;
+}
+.trainingplan-upcoming-time {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  color: var(--text-soft);
+}
+.trainingplan-upcoming-category {
+  font-weight: 600;
+  color: var(--cat-color);
+}
+.trainingplan-upcoming-detail {
+  color: var(--text-soft);
+}
+.trainingplan-upcoming-flag {
+  margin-left: auto;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--clay);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* Kalender */
+.trainingplan-calendar {
+  --fc-border-color: var(--line);
+  --fc-page-bg-color: var(--paper);
+  --fc-neutral-bg-color: var(--chalk);
+  --fc-neutral-text-color: var(--text-soft);
+  --fc-today-bg-color: color-mix(in srgb, var(--ball) 20%, var(--paper));
+  --fc-event-text-color: #fff;
+  --fc-highlight-color: color-mix(in srgb, var(--court) 15%, transparent);
+  --fc-button-text-color: #fff;
+  --fc-button-bg-color: var(--court);
+  --fc-button-border-color: var(--court);
+  --fc-button-hover-bg-color: var(--court-dark);
+  --fc-button-hover-border-color: var(--court-dark);
+  --fc-button-active-bg-color: var(--court-dark);
+  --fc-button-active-border-color: var(--court-dark);
+  --fc-small-font-size: 12px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px;
+  font-family: 'Inter', sans-serif;
+}
+.trainingplan-calendar .fc-toolbar-title {
+  font-family: 'Big Shoulders Display', sans-serif;
+  color: var(--ink);
+}
+.trainingplan-calendar .fc-button {
+  text-transform: none;
+  border-radius: 9px;
+  font-weight: 600;
+  box-shadow: none !important;
+}
+.trainingplan-calendar .fc-event {
+  border-radius: 6px;
+  border-width: 0;
+  cursor: pointer;
+  font-size: 12.5px;
+}
+.trainingplan-calendar .fc-event.trainingplan-event--proposed {
+  opacity: 0.6;
+  border: 1.5px dashed var(--ink);
+}
+.trainingplan-calendar .fc-daygrid-event-dot {
+  display: none;
+}
+
+/* Editor-Popover (Kopie/Anpassung von .yearplan-popover*) */
+.trainingplan-popover-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 39, 64, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 300;
+  overflow-y: auto;
+}
+.trainingplan-popover {
+  background: var(--paper);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  max-width: 420px;
+  width: 100%;
+  margin: auto;
+}
+.trainingplan-popover h3 {
+  font-size: 18px;
+  color: var(--ink);
+  margin: 0 0 4px;
+}
+.trainingplan-popover-subtitle {
+  font-size: 12.5px;
+  color: var(--text-soft);
+  margin: 0 0 10px;
+}
+.trainingplan-popover .proposed-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #fdedea;
+  color: var(--clay);
+  border: 1px solid #f3cfc5;
+  padding: 3px 8px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+.trainingplan-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.trainingplan-oneoff-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+.trainingplan-weekday-picker {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.trainingplan-weekday-picker button {
+  width: 38px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid var(--line);
+  background: var(--paper);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+}
+.trainingplan-weekday-picker button.active {
+  border-color: var(--court);
+  background: color-mix(in srgb, var(--court) 15%, var(--paper));
+  color: var(--court-dark);
+}
+.trainingplan-popover-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}

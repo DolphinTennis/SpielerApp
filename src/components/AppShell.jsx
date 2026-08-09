@@ -9,6 +9,7 @@ import LiveTicker from '../pages/LiveTicker'
 import Files from '../pages/Files'
 import TeamManage from '../pages/TeamManage'
 import YearPlanning from '../pages/YearPlanning'
+import Trainingsplan from '../pages/Trainingsplan'
 import Placeholder from '../pages/Placeholder'
 
 const OVERVIEW_ROUTES = { matchanalyse: 'matchanalyse', liveticker: 'liveticker', dateien: 'dateien' }
@@ -60,6 +61,7 @@ function AppShellInner() {
         <Route path="dateien" element={<Files />} />
         <Route path="team" element={<TeamManage />} />
         <Route path="turnierplanung" element={<YearPlanning />} />
+        <Route path="trainingsplan" element={<Trainingsplan />} />
         <Route path=":placeholderKey" element={<PlaceholderRoute />} />
       </Routes>
     </div>
