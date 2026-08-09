@@ -89,42 +89,52 @@ function extractMetaTag(html: string, property: string): string | null {
   return reversed ? decodeEntities(reversed[1]) : null
 }
 
-export async function getLinkPreview(rawUrl: string): Promise<LinkPreview> {
-  const platform = detectPlatform(rawUrl) || 'other'
-  const empty = { title: null, thumbnail_url: null, embed_html: null }
-
-  if (platform === 'youtube') {
-    const data = await fetchOEmbed(`https://www.youtube.com/oembed?url=${encodeURIComponent(rawUrl)}&format=json`)
-    return { platform, title: data?.title ?? null, thumbnail_url: data?.thumbnail_url ?? null, embed_html: data?.html ?? null }
-  }
-  if (platform === 'instagram') {
-    const data = await fetchOEmbed(`https://graph.facebook.com/v25.0/instagram_oembed?url=${encodeURIComponent(rawUrl)}`)
-    return { platform, title: data?.title ?? null, thumbnail_url: data?.thumbnail_url ?? null, embed_html: data?.html ?? null }
-  }
-  if (platform === 'tiktok') {
-    const data = await fetchOEmbed(`https://www.tiktok.com/oembed?url=${encodeURIComponent(rawUrl)}`)
-    return { platform, title: data?.title ?? null, thumbnail_url: data?.thumbnail_url ?? null, embed_html: data?.html ?? null }
-  }
-
-  // 'other' — best-effort og:title/og:image scrape, never throws.
-  if (!isSafeExternalUrl(rawUrl)) return { platform, ...empty }
+// Best-effort og:title/og:image scrape of a page, never throws. Used both
+// for 'other' links (no oEmbed provider at all) and as a fallback for
+// Instagram, whose oEmbed response never includes a title or thumbnail —
+// only embed HTML that needs their JS widget to render, which we don't
+// load (see the "not part of this phase" note in Beispiele.jsx).
+async function scrapePage(rawUrl: string): Promise<{ title: string | null; image: string | null } | null> {
+  if (!isSafeExternalUrl(rawUrl)) return null
   try {
     const res = await fetch(rawUrl, {
       signal: AbortSignal.timeout(6000),
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DolphinTennisBot/1.0)' },
       redirect: 'follow',
     })
-    if (!res.ok) return { platform, ...empty }
+    if (!res.ok) return null
     const html = await res.text()
+    return { title: extractMetaTag(html, 'og:title'), image: extractMetaTag(html, 'og:image') }
+  } catch {
+    return null
+  }
+}
+
+export async function getLinkPreview(rawUrl: string): Promise<LinkPreview> {
+  const platform = detectPlatform(rawUrl) || 'other'
+
+  if (platform === 'youtube') {
+    const data = await fetchOEmbed(`https://www.youtube.com/oembed?url=${encodeURIComponent(rawUrl)}&format=json`)
+    return { platform, title: data?.title ?? null, thumbnail_url: data?.thumbnail_url ?? null, embed_html: data?.html ?? null }
+  }
+  if (platform === 'tiktok') {
+    const data = await fetchOEmbed(`https://www.tiktok.com/oembed?url=${encodeURIComponent(rawUrl)}`)
+    return { platform, title: data?.title ?? null, thumbnail_url: data?.thumbnail_url ?? null, embed_html: data?.html ?? null }
+  }
+  if (platform === 'instagram') {
+    const data = await fetchOEmbed(`https://graph.facebook.com/v25.0/instagram_oembed?url=${encodeURIComponent(rawUrl)}`)
+    const scraped = !data?.thumbnail_url ? await scrapePage(rawUrl) : null
     return {
       platform,
-      title: extractMetaTag(html, 'og:title'),
-      thumbnail_url: extractMetaTag(html, 'og:image'),
-      embed_html: null,
+      title: data?.title ?? scraped?.title ?? null,
+      thumbnail_url: data?.thumbnail_url ?? scraped?.image ?? null,
+      embed_html: data?.html ?? null,
     }
-  } catch {
-    return { platform, ...empty }
   }
+
+  // 'other'
+  const scraped = await scrapePage(rawUrl)
+  return { platform, title: scraped?.title ?? null, thumbnail_url: scraped?.image ?? null, embed_html: null }
 }
 
 // Very small extractor for the email-inbound path — first http(s) link in a
