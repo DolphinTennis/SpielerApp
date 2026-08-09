@@ -23,9 +23,10 @@ import TrainingSessionEditor from '../components/TrainingSessionEditor'
 import TrainingGoalsPanel from '../components/TrainingGoalsPanel'
 
 function renderEventContent(arg) {
-  const { location, note } = arg.event.extendedProps
+  const { location, note, category } = arg.event.extendedProps
+  const textColor = CATEGORY_BY_KEY[category]?.textColor || '#fff'
   return (
-    <div className="trainingplan-event-content">
+    <div className="trainingplan-event-content" style={{ color: textColor }}>
       <div className="trainingplan-event-title">
         {arg.timeText && <span className="trainingplan-event-time">{arg.timeText} </span>}
         {arg.event.title}
@@ -70,7 +71,7 @@ export default function Trainingsplan() {
       })
       .catch((err) => {
         console.error(err)
-        toast('Trainingsplan konnte nicht geladen werden.')
+        toast('Terminplanung konnte nicht geladen werden.')
       })
       .finally(() => !cancelled && setLoading(false))
     return () => {
@@ -307,8 +308,8 @@ export default function Trainingsplan() {
 
   return (
     <div className="view">
-      <h1 className="section-title">Trainingsplan</h1>
-      <p className="section-sub">Trainingszeiten und Entwicklung mit Input von außen.</p>
+      <h1 className="section-title">Terminplanung</h1>
+      <p className="section-sub">Trainings- und Spieltermine an einem Ort.</p>
 
       <div className="trainingplan-upcoming">
         <div className="trainingplan-upcoming-header">

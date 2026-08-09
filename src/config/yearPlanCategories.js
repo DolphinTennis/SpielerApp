@@ -1,8 +1,8 @@
 export const CATEGORIES = [
   { key: 'turnier_national', label: 'Turnier national', color: '#1C63B7' },
-  { key: 'turnier_international', label: 'Turnier international', color: '#7C4FE0' },
-  { key: 'training', label: 'Training', color: '#3FA65C' },
-  { key: 'ferien', label: 'Ferien', color: '#F2A93D' },
+  { key: 'turnier_international', label: 'Turnier international', color: '#17A2A2' },
+  { key: 'training', label: 'Training', color: '#D9A916' },
+  { key: 'ferien', label: 'Ferien', color: '#F2ECDD' },
   { key: 'sonstiges', label: 'Sonstiges', color: '#C0392B' },
 ]
 

@@ -1,9 +1,14 @@
+// `textColor` is optional (default white) — light background colors
+// (Tennis, Spiel) need dark text instead to stay readable.
 export const CATEGORIES = [
-  { key: 'tennis', label: 'Tennis', color: '#1C63B7' },
+  { key: 'tennis', label: 'Tennis', color: '#D9A916', textColor: 'var(--ink)' },
   { key: 'kondi', label: 'Kondi', color: '#E08E45' },
   { key: 'physio', label: 'Physio', color: '#2FA84F' },
   { key: 'mental', label: 'Mental', color: '#8E5FD1' },
-  { key: 'sonstiges', label: 'Sonstiges', color: '#7A8794' },
+  { key: 'spiel', label: 'Spiel', color: '#C4A484', textColor: 'var(--ink)' },
+  { key: 'turnier_national', label: 'Turnier national', color: '#1C63B7' },
+  { key: 'turnier_international', label: 'Turnier international', color: '#17A2A2' },
+  { key: 'sonstiges', label: 'Sonstiges', color: '#C0392B' },
 ]
 
 export const CATEGORY_BY_KEY = Object.fromEntries(CATEGORIES.map((c) => [c.key, c]))
