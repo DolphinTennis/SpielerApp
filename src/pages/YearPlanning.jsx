@@ -198,6 +198,9 @@ export default function YearPlanning() {
     }
   }
 
+  const now = new Date()
+  const todayStr = dateStr(now.getFullYear(), now.getMonth(), now.getDate())
+
   return (
     <div className="view">
       <h1 className="section-title">Jahresplanung</h1>
@@ -264,11 +267,12 @@ export default function YearPlanning() {
                   const cat = entry ? CATEGORY_BY_KEY[entry.category] : null
                   const weekday = new Date(year, monthIndex, day).getDay()
                   const isWeekend = weekday === 0 || weekday === 6
+                  const isToday = date === todayStr
                   return (
                     <div className="yearplan-cell-wrap" key={i}>
                       <button
                         type="button"
-                        className={`yearplan-cell${isWeekend ? ' weekend' : ''}${entry ? ' filled' : ''}${entry?.status === 'proposed' ? ' proposed' : ''}`}
+                        className={`yearplan-cell${isWeekend ? ' weekend' : ''}${entry ? ' filled' : ''}${entry?.status === 'proposed' ? ' proposed' : ''}${isToday ? ' today' : ''}`}
                         style={entry ? { background: cat.color } : undefined}
                         title={
                           entry

@@ -135,6 +135,12 @@
 .yearplan-cell.weekend.filled {
   filter: brightness(0.8) saturate(1.15);
 }
+.yearplan-cell.today {
+  box-shadow: 0 0 0 2px var(--ball-dark) inset;
+}
+.yearplan-cell.today:not(.filled) {
+  background: color-mix(in srgb, var(--ball) 25%, var(--chalk));
+}
 .yearplan-cell.proposed {
   opacity: 0.5;
   border: 1.5px dashed var(--ink);
