@@ -343,6 +343,7 @@ export default function Trainingsplan() {
           eventResizableFromStart
           eventDisplay="block"
           dayMaxEvents={0}
+          views={{ dayGridMonth: { dayMaxEvents: false } }}
           events={calendarEvents}
           eventContent={renderEventContent}
           eventClassNames={(arg) => (arg.event.extendedProps.status === 'proposed' ? ['trainingplan-event--proposed'] : [])}
