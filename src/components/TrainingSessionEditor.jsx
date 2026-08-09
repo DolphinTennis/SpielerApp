@@ -103,7 +103,10 @@ export default function TrainingSessionEditor({
 
         <label className="trainingplan-oneoff-toggle">
           <input type="checkbox" checked={oneOff} onChange={(e) => setOneOff(e.target.checked)} />
-          Einmaliger Termin
+          <span>
+            Einmaliger Termin
+            <span className="trainingplan-oneoff-hint"> — sonst wöchentlich wiederholend</span>
+          </span>
         </label>
 
         {oneOff ? (

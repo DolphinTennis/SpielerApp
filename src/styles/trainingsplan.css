@@ -234,6 +234,10 @@
   margin-bottom: 12px;
   cursor: pointer;
 }
+.trainingplan-oneoff-hint {
+  color: var(--text-soft);
+  font-size: 12px;
+}
 .trainingplan-weekday-picker {
   display: flex;
   gap: 5px;
