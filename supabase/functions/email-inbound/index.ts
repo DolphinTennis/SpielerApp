@@ -1,8 +1,9 @@
-// Triggered on a schedule by pg_cron (not by a logged-in browser), so
-// there's no user session to check. Instead this only accepts requests
-// carrying a dedicated CRON_SECRET as the bearer token (set only in the
-// pg_cron job definition and here) — deliberately not the service_role
-// key itself, to avoid handing that broader credential to a scheduled job.
+// Triggered from the client whenever someone opens the Beispiele page
+// (see Beispiele.jsx) rather than on a fixed schedule — checking the
+// mailbox only when someone's actually looking avoids running a cron job
+// around the clock for something that only matters when the page is open.
+// Auth is a normal logged-in user session (any active team member), same
+// pattern as link-preview.
 //
 // Polls the shared mailbox via IMAP for unread mail. Anyone can send to
 // this address — instead of checking the sender's identity, a message is
@@ -16,8 +17,16 @@ import { simpleParser } from 'npm:mailparser@3'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { extractFirstUrl, getLinkPreview } from '../_shared/linkPreview.ts'
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
 function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
 }
 
 function escapeRegex(text: string) {
@@ -38,12 +47,24 @@ function matchOrgByPlayerFirstName<T extends { player_name: string | null }>(org
 }
 
 Deno.serve(async (req) => {
-  const authHeader = req.headers.get('Authorization') || ''
-  if (authHeader !== `Bearer ${Deno.env.get('CRON_SECRET')!}`) {
-    return json({ error: 'Nicht autorisiert.' }, 401)
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
   }
 
-  const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
+  const authHeader = req.headers.get('Authorization')
+  if (!authHeader) return json({ error: 'Nicht authentifiziert.' }, 401)
+
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+  const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!
+  const asCaller = createClient(supabaseUrl, anonKey, {
+    global: { headers: { Authorization: authHeader } },
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  })
+  const jwt = authHeader.replace(/^Bearer\s+/i, '')
+  const { data: userData } = await asCaller.auth.getUser(jwt)
+  if (!userData.user) return json({ error: 'Nicht authentifiziert.' }, 401)
+
+  const admin = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
   const client = new ImapFlow({
     host: Deno.env.get('MAILBOX_HOST')!,
     port: Number(Deno.env.get('MAILBOX_IMAP_PORT')!),

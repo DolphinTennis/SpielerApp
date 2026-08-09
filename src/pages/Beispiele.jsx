@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { useOrg } from '../lib/OrgContext'
 import { useToast } from '../lib/ToastContext'
-import { addMediaExample, deleteMediaExample, fetchLinkPreview, listMediaExamples } from '../lib/mediaExamplesApi'
+import { addMediaExample, checkMailbox, deleteMediaExample, fetchLinkPreview, listMediaExamples } from '../lib/mediaExamplesApi'
 import MediaExampleCard from '../components/MediaExampleCard'
 
 export default function Beispiele() {
@@ -25,6 +25,14 @@ export default function Beispiele() {
         toast('Beispiele konnten nicht geladen werden.')
       })
       .finally(() => !cancelled && setLoading(false))
+
+    // Quiet background check — if a link came in by mail since the last
+    // visit, pick it up now instead of waiting for a schedule. Failures
+    // here (e.g. a slow mailbox) shouldn't interrupt the page, so no toast.
+    checkMailbox()
+      .then(() => !cancelled && listMediaExamples(orgId).then((data) => !cancelled && setItems(data)))
+      .catch((err) => console.error(err))
+
     return () => {
       cancelled = true
     }

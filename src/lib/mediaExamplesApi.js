@@ -39,6 +39,12 @@ export async function fetchLinkPreview(url) {
   return callFunction('link-preview', { url })
 }
 
+// Checks the shared mailbox for new links right now, instead of on a
+// fixed schedule — called when the Beispiele page opens.
+export async function checkMailbox() {
+  return callFunction('email-inbound', {})
+}
+
 export async function addMediaExample({ orgId, url, note, userLabel, preview }) {
   const { data, error } = await supabase
     .from('media_examples')

@@ -387,8 +387,8 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.email-inbound]
-# Cron-triggered, not a user session — this checks the service_role key as
-# a bearer token itself instead of a user JWT.
+# Same gateway issue as the functions above — auth is verified manually
+# inside the function via getUser(jwt) instead.
 verify_jwt = false
 
 [edge_runtime]
