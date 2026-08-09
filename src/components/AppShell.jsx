@@ -11,6 +11,8 @@ import TeamManage from '../pages/TeamManage'
 import YearPlanning from '../pages/YearPlanning'
 import Trainingsplan from '../pages/Trainingsplan'
 import Beispiele from '../pages/Beispiele'
+import TrainingFocusList from '../pages/TrainingFocusList'
+import TrainingFocusEditor from '../pages/TrainingFocusEditor'
 import Placeholder from '../pages/Placeholder'
 
 const OVERVIEW_ROUTES = { matchanalyse: 'matchanalyse', liveticker: 'liveticker', dateien: 'dateien' }
@@ -19,6 +21,12 @@ function MatchEditorRoute() {
   const { matchId } = useParams()
   const navigate = useNavigate()
   return <MatchEditor matchId={matchId === 'neu' ? null : matchId} onBack={() => navigate('/app/matchanalyse')} />
+}
+
+function TrainingFocusEditorRoute() {
+  const { entryId } = useParams()
+  const navigate = useNavigate()
+  return <TrainingFocusEditor entryId={entryId === 'neu' ? null : entryId} onBack={() => navigate('/app/trainingsfokus')} />
 }
 
 function PlaceholderRoute() {
@@ -36,6 +44,9 @@ function AppShellInner() {
     crumbs = [{ label: '← Übersicht', onClick: () => navigate('/app') }]
     if (location.pathname.startsWith('/app/matchanalyse/')) {
       crumbs.push({ label: '← Matchanalyse', onClick: () => navigate('/app/matchanalyse') })
+    }
+    if (location.pathname.startsWith('/app/trainingsfokus/')) {
+      crumbs.push({ label: '← Trainingsfokus', onClick: () => navigate('/app/trainingsfokus') })
     }
   }
 
@@ -64,6 +75,16 @@ function AppShellInner() {
         <Route path="turnierplanung" element={<YearPlanning />} />
         <Route path="trainingsplan" element={<Trainingsplan />} />
         <Route path="videos" element={<Beispiele />} />
+        <Route
+          path="trainingsfokus"
+          element={
+            <TrainingFocusList
+              onOpenEntry={(id) => navigate(`/app/trainingsfokus/${id}`)}
+              onNewEntry={() => navigate('/app/trainingsfokus/neu')}
+            />
+          }
+        />
+        <Route path="trainingsfokus/:entryId" element={<TrainingFocusEditorRoute />} />
         <Route path=":placeholderKey" element={<PlaceholderRoute />} />
       </Routes>
     </div>

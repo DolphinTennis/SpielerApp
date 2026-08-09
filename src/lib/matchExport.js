@@ -59,7 +59,8 @@ export function buildForm2Html(rec) {
       ${buildRow('Was lief gut?', rec.form2.gut)}
       ${buildRow('Was lief nicht optimal?', rec.form2.nicht)}
       ${buildRow('Warum lief es nicht optimal?', rec.form2.warum)}
-      ${buildRow('Ziel für das nächste Match', rec.form2.ziel)}
+      ${buildRow('Ziele fürs nächste Match', rec.form2.zieleMatch ?? rec.form2.ziel)}
+      ${buildRow('Ziele fürs nächste Training', rec.form2.zieleTraining)}
       <p style="font-size:10px;color:#5B6875;margin-top:20px;">© Stefanie Sziburies — Triple-A-Analyse</p>
     </div>`
 }
@@ -101,6 +102,7 @@ export function buildMailBody(rec) {
   body += line('Was lief gut', rec.form2.gut)
   body += line('Was lief nicht optimal', rec.form2.nicht)
   body += line('Warum', rec.form2.warum)
-  body += line('Ziel nächstes Match', rec.form2.ziel)
+  body += line('Ziele fürs nächste Match', rec.form2.zieleMatch ?? rec.form2.ziel)
+  body += line('Ziele fürs nächste Training', rec.form2.zieleTraining)
   return body
 }

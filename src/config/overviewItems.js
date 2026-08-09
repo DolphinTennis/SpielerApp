@@ -5,8 +5,8 @@
 // "Beispiele") so no routes had to change along with the rename.
 export const OVERVIEW_ITEMS = [
   { key: 'turnierplanung', icon: '🗺️', title: 'Jahresplanung', desc: 'Übersichtsplanung mit Input von außen.', implemented: true, badge: 'ready' },
-  { key: 'turniere', icon: '🏆', title: 'Anstehende Turniere', desc: 'Gemeldeter Turnierplan.', implemented: false },
   { key: 'trainingsplan', icon: '📋', title: 'Terminplanung', desc: 'Trainings- und Spieltermine an einem Ort.', implemented: true, badge: 'ready' },
+  { key: 'trainingsfokus', icon: '🎯', title: 'Trainingsfokus', desc: 'Vorbereitung und Nacharbeit zum Training.', implemented: true, badge: 'ready' },
   { key: 'videos', icon: '🎬', title: 'Beispiele', desc: 'Geteilte Medien als Vorbilder, Hilfestellung, etc. …', implemented: true, badge: 'ready' },
   { key: 'dateien', icon: '📁', title: 'Meine Dateien', desc: 'Alles was mir wichtig ist.', implemented: true, badge: 'ready' },
   { key: 'liveticker', icon: '📡', title: 'Matchticker', desc: 'Aktuelles Spiel im Blick.', implemented: true, badge: 'live' },
