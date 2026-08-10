@@ -1,10 +1,9 @@
 <!--
-  Team invitation. Same table-based structure as the other auth templates:
-  solid-colour fallback behind the header gradient and a cell-background
-  button, because Outlook's Word renderer drops CSS gradients and ignores
-  padding on inline <a> elements.
+  Password reset. The app has no in-app "forgot password" entry point yet, so
+  today this is only reachable from the Supabase dashboard — worth styling
+  anyway so an admin-triggered reset doesn't arrive looking like spam.
 -->
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Du wurdest zu einem Team auf Dolphin eingeladen.</div>
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Setze dein Dolphin-Passwort zurück.</div>
 <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f4f7fb;padding:32px 16px;font-family:Arial,Helvetica,sans-serif;">
   <tr>
     <td align="center">
@@ -21,16 +20,15 @@
         </tr>
         <tr>
           <td style="padding:32px 28px;">
-            <h1 style="margin:0 0 12px;font-size:20px;color:#16232e;">Du wurdest eingeladen</h1>
+            <h1 style="margin:0 0 12px;font-size:20px;color:#16232e;">Passwort zurücksetzen</h1>
             <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:#5b6875;">
-              Du wurdest eingeladen, einem Team auf Dolphin Tennis beizutreten. Klicke auf den Button unten,
-              um ein Passwort festzulegen und loszulegen.
+              Klicke auf den Button unten, um ein neues Passwort für deinen Dolphin-Zugang festzulegen.
             </p>
             <table cellpadding="0" cellspacing="0" role="presentation" align="center" style="margin:0 auto 24px;">
               <tr>
                 <td style="background:#d7f23d;border-radius:9px;">
                   <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:13px 28px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#0f2740;text-decoration:none;">
-                    Einladung annehmen
+                    Neues Passwort festlegen
                   </a>
                 </td>
               </tr>
@@ -44,7 +42,7 @@
         <tr>
           <td style="padding:16px 28px;border-top:1px solid #d7dee6;text-align:center;">
             <p style="margin:0;font-size:11px;color:#8b97a3;">
-              Falls du diese Einladung nicht erwartet hast, kannst du diese E-Mail einfach ignorieren.
+              Du hast kein neues Passwort angefordert? Dann ignoriere diese E-Mail — dein Passwort bleibt unverändert.
             </p>
           </td>
         </tr>

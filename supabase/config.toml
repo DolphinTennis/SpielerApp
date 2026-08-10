@@ -241,33 +241,44 @@ otp_length = 8
 # Bumped to 3 days — team invites realistically sit unread longer than 1h.
 otp_expiry = 259200
 
-# Use a production-ready SMTP server
-# Custom sender (e.g. support@dolphintennis.com) needs real SMTP credentials
-# first — uncomment and fill in once that mailbox/relay exists.
+# Custom SMTP. Two things depend on this and nothing else:
+#   1. the From address (default is Supabase's own noreply@mail.app.supabase.io)
+#   2. custom templates below — Supabase refuses template overrides on the free
+#      tier while the default email provider is in use.
+# Values below are all-inkl's mail server, which already hosts dolphintennis.com
+# (its SPF record includes spf.kasserver.com, so mail from that domain
+# authenticates). Set SMTP_PASSWORD in the environment before `config push`;
+# never commit the password itself.
 # [auth.email.smtp]
 # enabled = true
-# host = "smtp.sendgrid.net"
+# host = "w01c3d1b.kasserver.com"
 # port = 587
-# user = "apikey"
-# pass = "env(SENDGRID_API_KEY)"
-# admin_email = "admin@email.com"
-# sender_name = "Admin"
+# user = "support@dolphintennis.com"
+# pass = "env(SMTP_PASSWORD)"
+# admin_email = "support@dolphintennis.com"
+# sender_name = "Dolphin Support"
 
-# Blocked on the free tier without custom SMTP ("Email template modification
-# is not available for free tier projects using the default email provider").
-# Content is ready in supabase/templates/invite.html — uncomment once SMTP
-# is set up (see support@dolphintennis.com discussion), then `supabase config push`.
+# Branded German templates, ready in supabase/templates/. Uncomment together
+# with the SMTP block above, then `supabase config push`.
+# [auth.email.template.confirmation]
+# subject = "Bestätige deine Anmeldung bei Dolphin"
+# content_path = "./supabase/templates/confirmation.html"
+
 # [auth.email.template.invite]
 # subject = "Einladung zu Dolphin Tennis"
 # content_path = "./supabase/templates/invite.html"
 
-# Uncomment to customize notification email template
+# [auth.email.template.email_change]
+# subject = "Bestätige deine neue E-Mail-Adresse"
+# content_path = "./supabase/templates/email_change.html"
 
-# Uncomment to customize notification email template
-# [auth.email.notification.password_changed]
-# enabled = true
-# subject = "Your password has been changed"
-# content_path = "./templates/password_changed_notification.html"
+# [auth.email.template.recovery]
+# subject = "Passwort zurücksetzen"
+# content_path = "./supabase/templates/recovery.html"
+
+# [auth.email.template.magic_link]
+# subject = "Dein Anmeldelink für Dolphin"
+# content_path = "./supabase/templates/magic_link.html"
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.

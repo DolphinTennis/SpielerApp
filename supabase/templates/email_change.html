@@ -1,10 +1,10 @@
 <!--
-  Team invitation. Same table-based structure as the other auth templates:
-  solid-colour fallback behind the header gradient and a cell-background
-  button, because Outlook's Word renderer drops CSS gradients and ignores
-  padding on inline <a> elements.
+  Email change confirmation. auth.email.double_confirm_changes is on, so this
+  goes to BOTH the old and the new address and the switch only takes effect
+  once both are confirmed — the copy says so explicitly, because a half-
+  confirmed change silently leaves the old address active and looks broken.
 -->
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Du wurdest zu einem Team auf Dolphin eingeladen.</div>
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Bestätige deine neue E-Mail-Adresse für Dolphin.</div>
 <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f4f7fb;padding:32px 16px;font-family:Arial,Helvetica,sans-serif;">
   <tr>
     <td align="center">
@@ -21,20 +21,32 @@
         </tr>
         <tr>
           <td style="padding:32px 28px;">
-            <h1 style="margin:0 0 12px;font-size:20px;color:#16232e;">Du wurdest eingeladen</h1>
-            <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:#5b6875;">
-              Du wurdest eingeladen, einem Team auf Dolphin Tennis beizutreten. Klicke auf den Button unten,
-              um ein Passwort festzulegen und loszulegen.
+            <h1 style="margin:0 0 12px;font-size:20px;color:#16232e;">E-Mail-Adresse ändern</h1>
+            <p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:#5b6875;">
+              Du möchtest deine Login-Adresse ändern:
             </p>
-            <table cellpadding="0" cellspacing="0" role="presentation" align="center" style="margin:0 auto 24px;">
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 20px;background:#f4f7fb;border:1px solid #d7dee6;border-radius:9px;">
+              <tr>
+                <td style="padding:14px 16px;font-size:13px;line-height:1.7;color:#16232e;">
+                  <span style="color:#8b97a3;">Bisher:</span> {{ .Email }}<br>
+                  <span style="color:#8b97a3;">Neu:</span> <strong>{{ .NewEmail }}</strong>
+                </td>
+              </tr>
+            </table>
+            <table cellpadding="0" cellspacing="0" role="presentation" align="center" style="margin:0 auto 20px;">
               <tr>
                 <td style="background:#d7f23d;border-radius:9px;">
                   <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:13px 28px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#0f2740;text-decoration:none;">
-                    Einladung annehmen
+                    Änderung bestätigen
                   </a>
                 </td>
               </tr>
             </table>
+            <p style="margin:0 0 20px;font-size:13px;line-height:1.6;color:#5b6875;background:#f4f7fb;border-left:3px solid #1c63b7;padding:12px 14px;">
+              <strong>Wichtig:</strong> Aus Sicherheitsgründen muss die Änderung an <em>beiden</em> Adressen
+              bestätigt werden — an der alten und an der neuen. Erst danach ist die neue Adresse aktiv.
+              Prüfe also beide Postfächer.
+            </p>
             <p style="margin:0;font-size:12px;line-height:1.5;color:#8b97a3;">
               Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:<br>
               <a href="{{ .ConfirmationURL }}" style="color:#1c63b7;word-break:break-all;">{{ .ConfirmationURL }}</a>
@@ -44,7 +56,7 @@
         <tr>
           <td style="padding:16px 28px;border-top:1px solid #d7dee6;text-align:center;">
             <p style="margin:0;font-size:11px;color:#8b97a3;">
-              Falls du diese Einladung nicht erwartet hast, kannst du diese E-Mail einfach ignorieren.
+              Du hast diese Änderung nicht angefordert? Dann ignoriere diese E-Mail — es passiert nichts.
             </p>
           </td>
         </tr>
