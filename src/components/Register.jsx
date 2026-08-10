@@ -77,14 +77,14 @@ export default function Register() {
         </div>
 
         <div className="field" style={{ marginBottom: 14 }}>
-          <label htmlFor="reg-player">Name der Spielerin/des Spielers</label>
+          <label htmlFor="reg-player">Name des Spielers</label>
           <input id="reg-player" type="text" required placeholder="Vor- und Nachname" value={playerName} onChange={(e) => setPlayerName(e.target.value)} />
         </div>
 
         <div className="field" style={{ marginBottom: 14 }}>
           <label htmlFor="reg-role">Deine Rolle</label>
           <select id="reg-role" value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="spieler">Spieler:in</option>
+            <option value="spieler">Spieler</option>
             <option value="management">Management / Eltern</option>
           </select>
         </div>

@@ -45,8 +45,8 @@ export function buildForm1Html(rec) {
       ${buildRow('Mentales Feeling', rec.form1.feeling2)}
       <h3 style="font-size:14px;color:#1C63B7;">3. Mein Gegner</h3>
       ${buildRow('Spielweise des Gegners', rec.form1.gegner1)}
-      ${buildRow('Ihre Stärken', rec.form1.gegner2)}
-      ${buildRow('Ihre Schwächen', rec.form1.gegner3)}
+      ${buildRow('Seine Stärken', rec.form1.gegner2)}
+      ${buildRow('Seine Schwächen', rec.form1.gegner3)}
       <h3 style="font-size:14px;color:#1C63B7;">4. Ziele</h3>
       ${buildRow('Ziele fürs nächste Match', rec.form2?.zieleMatch ?? rec.form2?.ziel)}
       ${buildRow('Ziele fürs nächste Training', rec.form2?.zieleTraining)}

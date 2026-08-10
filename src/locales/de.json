@@ -80,8 +80,8 @@
         "feeling1": "Wie habe ich mich körperlich auf dem Platz gefühlt? (Energie, Beweglichkeit …)",
         "feeling2": "Wie habe ich mich mental auf dem Platz gefühlt? (Fokus, Selbstvertrauen …)",
         "gegner1": "Wie hat mein Gegner gespielt? (Taktik …)",
-        "gegner2": "Was waren ihre Stärken?",
-        "gegner3": "Was waren ihre Schwächen?"
+        "gegner2": "Was waren seine Stärken?",
+        "gegner3": "Was waren seine Schwächen?"
       }
     },
     "form2": {
@@ -96,7 +96,7 @@
     "list": {
       "title": "Matchanalyse",
       "subtitle": "Alle erfassten Spiele von {{name}} — durchsuchen, filtern, auswerten.",
-      "opponentName": "Name Gegnerin",
+      "opponentName": "Name Gegner",
       "opponentPlaceholder": "z. B. Meier",
       "matchDate": "Spieldatum",
       "tournament": "Turnier",
@@ -121,7 +121,7 @@
     "subtitle": "Farbschema fürs ganze Team.",
     "colorSectionTitle": "Farbeinstellung",
     "hintCanChange": "Gilt einheitlich für alle Mitglieder des Teams.",
-    "hintCannotChange": "Nur Spieler:in kann das Farbschema ändern.",
+    "hintCannotChange": "Nur der Spieler kann das Farbschema ändern.",
     "themeHardcourt": "Hardcourt",
     "themeGras": "Gras",
     "themeSand": "Sand",
@@ -130,7 +130,7 @@
     "changeFailed": "Ändern fehlgeschlagen."
   },
   "teamManage": {
-    "roleSpieler": "Spieler:in",
+    "roleSpieler": "Spieler",
     "roleManagement": "Management / Eltern",
     "roleTrainer": "Trainer",
     "meineDatenTitle": "Meine Daten",
@@ -149,7 +149,7 @@
     "newPasswordPlaceholder": "Mindestens 6 Zeichen",
     "passwordChanged": "Passwort geändert.",
     "passwordChangeFailed": "Passwort ändern fehlgeschlagen: {{error}}",
-    "playerNameHint": "Der Name der Spielerin/des Spielers — gilt fürs ganze Team.",
+    "playerNameHint": "Der Name des Spielers — gilt fürs ganze Team.",
     "firstName": "Vorname",
     "lastName": "Nachname",
     "saving": "Speichert …",
@@ -166,7 +166,7 @@
     "title": "Mein Team",
     "subtitle": "Mitglieder, Einladungen und Rechte.",
     "noAccess": "Kein Zugriff.",
-    "noAccessDesc": "Nur Spieler:in und Management können das Team verwalten.",
+    "noAccessDesc": "Nur Spieler und Management können das Team verwalten.",
     "membersTitle": "Teammitglieder",
     "inviteEmail": "E-Mail einladen",
     "role": "Rolle",
@@ -198,8 +198,8 @@
     "newMatchTitle": "Neues Match anlegen",
     "newMatchHint": "Trage die Eckdaten ein und starte das Live-Tracking.",
     "matchDate": "Spiel Datum",
-    "opponentName": "Name Gegnerin",
-    "opponentPlaceholder": "Gegnerin",
+    "opponentName": "Name Gegner",
+    "opponentPlaceholder": "Gegner",
     "tournament": "Turnier",
     "tournamentPlaceholder": "Turniername",
     "setMode": "Satzmodus",
@@ -222,8 +222,8 @@
     "matchTiebreakRunning": "Match-Tiebreak (läuft)",
     "setRunning": "Satz {{n}} (läuft)",
     "tiebreakAbbrev": "TB {{a}}:{{b}}",
-    "playerLabelFallback": "SPIELER:IN",
-    "opponentLabelFallback": "GEGNERIN",
+    "playerLabelFallback": "SPIELER",
+    "opponentLabelFallback": "GEGNER",
     "tiebreakBadge": "🎾 Tiebreak bei 6:6",
     "matchTiebreakBadge": "🎾 Match-Tiebreak entscheidet (bis 10, 2 Punkte Vorsprung)",
     "decidedBanner": "🏆 Match entschieden: {{winner}} gewinnt {{a}}:{{b}} nach Sätzen",

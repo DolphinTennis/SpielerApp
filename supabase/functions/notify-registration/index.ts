@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
       html: `
         <div style="font-family:Arial,sans-serif;font-size:14px;color:#16232E;">
           <p>Ein neues Team hat sich registriert:</p>
-          <p><strong>${org.name}</strong><br>Spieler:in: ${org.player_name || '–'}</p>
+          <p><strong>${org.name}</strong><br>Spieler: ${org.player_name || '–'}</p>
           <p><a href="${approveUrl}" style="display:inline-block;background:#D7F23D;color:#0F2740;font-weight:700;padding:10px 18px;border-radius:8px;text-decoration:none;">Team freigeben</a></p>
         </div>
       `,
