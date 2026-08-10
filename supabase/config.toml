@@ -249,36 +249,36 @@ otp_expiry = 259200
 # (its SPF record includes spf.kasserver.com, so mail from that domain
 # authenticates). Set SMTP_PASSWORD in the environment before `config push`;
 # never commit the password itself.
-# [auth.email.smtp]
-# enabled = true
-# host = "w01c3d1b.kasserver.com"
-# port = 587
-# user = "support@dolphintennis.com"
-# pass = "env(SMTP_PASSWORD)"
-# admin_email = "support@dolphintennis.com"
-# sender_name = "Dolphin Support"
+[auth.email.smtp]
+enabled = true
+host = "w01c3d1b.kasserver.com"
+port = 587
+user = "support@dolphintennis.com"
+pass = "env(SMTP_PASSWORD)"
+admin_email = "support@dolphintennis.com"
+sender_name = "Dolphin Support"
 
-# Branded German templates, ready in supabase/templates/. Uncomment together
-# with the SMTP block above, then `supabase config push`.
-# [auth.email.template.confirmation]
-# subject = "Bestätige deine Anmeldung bei Dolphin"
-# content_path = "./supabase/templates/confirmation.html"
+# Branded German templates. These only apply while custom SMTP above is on —
+# Supabase rejects template overrides on the default email provider.
+[auth.email.template.confirmation]
+subject = "Bestätige deine Anmeldung bei Dolphin"
+content_path = "./supabase/templates/confirmation.html"
 
-# [auth.email.template.invite]
-# subject = "Einladung zu Dolphin Tennis"
-# content_path = "./supabase/templates/invite.html"
+[auth.email.template.invite]
+subject = "Einladung zu Dolphin Tennis"
+content_path = "./supabase/templates/invite.html"
 
-# [auth.email.template.email_change]
-# subject = "Bestätige deine neue E-Mail-Adresse"
-# content_path = "./supabase/templates/email_change.html"
+[auth.email.template.email_change]
+subject = "Bestätige deine neue E-Mail-Adresse"
+content_path = "./supabase/templates/email_change.html"
 
-# [auth.email.template.recovery]
-# subject = "Passwort zurücksetzen"
-# content_path = "./supabase/templates/recovery.html"
+[auth.email.template.recovery]
+subject = "Passwort zurücksetzen"
+content_path = "./supabase/templates/recovery.html"
 
-# [auth.email.template.magic_link]
-# subject = "Dein Anmeldelink für Dolphin"
-# content_path = "./supabase/templates/magic_link.html"
+[auth.email.template.magic_link]
+subject = "Dein Anmeldelink für Dolphin"
+content_path = "./supabase/templates/magic_link.html"
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.
