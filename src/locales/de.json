@@ -164,7 +164,7 @@
     "spielerFixedNote": "immer Admin, alle Rechte (nicht änderbar).",
     "saveRoles": "Rechte speichern",
     "title": "Mein Team",
-    "subtitle": "{{orgName}} — Mitglieder, Einladungen und Rechte.",
+    "subtitle": "Mitglieder, Einladungen und Rechte.",
     "noAccess": "Kein Zugriff.",
     "noAccessDesc": "Nur Spieler:in und Management können das Team verwalten.",
     "membersTitle": "Teammitglieder",
@@ -177,7 +177,13 @@
     "countMember": "Mitglied",
     "countMembers": "Mitglieder",
     "unknown": "Unbekannt",
-    "invited": "Eingeladen"
+    "invited": "Eingeladen",
+    "resendInvite": "Erneut einladen",
+    "inviteResent": "Einladung an „{{email}}\" erneut verschickt.",
+    "remove": "Entfernen",
+    "removeConfirm": "„{{email}}\" wirklich aus dem Team entfernen?",
+    "memberRemoved": "„{{email}}\" wurde entfernt.",
+    "removeFailed": "Entfernen fehlgeschlagen: {{error}}"
   },
   "liveMatchLogic": {
     "matchDecidedInLastSet": "Match entschieden: {{score}} im letzten Satz.",

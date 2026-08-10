@@ -10,6 +10,17 @@ export async function listMembers(orgId) {
   return data
 }
 
+// Removing a member is just deleting their membership row — RLS ("Members can
+// delete memberships in their org") already lets an org admin do this directly,
+// so no Edge Function is needed. For an invited-but-not-yet-active member this
+// leaves their placeholder auth user orphaned, which is harmless (they simply
+// lose team access); re-inviting the same address later goes through the
+// resend flow below.
+export async function removeMember(membershipId) {
+  const { error } = await supabase.from('memberships').delete().eq('id', membershipId)
+  if (error) throw error
+}
+
 export async function getRolePermissions(orgId) {
   const { data, error } = await supabase.from('organizations').select('role_permissions').eq('id', orgId).single()
   if (error) throw error
@@ -63,6 +74,17 @@ export async function inviteMember({ email, role, orgId }) {
   const appUrl = import.meta.env.VITE_APP_URL || window.location.origin
   const redirectTo = `${appUrl}/accept-invite`
   return callFunction('invite-member', { email, role, orgId, redirectTo })
+}
+
+// Re-sends the invite email to an already-invited member. Needs service_role
+// (Supabase's invite email can only be triggered server-side), so it goes
+// through an Edge Function. The function regenerates a fresh invite for the
+// membership's user, so the member id may change — callers should reload the
+// member list afterwards rather than reuse the old row.
+export async function resendInvite({ membershipId, orgId }) {
+  const appUrl = import.meta.env.VITE_APP_URL || window.location.origin
+  const redirectTo = `${appUrl}/accept-invite`
+  return callFunction('resend-invite', { membershipId, orgId, redirectTo })
 }
 
 // Runs server-side with service_role rather than a client-side RLS update —

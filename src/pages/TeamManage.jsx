@@ -4,7 +4,7 @@ import { useOrg } from '../lib/OrgContext'
 import { useAuth } from '../lib/AuthContext'
 import { useToast } from '../lib/ToastContext'
 import { supabase } from '../lib/supabaseClient'
-import { getRolePermissions, inviteMember, listMembers, updatePlayerName, updateRolePermissions } from '../lib/teamApi'
+import { getRolePermissions, inviteMember, listMembers, removeMember, resendInvite, updatePlayerName, updateRolePermissions } from '../lib/teamApi'
 import RolePermissionsEditor from '../components/RolePermissionsEditor'
 
 function splitName(fullName) {
@@ -224,13 +224,16 @@ function Rollenverteilung({ orgId }) {
 
 export default function TeamManage() {
   const { t } = useTranslation()
-  const { orgId, orgName, isAdmin, permissions } = useOrg()
+  const { session } = useAuth()
+  const { orgId, isAdmin, permissions } = useOrg()
   const toast = useToast()
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState('')
   const [role, setRole] = useState('trainer')
   const [inviting, setInviting] = useState(false)
+  const [busyId, setBusyId] = useState(null)
+  const canManageMembers = permissions?.invite_members
 
   const ROLE_LABELS = { spieler: t('teamManage.roleSpieler'), management: t('teamManage.roleManagement'), trainer: t('teamManage.roleTrainer') }
 
@@ -269,6 +272,36 @@ export default function TeamManage() {
     }
   }
 
+  async function handleResend(m) {
+    setBusyId(m.id)
+    try {
+      await resendInvite({ membershipId: m.id, orgId })
+      toast(t('teamManage.inviteResent', { email: m.email }))
+      const data = await listMembers(orgId)
+      setMembers(data)
+    } catch (err) {
+      console.error(err)
+      toast(t('teamManage.inviteFailed', { error: err.message }))
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  async function handleRemove(m) {
+    if (!window.confirm(t('teamManage.removeConfirm', { email: m.email }))) return
+    setBusyId(m.id)
+    try {
+      await removeMember(m.id)
+      setMembers((prev) => prev.filter((x) => x.id !== m.id))
+      toast(t('teamManage.memberRemoved', { email: m.email }))
+    } catch (err) {
+      console.error(err)
+      toast(t('teamManage.removeFailed', { error: err.message }))
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   if (!isAdmin) {
     return (
       <div className="view">
@@ -287,7 +320,7 @@ export default function TeamManage() {
   return (
     <div className="view">
       <h1 className="section-title">{t('teamManage.title')}</h1>
-      <p className="section-sub">{t('teamManage.subtitle', { orgName })}</p>
+      <p className="section-sub">{t('teamManage.subtitle')}</p>
 
       <MeineDaten />
 
@@ -335,7 +368,29 @@ export default function TeamManage() {
                   <span>{ROLE_LABELS[m.role] || m.role}</span>
                 </div>
               </div>
-              {m.status === 'invited' && <span className="filed-tag">{t('teamManage.invited')}</span>}
+              <div className="member-actions">
+                {m.status === 'invited' && <span className="filed-tag">{t('teamManage.invited')}</span>}
+                {canManageMembers && m.status === 'invited' && (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    disabled={busyId === m.id}
+                    onClick={() => handleResend(m)}
+                  >
+                    {t('teamManage.resendInvite')}
+                  </button>
+                )}
+                {canManageMembers && m.role !== 'spieler' && m.user_id !== session?.user?.id && (
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-sm"
+                    disabled={busyId === m.id}
+                    onClick={() => handleRemove(m)}
+                  >
+                    {t('teamManage.remove')}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

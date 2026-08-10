@@ -164,7 +164,7 @@
     "spielerFixedNote": "always admin, all permissions (not changeable).",
     "saveRoles": "Save permissions",
     "title": "My team",
-    "subtitle": "{{orgName}} — members, invitations, and permissions.",
+    "subtitle": "Members, invitations, and permissions.",
     "noAccess": "No access.",
     "noAccessDesc": "Only the player and management can manage the team.",
     "membersTitle": "Team members",
@@ -177,7 +177,13 @@
     "countMember": "member",
     "countMembers": "members",
     "unknown": "Unknown",
-    "invited": "Invited"
+    "invited": "Invited",
+    "resendInvite": "Resend invite",
+    "inviteResent": "Invitation to \"{{email}}\" sent again.",
+    "remove": "Remove",
+    "removeConfirm": "Really remove \"{{email}}\" from the team?",
+    "memberRemoved": "\"{{email}}\" has been removed.",
+    "removeFailed": "Removal failed: {{error}}"
   },
   "liveMatchLogic": {
     "matchDecidedInLastSet": "Match decided: {{score}} in the final set.",

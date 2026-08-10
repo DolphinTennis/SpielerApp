@@ -136,3 +136,21 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
+/* Member row actions (resend invite / remove) — sit at the right end of the
+   .match-row, after the flex:1 .match-meta pushes them over. */
+.member-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.btn-danger {
+  background: var(--clay);
+  color: #fff;
+}
+.btn-danger:hover:not(:disabled) {
+  filter: brightness(0.93);
+}
