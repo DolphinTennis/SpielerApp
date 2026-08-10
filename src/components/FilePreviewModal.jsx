@@ -1,4 +1,7 @@
+import { useTranslation } from 'react-i18next'
+
 export default function FilePreviewModal({ file, url, loading, onClose, onDelete }) {
+  const { t } = useTranslation()
   if (!file) return null
 
   return (
@@ -11,17 +14,17 @@ export default function FilePreviewModal({ file, url, loading, onClose, onDelete
           </button>
         </div>
         <div className="modal-body">
-          {loading && <p style={{ color: 'var(--text-soft)', fontSize: 13 }}>Lädt …</p>}
+          {loading && <p style={{ color: 'var(--text-soft)', fontSize: 13 }}>{t('files.loading')}</p>}
           {!loading && url && file.type === 'Video' && <video src={url} controls />}
           {!loading && url && file.type === 'Audio' && <audio src={url} controls />}
           {!loading && url && file.type === 'Bild' && <img src={url} alt={file.name} />}
           {!loading && url && !['Video', 'Audio', 'Bild'].includes(file.type) && (
             <a className="btn btn-primary" href={url} target="_blank" rel="noreferrer" download={file.name}>
-              ⬇ Herunterladen
+              {t('files.download')}
             </a>
           )}
           <button className="btn btn-clay btn-sm" onClick={onDelete}>
-            🗑️ Datei löschen
+            {t('files.deleteFile')}
           </button>
         </div>
       </div>

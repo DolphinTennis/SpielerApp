@@ -43,10 +43,13 @@ export function buildForm1Html(rec) {
       ${buildRow('Schläge (Vorhand, Rückhand, etc.)', rec.form1.schlaege)}
       ${buildRow('Körperliches Feeling', rec.form1.feeling1)}
       ${buildRow('Mentales Feeling', rec.form1.feeling2)}
-      <h3 style="font-size:14px;color:#1C63B7;">3. Meine Gegnerin</h3>
-      ${buildRow('Spielweise der Gegnerin', rec.form1.gegner1)}
+      <h3 style="font-size:14px;color:#1C63B7;">3. Mein Gegner</h3>
+      ${buildRow('Spielweise des Gegners', rec.form1.gegner1)}
       ${buildRow('Ihre Stärken', rec.form1.gegner2)}
       ${buildRow('Ihre Schwächen', rec.form1.gegner3)}
+      <h3 style="font-size:14px;color:#1C63B7;">4. Ziele</h3>
+      ${buildRow('Ziele fürs nächste Match', rec.form2?.zieleMatch ?? rec.form2?.ziel)}
+      ${buildRow('Ziele fürs nächste Training', rec.form2?.zieleTraining)}
     </div>`
 }
 
@@ -61,7 +64,6 @@ export function buildForm2Html(rec) {
       ${buildRow('Warum lief es nicht optimal?', rec.form2.warum)}
       ${buildRow('Ziele fürs nächste Match', rec.form2.zieleMatch ?? rec.form2.ziel)}
       ${buildRow('Ziele fürs nächste Training', rec.form2.zieleTraining)}
-      <p style="font-size:10px;color:#5B6875;margin-top:20px;">© Stefanie Sziburies — Triple-A-Analyse</p>
     </div>`
 }
 
@@ -83,7 +85,7 @@ export function buildMailBody(rec) {
   const line = (label, val) => label + ': ' + (val || '–') + '%0D%0A'
   let body = 'Matchanalyse - ' + rec.spieler + '%0D%0A'
   body += line('Datum', formatDate(rec.datum))
-  body += line('Gegnerin', rec.gegner)
+  body += line('Gegner', rec.gegner)
   body += line('Turnier', rec.turnier)
   body += line('Ergebnis', rec.ergebnis)
   body += '%0D%0A--- Formular 1: Spielreflexion ---%0D%0A'
@@ -95,9 +97,9 @@ export function buildMailBody(rec) {
   body += line('Schläge', rec.form1.schlaege)
   body += line('Feeling körperlich', rec.form1.feeling1)
   body += line('Feeling mental', rec.form1.feeling2)
-  body += line('Gegnerin - Spielweise', rec.form1.gegner1)
-  body += line('Gegnerin - Stärken', rec.form1.gegner2)
-  body += line('Gegnerin - Schwächen', rec.form1.gegner3)
+  body += line('Gegner - Spielweise', rec.form1.gegner1)
+  body += line('Gegner - Stärken', rec.form1.gegner2)
+  body += line('Gegner - Schwächen', rec.form1.gegner3)
   body += '%0D%0A--- Formular 2: Triple-A-Analyse ---%0D%0A'
   body += line('Was lief gut', rec.form2.gut)
   body += line('Was lief nicht optimal', rec.form2.nicht)

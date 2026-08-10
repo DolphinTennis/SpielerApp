@@ -1,20 +1,38 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 import { useAuth } from './AuthContext'
-import { activateOwnMembership } from './teamApi'
+import { activateOwnMembership, notifyRegistration } from './teamApi'
 
 const OrgContext = createContext(null)
 
 async function fetchMembership(userId) {
   const { data, error } = await supabase
     .from('memberships')
-    .select('org_id, role, organizations(name, player_name)')
+    .select('org_id, role, organizations(name, player_name, role_permissions, theme, approved)')
     .eq('user_id', userId)
     .eq('status', 'active')
     .limit(1)
     .maybeSingle()
   if (error) throw error
   return data
+}
+
+const FULL_PERMISSIONS = {
+  manage_permissions: true,
+  invite_members: true,
+  year_plan_entries: true,
+  year_plan_auto_confirm: true,
+  calendar_entries: true,
+  calendar_auto_confirm: true,
+  confirm_termine: true,
+  visible_tiles: null,
+}
+
+// spieler is always full access, regardless of what's stored — matches the
+// role_has_permission() DB function's rule (see 015_role_permissions.sql).
+function derivePermissions(role, rolePermissions) {
+  if (role === 'spieler') return FULL_PERMISSIONS
+  return rolePermissions?.[role] || {}
 }
 
 // After Register.jsx signs a new user up, no session exists yet (email
@@ -47,6 +65,10 @@ async function provisionPendingTeam(session) {
   await supabase.auth.updateUser({
     data: { pending_team_name: null, pending_player_name: null, pending_role: null },
   })
+
+  // Doesn't block onboarding if it fails — the owner can always approve
+  // manually later once they notice; this is just the fast path.
+  notifyRegistration(orgId).catch((err) => console.error(err))
 
   return fetchMembership(session.user.id)
 }
@@ -96,6 +118,12 @@ export function OrgProvider({ children }) {
     }
   }, [session])
 
+  const theme = membership?.organizations?.theme || 'hardcourt'
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+  }, [theme])
+
   const value = {
     loading,
     orgId: membership?.org_id ?? null,
@@ -103,6 +131,9 @@ export function OrgProvider({ children }) {
     orgName: membership?.organizations?.name ?? null,
     playerName: membership?.organizations?.player_name || '',
     isAdmin: membership?.role === 'spieler' || membership?.role === 'management',
+    permissions: derivePermissions(membership?.role, membership?.organizations?.role_permissions),
+    theme,
+    approved: membership?.organizations?.approved ?? true,
   }
 
   return <OrgContext.Provider value={value}>{children}</OrgContext.Provider>

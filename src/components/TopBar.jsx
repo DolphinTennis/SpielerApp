@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../lib/AuthContext'
 
 function GearIcon() {
@@ -12,6 +13,7 @@ function GearIcon() {
 }
 
 export default function TopBar({ playerName, crumbs = [] }) {
+  const { t } = useTranslation()
   const { signOut } = useAuth()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -52,23 +54,20 @@ export default function TopBar({ playerName, crumbs = [] }) {
           {menuOpen && (
             <div className="settings-dropdown">
               <button type="button" onClick={() => goTo('/app/team')}>
-                Mein Team
+                {t('topbar.myTeam')}
               </button>
               <button type="button" onClick={() => goTo('/app/einstellungen')}>
-                Allgemeine Einstellungen
-              </button>
-              <button type="button" onClick={() => goTo('/app/mein-dolphin')}>
-                Mein Dolphin
+                {t('topbar.generalSettings')}
               </button>
               <div className="settings-dropdown-divider" />
               <button type="button" className="danger" onClick={signOut}>
-                Abmelden
+                {t('topbar.signOut')}
               </button>
             </div>
           )}
         </div>
       </div>
-      <div className="brand-sub">DEIN SPIELERPORTAL</div>
+      <div className="brand-sub">{t('topbar.tagline')}</div>
       <div className="breadcrumb">
         {crumbs.map((crumb, i) => (
           <button key={i} type="button" onClick={crumb.onClick}>

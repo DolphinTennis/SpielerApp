@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import FileRow from '../components/FileRow'
 import FilePreviewModal from '../components/FilePreviewModal'
 import { useAuth } from '../lib/AuthContext'
@@ -41,6 +42,7 @@ function sortFiles(list, sort) {
 }
 
 export default function Files() {
+  const { t } = useTranslation()
   const { session } = useAuth()
   const { orgId } = useOrg()
   const toast = useToast()
@@ -69,7 +71,7 @@ export default function Files() {
       })
       .catch((err) => {
         console.error(err)
-        toast('Dateien konnten nicht geladen werden.')
+        toast(t('files.loadFailed'))
       })
       .finally(() => !cancelled && setLoading(false))
     return () => {
@@ -104,17 +106,17 @@ export default function Files() {
   async function handleAddFolder() {
     const name = newFolderName.trim()
     if (!name) {
-      toast('Bitte einen Ordnernamen eingeben.')
+      toast(t('files.folderNameRequired'))
       return
     }
     try {
       const folder = await createFolder(orgId, name)
       setFolders((prev) => [...prev, folder].sort((a, b) => a.name.localeCompare(b.name, 'de')))
       setNewFolderName('')
-      toast('Ordner „' + name + '" angelegt.')
+      toast(t('files.folderCreated', { name }))
     } catch (err) {
       console.error(err)
-      toast('Ordner konnte nicht angelegt werden.')
+      toast(t('files.folderCreateFailed'))
     }
   }
 
@@ -124,10 +126,10 @@ export default function Files() {
       setFolders((prev) => prev.filter((f) => f.id !== folder.id))
       setFiles((prev) => prev.map((f) => (f.folder_id === folder.id ? { ...f, folder_id: null } : f)))
       if (currentFolderId === folder.id) setCurrentFolderId(null)
-      toast('Ordner „' + folder.name + '" gelöscht — Dateien sind jetzt nicht mehr zugeordnet.')
+      toast(t('files.folderDeleted', { name: folder.name }))
     } catch (err) {
       console.error(err)
-      toast('Ordner konnte nicht gelöscht werden.')
+      toast(t('files.folderDeleteFailed'))
     }
   }
 
@@ -137,7 +139,7 @@ export default function Files() {
       setFiles((prev) => prev.map((f) => (f.id === fileId ? { ...f, folder_id: folderId || null } : f)))
     } catch (err) {
       console.error(err)
-      toast('Ordner-Zuordnung fehlgeschlagen.')
+      toast(t('files.folderAssignFailed'))
     }
   }
 
@@ -149,10 +151,10 @@ export default function Files() {
     try {
       const saved = await uploadFile(userId, orgId, file, currentFolderId)
       setFiles((prev) => [saved, ...prev])
-      toast('Datei „' + file.name + '" hochgeladen.')
+      toast(t('files.fileUploaded', { name: file.name }))
     } catch (err) {
       console.error(err)
-      toast('Upload fehlgeschlagen: ' + (err.message || 'Unbekannter Fehler'))
+      toast(t('files.uploadFailed', { error: err.message || t('files.unknownError') }))
     } finally {
       setUploading(false)
     }
@@ -166,7 +168,7 @@ export default function Files() {
       setPreviewUrl(url)
     } catch (err) {
       console.error(err)
-      toast('Datei konnte nicht geöffnet werden.')
+      toast(t('files.openFailed'))
     } finally {
       setPreviewLoading(false)
     }
@@ -182,11 +184,11 @@ export default function Files() {
     try {
       await deleteFile(previewFile)
       setFiles((prev) => prev.filter((f) => f.id !== previewFile.id))
-      toast('Datei gelöscht.')
+      toast(t('files.fileDeleted'))
       closePreview()
     } catch (err) {
       console.error(err)
-      toast('Datei konnte nicht gelöscht werden.')
+      toast(t('files.fileDeleteFailed'))
     }
   }
 
@@ -194,20 +196,20 @@ export default function Files() {
 
   return (
     <div className="view">
-      <h1 className="section-title">Meine Dateien</h1>
-      <p className="section-sub">Dokumente, Bilder, Videos und mehr — in Ordnern organisieren, durchsuchen, sortieren.</p>
+      <h1 className="section-title">{t('files.title')}</h1>
+      <p className="section-sub">{t('files.subtitle')}</p>
 
       {!currentFolderId && (
         <div className="folder-create-row">
           <input
             type="text"
-            placeholder="Neuer Ordner, z. B. Ziele, Musik, Matchanalysen …"
+            placeholder={t('files.newFolderPlaceholder')}
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAddFolder()}
           />
           <button className="btn btn-primary btn-sm" onClick={handleAddFolder}>
-            + Ordner anlegen
+            {t('files.createFolder')}
           </button>
         </div>
       )}
@@ -215,9 +217,9 @@ export default function Files() {
       {currentFolderId && (
         <div>
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => setCurrentFolderId(null)}>
-            ← Alle Ordner
+            {t('files.allFolders')}
           </button>
-          <h3 className="folder-context-title">📂 {currentFolder ? currentFolder.name : 'Ordner'}</h3>
+          <h3 className="folder-context-title">📂 {currentFolder ? currentFolder.name : t('files.folder')}</h3>
         </div>
       )}
 
@@ -229,7 +231,7 @@ export default function Files() {
               <div className="folder-btn" key={folder.id} onClick={() => setCurrentFolderId(folder.id)}>
                 <button
                   className="folder-delete"
-                  title="Ordner löschen"
+                  title={t('files.deleteFolderTitle')}
                   onClick={(e) => {
                     e.stopPropagation()
                     handleDeleteFolder(folder)
@@ -240,7 +242,7 @@ export default function Files() {
                 <div className="folder-icon">📂</div>
                 <div className="folder-name">{folder.name}</div>
                 <div className="folder-count">
-                  {count} {count === 1 ? 'Datei' : 'Dateien'}
+                  {count} {count === 1 ? t('files.countFile') : t('files.countFiles')}
                 </div>
               </div>
             )
@@ -250,17 +252,17 @@ export default function Files() {
 
       <div className="filter-bar">
         <div className="field">
-          <label htmlFor="ff-name">Name</label>
+          <label htmlFor="ff-name">{t('files.name')}</label>
           <input
             id="ff-name"
             type="text"
-            placeholder="z. B. Trainingsplan"
+            placeholder={t('files.namePlaceholder')}
             value={filters.name}
             onChange={(e) => setFilters((f) => ({ ...f, name: e.target.value }))}
           />
         </div>
         <div className="field">
-          <label htmlFor="ff-date">Datum (gespeichert am)</label>
+          <label htmlFor="ff-date">{t('files.dateSaved')}</label>
           <input
             id="ff-date"
             type="date"
@@ -269,41 +271,41 @@ export default function Files() {
           />
         </div>
         <div className="field">
-          <label htmlFor="ff-type">Dateiart</label>
+          <label htmlFor="ff-type">{t('files.fileType')}</label>
           <select id="ff-type" value={filters.type} onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value }))}>
-            <option value="">Alle Dateiarten</option>
-            <option value="Bild">Bild</option>
-            <option value="Video">Video</option>
-            <option value="PDF">PDF</option>
-            <option value="Dokument">Dokument</option>
-            <option value="Audio">Audio</option>
-            <option value="Sonstiges">Sonstiges</option>
+            <option value="">{t('files.allFileTypes')}</option>
+            <option value="Bild">{t('fileTypes.Bild')}</option>
+            <option value="Video">{t('fileTypes.Video')}</option>
+            <option value="PDF">{t('fileTypes.PDF')}</option>
+            <option value="Dokument">{t('fileTypes.Dokument')}</option>
+            <option value="Audio">{t('fileTypes.Audio')}</option>
+            <option value="Sonstiges">{t('fileTypes.Sonstiges')}</option>
           </select>
         </div>
         <div className="field sort-field">
-          <label htmlFor="ff-sort">Sortierung</label>
+          <label htmlFor="ff-sort">{t('files.sorting')}</label>
           <select id="ff-sort" value={sort} onChange={(e) => setSort(e.target.value)}>
-            <option value="name-asc">A–Z (Name)</option>
-            <option value="name-desc">Z–A (Name)</option>
-            <option value="date-desc">Datum (neueste zuerst)</option>
-            <option value="date-asc">Datum (älteste zuerst)</option>
-            <option value="type-asc">Dateiart (aufsteigend)</option>
-            <option value="type-desc">Dateiart (absteigend)</option>
+            <option value="name-asc">{t('files.sortNameAsc')}</option>
+            <option value="name-desc">{t('files.sortNameDesc')}</option>
+            <option value="date-desc">{t('files.sortDateDesc')}</option>
+            <option value="date-asc">{t('files.sortDateAsc')}</option>
+            <option value="type-asc">{t('files.sortTypeAsc')}</option>
+            <option value="type-desc">{t('files.sortTypeDesc')}</option>
           </select>
         </div>
         <button className="btn btn-ghost" onClick={() => setFilters({ name: '', datum: '', type: '' })}>
-          Filter löschen
+          {t('files.clearFilters')}
         </button>
       </div>
 
       <div className="list-head">
         <span style={{ fontSize: 13, color: 'var(--text-soft)', fontWeight: 600 }}>
           {loading
-            ? 'Lädt …'
-            : `${filtered.length} ${filtered.length === 1 ? 'Datei' : 'Dateien'}` + (currentFolderId ? '' : ' · ohne Ordner')}
+            ? t('files.loading')
+            : `${filtered.length} ${filtered.length === 1 ? t('files.countFile') : t('files.countFiles')}` + (currentFolderId ? '' : t('files.withoutFolder'))}
         </span>
         <button className="btn btn-primary" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-          {uploading ? 'Lädt hoch …' : '+ Datei hochladen'}
+          {uploading ? t('files.uploading') : t('files.uploadFile')}
         </button>
         <input ref={fileInputRef} type="file" style={{ display: 'none' }} onChange={handleFileSelected} />
       </div>
@@ -312,9 +314,9 @@ export default function Files() {
         <div className="empty-state">
           <div className="big-emoji">📁</div>
           <p>
-            <strong>Keine Dateien gefunden.</strong>
+            <strong>{t('files.emptyTitle')}</strong>
           </p>
-          <p>{currentFolderId ? 'Diesem Ordner sind noch keine Dateien zugeordnet.' : 'Passe die Filter an oder lade eine neue Datei hoch.'}</p>
+          <p>{currentFolderId ? t('files.emptyInFolder') : t('files.emptyNoFolder')}</p>
         </div>
       )}
 

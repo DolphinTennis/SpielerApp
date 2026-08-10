@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../lib/AuthContext'
 import { useOrg } from '../lib/OrgContext'
 import { useToast } from '../lib/ToastContext'
@@ -6,6 +7,7 @@ import { addMediaExample, deleteMediaExample, fetchLinkPreview, listMediaExample
 import MediaExampleCard from '../components/MediaExampleCard'
 
 export default function Beispiele() {
+  const { t } = useTranslation()
   const { session } = useAuth()
   const { orgId } = useOrg()
   const toast = useToast()
@@ -31,7 +33,7 @@ export default function Beispiele() {
       })
       .catch((err) => {
         console.error(err)
-        toast('Beispiele konnten nicht geladen werden.')
+        toast(t('beispiele.loadFailed'))
       })
       .finally(() => !cancelled && setLoading(false))
     return () => {
@@ -43,7 +45,7 @@ export default function Beispiele() {
   async function handleSave() {
     const trimmed = url.trim()
     if (!trimmed || !/^https?:\/\//i.test(trimmed)) {
-      toast('Bitte einen gültigen Link (beginnend mit http/https) angeben.')
+      toast(t('beispiele.invalidLink'))
       return
     }
     setSaving(true)
@@ -59,10 +61,10 @@ export default function Beispiele() {
       setItems((prev) => [saved, ...prev])
       setUrl('')
       setNote('')
-      toast('Beispiel hinzugefügt.')
+      toast(t('beispiele.added'))
     } catch (err) {
       console.error(err)
-      toast('Speichern fehlgeschlagen.')
+      toast(t('beispiele.saveFailed'))
     } finally {
       setSaving(false)
     }
@@ -72,29 +74,29 @@ export default function Beispiele() {
     try {
       await deleteMediaExample(item.id)
       setItems((prev) => prev.filter((i) => i.id !== item.id))
-      toast('Beispiel gelöscht.')
+      toast(t('beispiele.deleted'))
     } catch (err) {
       console.error(err)
-      toast('Löschen fehlgeschlagen.')
+      toast(t('beispiele.deleteFailed'))
     }
   }
 
   return (
     <div className="view">
-      <h1 className="section-title">Beispiele</h1>
-      <p className="section-sub">Geteilte Medien als Vorbilder, Hilfestellung, etc. — Link aus Instagram/YouTube/TikTok einfügen.</p>
+      <h1 className="section-title">{t('beispiele.title')}</h1>
+      <p className="section-sub">{t('beispiele.subtitle')}</p>
 
       <div className="media-example-add-form">
         <input
           type="text"
-          placeholder="Link einfügen, z. B. https://..."
+          placeholder={t('beispiele.linkPlaceholder')}
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSave()}
         />
-        <input type="text" placeholder="Notiz (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
+        <input type="text" placeholder={t('beispiele.notePlaceholder')} value={note} onChange={(e) => setNote(e.target.value)} />
         <button type="button" className="btn btn-primary" onClick={handleSave} disabled={saving}>
-          {saving ? 'Lädt Vorschau …' : 'Speichern'}
+          {saving ? t('beispiele.loadingPreview') : t('beispiele.save')}
         </button>
       </div>
 
@@ -102,9 +104,9 @@ export default function Beispiele() {
         <div className="empty-state">
           <div className="big-emoji">🎬</div>
           <p>
-            <strong>Noch keine Beispiele.</strong>
+            <strong>{t('beispiele.emptyTitle')}</strong>
           </p>
-          <p>Füge oben einen Link ein, um loszulegen.</p>
+          <p>{t('beispiele.emptyDesc')}</p>
         </div>
       )}
 

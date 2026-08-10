@@ -3,12 +3,14 @@
 // Placeholder.jsx) and are intentionally stable even where the display
 // title was renamed (e.g. `liveticker` -> "Matchticker", `videos` ->
 // "Beispiele") so no routes had to change along with the rename.
+// titleKey/descKey point into src/locales/*.json under overview.items.<key> —
+// actual display text lives there, not here, so it can be translated.
 export const OVERVIEW_ITEMS = [
-  { key: 'turnierplanung', icon: '🗺️', title: 'Jahresplanung', desc: 'Übersichtsplanung mit Input von außen.', implemented: true, badge: 'ready' },
-  { key: 'trainingsplan', icon: '📋', title: 'Terminplanung', desc: 'Trainings- und Spieltermine an einem Ort.', implemented: true, badge: 'ready' },
-  { key: 'trainingsfokus', icon: '🎯', title: 'Trainingsfokus', desc: 'Vorbereitung und Nacharbeit zum Training.', implemented: true, badge: 'ready' },
-  { key: 'videos', icon: '🎬', title: 'Beispiele', desc: 'Geteilte Medien als Vorbilder, Hilfestellung, etc. …', implemented: true, badge: 'ready' },
-  { key: 'dateien', icon: '📁', title: 'Meine Dateien', desc: 'Alles was mir wichtig ist.', implemented: true, badge: 'ready' },
-  { key: 'liveticker', icon: '📡', title: 'Matchticker', desc: 'Aktuelles Spiel im Blick.', implemented: true, badge: 'live' },
-  { key: 'matchanalyse', icon: '🎾', title: 'Matchanalyse', desc: 'Spiele auswerten & reflektieren.', implemented: true, badge: 'ready' },
+  { key: 'turnierplanung', icon: '🗺️', titleKey: 'overview.items.turnierplanung.title', descKey: 'overview.items.turnierplanung.desc', implemented: true, badge: 'ready' },
+  { key: 'trainingsplan', icon: '📋', titleKey: 'overview.items.trainingsplan.title', descKey: 'overview.items.trainingsplan.desc', implemented: true, badge: 'ready' },
+  { key: 'trainingsfokus', icon: '🎯', titleKey: 'overview.items.trainingsfokus.title', descKey: 'overview.items.trainingsfokus.desc', implemented: true, badge: 'ready' },
+  { key: 'videos', icon: '🎬', titleKey: 'overview.items.videos.title', descKey: 'overview.items.videos.desc', implemented: true, badge: 'ready' },
+  { key: 'dateien', icon: '📁', titleKey: 'overview.items.dateien.title', descKey: 'overview.items.dateien.desc', implemented: true, badge: 'ready' },
+  { key: 'liveticker', icon: '📡', titleKey: 'overview.items.liveticker.title', descKey: 'overview.items.liveticker.desc', implemented: true, badge: 'live' },
+  { key: 'matchanalyse', icon: '🎾', titleKey: 'overview.items.matchanalyse.title', descKey: 'overview.items.matchanalyse.desc', implemented: true, badge: 'ready' },
 ]

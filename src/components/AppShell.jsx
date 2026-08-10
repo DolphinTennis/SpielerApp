@@ -1,4 +1,5 @@
 import { Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useOrg } from '../lib/OrgContext'
 import { ToastProvider } from '../lib/ToastContext'
 import TopBar from './TopBar'
@@ -13,6 +14,7 @@ import Trainingsplan from '../pages/Trainingsplan'
 import Beispiele from '../pages/Beispiele'
 import TrainingFocusList from '../pages/TrainingFocusList'
 import TrainingFocusEditor from '../pages/TrainingFocusEditor'
+import Einstellungen from '../pages/Einstellungen'
 import Placeholder from '../pages/Placeholder'
 
 const OVERVIEW_ROUTES = { matchanalyse: 'matchanalyse', liveticker: 'liveticker', dateien: 'dateien' }
@@ -35,18 +37,19 @@ function PlaceholderRoute() {
 }
 
 function AppShellInner() {
+  const { t } = useTranslation()
   const { playerName } = useOrg()
   const navigate = useNavigate()
   const location = useLocation()
 
   let crumbs = []
   if (location.pathname !== '/app') {
-    crumbs = [{ label: '← Übersicht', onClick: () => navigate('/app') }]
+    crumbs = [{ label: t('appShell.breadcrumbOverview'), onClick: () => navigate('/app') }]
     if (location.pathname.startsWith('/app/matchanalyse/')) {
-      crumbs.push({ label: '← Matchanalyse', onClick: () => navigate('/app/matchanalyse') })
+      crumbs.push({ label: t('appShell.breadcrumbMatchanalyse'), onClick: () => navigate('/app/matchanalyse') })
     }
     if (location.pathname.startsWith('/app/trainingsfokus/')) {
-      crumbs.push({ label: '← Trainingsfokus', onClick: () => navigate('/app/trainingsfokus') })
+      crumbs.push({ label: t('appShell.breadcrumbTrainingsfokus'), onClick: () => navigate('/app/trainingsfokus') })
     }
   }
 
@@ -85,6 +88,7 @@ function AppShellInner() {
           }
         />
         <Route path="trainingsfokus/:entryId" element={<TrainingFocusEditorRoute />} />
+        <Route path="einstellungen" element={<Einstellungen />} />
         <Route path=":placeholderKey" element={<PlaceholderRoute />} />
       </Routes>
     </div>
@@ -92,15 +96,21 @@ function AppShellInner() {
 }
 
 export default function AppShell() {
-  const { loading, orgId } = useOrg()
+  const { t } = useTranslation()
+  const { loading, orgId, approved } = useOrg()
 
   if (loading) return null
   if (!orgId) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-        <p style={{ color: 'var(--text-soft)', maxWidth: 360, textAlign: 'center' }}>
-          Kein Team gefunden. Falls du gerade registriert hast, versuch es in ein paar Sekunden erneut.
-        </p>
+        <p style={{ color: 'var(--text-soft)', maxWidth: 360, textAlign: 'center' }}>{t('appShell.noTeam')}</p>
+      </div>
+    )
+  }
+  if (!approved) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <p style={{ color: 'var(--text-soft)', maxWidth: 360, textAlign: 'center' }}>{t('appShell.waitingApproval')}</p>
       </div>
     )
   }

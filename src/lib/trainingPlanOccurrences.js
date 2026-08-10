@@ -1,4 +1,5 @@
-import { CATEGORY_BY_KEY, WEEKDAYS, WEEKDAY_FULL_NAMES } from '../config/trainingPlanCategories'
+import i18n from '../i18n'
+import { CATEGORY_BY_KEY, WEEKDAYS } from '../config/trainingPlanCategories'
 
 function isoFromDate(date) {
   const y = date.getFullYear()
@@ -20,7 +21,7 @@ function buildEvent(session, occurrenceDateIso, exception) {
   const status = exception ? exception.status : session.status
   return {
     id: `${session.id}::${occurrenceDateIso}`,
-    title: cat.label,
+    title: i18n.t(cat.labelKey),
     start: `${effectiveDate}T${startTime}`,
     end: `${effectiveDate}T${endTime}`,
     color: cat.color,
@@ -90,25 +91,27 @@ export function parseOccurrenceId(id) {
 }
 
 export function formatWeekdays(weekdays) {
-  if (!weekdays || weekdays.length === 0) return 'Einmalig'
-  return WEEKDAYS.filter((w) => weekdays.includes(w.value)).map((w) => w.label).join(', ')
+  if (!weekdays || weekdays.length === 0) return i18n.t('calendar.oneTime')
+  return WEEKDAYS.filter((w) => weekdays.includes(w.value)).map((w) => i18n.t(w.labelKey)).join(', ')
 }
 
 export function formatOccurrenceDateLong(iso) {
   const [y, m, d] = iso.split('-').map(Number)
   const date = new Date(y, m - 1, d)
-  return `${WEEKDAY_FULL_NAMES[date.getDay()]}, ${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.${y}`
+  const weekdaysFull = i18n.t('calendar.weekdaysFull', { returnObjects: true })
+  return `${weekdaysFull[date.getDay()]}, ${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.${y}`
 }
 
 export function formatOccurrenceDateShort(iso) {
   const [y, m, d] = iso.split('-').map(Number)
   const date = new Date(y, m - 1, d)
   const yy = String(y).slice(-2)
-  return `${WEEKDAY_FULL_NAMES[date.getDay()]}, ${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.${yy}`
+  const weekdaysFull = i18n.t('calendar.weekdaysFull', { returnObjects: true })
+  return `${weekdaysFull[date.getDay()]}, ${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.${yy}`
 }
 
 export function formatTimeRange(startTime, endTime) {
-  return `${startTime.slice(0, 5)}–${endTime.slice(0, 5)} Uhr`
+  return i18n.t('calendar.timeRange', { start: startTime.slice(0, 5), end: endTime.slice(0, 5) })
 }
 
 export function todayIso() {

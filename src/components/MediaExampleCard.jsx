@@ -1,13 +1,15 @@
+import { useTranslation } from 'react-i18next'
 import { PLATFORM_ICON } from '../config/mediaExamplePlatforms'
 import { formatDate } from '../lib/format'
 
 export default function MediaExampleCard({ item, onDelete }) {
+  const { t } = useTranslation()
   return (
     <div className="media-example-card" onClick={() => window.open(item.url, '_blank', 'noopener,noreferrer')}>
       <button
         type="button"
         className="media-example-delete"
-        title="Löschen"
+        title={t('beispiele.delete')}
         onClick={(e) => {
           e.stopPropagation()
           onDelete(item)
@@ -25,7 +27,10 @@ export default function MediaExampleCard({ item, onDelete }) {
       <div className="media-example-title">{item.title || item.url}</div>
       {item.note && <div className="media-example-note">{item.note}</div>}
       <div className="media-example-meta">
-        hinzugefügt von {item.created_by_label || 'Teammitglied'} · {formatDate(item.created_at?.slice(0, 10))}
+        {t('beispiele.addedBy', {
+          name: item.created_by_label || t('beispiele.teamMember'),
+          date: formatDate(item.created_at?.slice(0, 10)),
+        })}
       </div>
     </div>
   )

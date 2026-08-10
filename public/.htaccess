@@ -1,0 +1,11 @@
+# Apache equivalent of Netlify's public/_redirects (/* /index.html 200) —
+# without this, refreshing a client-side route like /app/matchanalyse
+# would 404 on the server instead of being handed to React Router.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>

@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next'
 import { FILE_TYPE_ICON, formatFileSize } from '../lib/fileHelpers'
 import { formatDate } from '../lib/format'
 
 export default function FileRow({ file, folders, onOpen, onAssignFolder }) {
+  const { t } = useTranslation()
   return (
     <div className="file-row" onClick={onOpen}>
       <div className="file-icon">{FILE_TYPE_ICON[file.type] || '📁'}</div>
@@ -12,15 +14,15 @@ export default function FileRow({ file, folders, onOpen, onAssignFolder }) {
           <span>{formatFileSize(file.size_bytes)}</span>
         </div>
       </div>
-      <span className="type-tag">{file.type}</span>
+      <span className="type-tag">{t(`fileTypes.${file.type}`, file.type)}</span>
       <select
         className="file-folder-select"
         value={file.folder_id || ''}
         onClick={(e) => e.stopPropagation()}
         onChange={(e) => onAssignFolder(file.id, e.target.value)}
-        title="Ordner zuweisen"
+        title={t('files.assignFolder')}
       >
-        <option value="">Ohne Ordner</option>
+        <option value="">{t('files.noFolder')}</option>
         {folders.map((f) => (
           <option key={f.id} value={f.id}>
             {f.name}

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../lib/AuthContext'
 import { useOrg } from '../lib/OrgContext'
 import { useToast } from '../lib/ToastContext'
 import { deleteYearPlanDay, deleteYearPlanDayByDate, listYearPlanDays, saveYearPlanDay } from '../lib/yearPlanApi'
-import { CATEGORIES, CATEGORY_BY_KEY, MONTH_NAMES, daysInMonth } from '../config/yearPlanCategories'
+import { CATEGORIES, CATEGORY_BY_KEY, daysInMonth } from '../config/yearPlanCategories'
 import YearPlanDayPopover from '../components/YearPlanDayPopover'
 
 const LONG_PRESS_MS = 550
@@ -13,10 +14,13 @@ function dateStr(year, monthIndex, day) {
 }
 
 export default function YearPlanning() {
+  const { t } = useTranslation()
   const { session } = useAuth()
-  const { orgId, role } = useOrg()
+  const { orgId, permissions } = useOrg()
   const toast = useToast()
-  const isSpieler = role === 'spieler'
+  const monthNames = t('calendar.months', { returnObjects: true })
+  const canConfirm = !!permissions?.confirm_termine
+  const canCreate = canConfirm || !!permissions?.year_plan_entries
 
   const [year, setYear] = useState(new Date().getFullYear())
   const [days, setDays] = useState([])
@@ -38,7 +42,7 @@ export default function YearPlanning() {
       })
       .catch((err) => {
         console.error(err)
-        toast('Jahresplanung konnte nicht geladen werden.')
+        toast(t('yearPlanning.loadFailed'))
       })
       .finally(() => !cancelled && setLoading(false))
     return () => {
@@ -78,7 +82,7 @@ export default function YearPlanning() {
       setDays((prev) => [...prev.filter((d) => d.date !== date), saved])
     } catch (err) {
       console.error(err)
-      toast('Eintrag konnte nicht gespeichert werden.')
+      toast(t('yearPlanning.entrySaveFailed'))
     }
   }
 
@@ -88,7 +92,7 @@ export default function YearPlanning() {
       setDays((prev) => prev.filter((d) => d.date !== date))
     } catch (err) {
       console.error(err)
-      toast('Löschen fehlgeschlagen.')
+      toast(t('yearPlanning.deleteFailed'))
     }
   }
 
@@ -103,6 +107,7 @@ export default function YearPlanning() {
   function handleCellPointerDown(e, date) {
     if (loading) return
     if (e.pointerType === 'mouse' && e.button !== 0) return
+    if (!dayMap[date] && !canCreate) return
     const d = dragRef.current
     d.pressed = true
     d.active = false
@@ -173,10 +178,10 @@ export default function YearPlanning() {
       const saved = await saveYearPlanDay({ orgId, date: selected.date, category, note, userLabel: session.user.email })
       setDays((prev) => [...prev.filter((d) => d.date !== selected.date), saved])
       setSelected(null)
-      toast('Gespeichert.')
+      toast(t('yearPlanning.saved'))
     } catch (err) {
       console.error(err)
-      toast('Speichern fehlgeschlagen.')
+      toast(t('yearPlanning.saveFailed'))
     }
   }
 
@@ -191,10 +196,10 @@ export default function YearPlanning() {
       await deleteYearPlanDay(selected.entry.id)
       setDays((prev) => prev.filter((d) => d.date !== selected.date))
       setSelected(null)
-      toast('Eintrag gelöscht.')
+      toast(t('yearPlanning.deleted'))
     } catch (err) {
       console.error(err)
-      toast('Löschen fehlgeschlagen.')
+      toast(t('yearPlanning.deleteFailed'))
     }
   }
 
@@ -203,16 +208,16 @@ export default function YearPlanning() {
 
   return (
     <div className="view">
-      <h1 className="section-title">Jahresplanung</h1>
-      <p className="section-sub">Übersichtsplanung mit Input von außen.</p>
+      <h1 className="section-title">{t('yearPlanning.title')}</h1>
+      <p className="section-sub">{t('yearPlanning.subtitle')}</p>
 
       <div className="yearplan-toolbar">
         <div className="yearplan-year-switch">
-          <button type="button" onClick={() => setYear((y) => y - 1)} aria-label="Vorheriges Jahr">
+          <button type="button" onClick={() => setYear((y) => y - 1)} aria-label={t('yearPlanning.prevYear')}>
             ‹
           </button>
           <span className="year">{year}</span>
-          <button type="button" onClick={() => setYear((y) => y + 1)} aria-label="Nächstes Jahr">
+          <button type="button" onClick={() => setYear((y) => y + 1)} aria-label={t('yearPlanning.nextYear')}>
             ›
           </button>
         </div>
@@ -228,14 +233,12 @@ export default function YearPlanning() {
             onClick={() => setActiveCategory(c.key)}
           >
             <span className="swatch" />
-            {c.label}
+            {t(c.labelKey)}
           </button>
         ))}
       </div>
       <p className="yearplan-note">
-        Kategorie auswählen, dann klicken zum Markieren oder klicken-und-ziehen für einen Zeitraum (z. B. eine
-        Ferienwoche) — genauso funktioniert das Ziehen über bereits markierte Tage zum Entfernen. Doppelklick löscht
-        einen einzelnen Tag. Langes Drücken auf einen Tag öffnet die Detailansicht{isSpieler ? ' zum Bearbeiten oder Bestätigen' : ' zum Bearbeiten'}.
+        {t('yearPlanning.noteBase', { suffix: t(canConfirm ? 'yearPlanning.noteSuffixEditConfirm' : 'yearPlanning.noteSuffixEdit') })}
       </p>
 
       <div className="yearplan-scroll">
@@ -248,7 +251,7 @@ export default function YearPlanning() {
               </div>
             ))}
           </div>
-          {MONTH_NAMES.map((name, monthIndex) => {
+          {monthNames.map((name, monthIndex) => {
             const total = daysInMonth(year, monthIndex)
             return (
               <div className="yearplan-row" key={name}>
@@ -276,7 +279,7 @@ export default function YearPlanning() {
                         style={entry ? { background: cat.color } : undefined}
                         title={
                           entry
-                            ? `${cat.label}${entry.note ? ' — ' + entry.note : ''}${entry.status === 'proposed' ? ' (Vorschlag)' : ''}`
+                            ? `${t(cat.labelKey)}${entry.note ? ' — ' + entry.note : ''}${entry.status === 'proposed' ? t('yearPlanning.proposedSuffix') : ''}`
                             : `${day}.${monthIndex + 1}.${year}`
                         }
                         disabled={loading}
@@ -301,7 +304,7 @@ export default function YearPlanning() {
           date={selected.date}
           entry={selected.entry}
           activeCategory={activeCategory}
-          isSpieler={isSpieler}
+          canConfirm={canConfirm}
           onClose={() => setSelected(null)}
           onSave={handlePopoverSave}
           onConfirm={handlePopoverConfirm}

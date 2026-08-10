@@ -10,6 +10,8 @@ import './styles/print.css'
 import './styles/yearplan.css'
 import './styles/trainingsplan.css'
 import './styles/beispiele.css'
+import './styles/team.css'
+import './i18n'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(

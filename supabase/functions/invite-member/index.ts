@@ -59,7 +59,16 @@ Deno.serve(async (req) => {
       .eq('status', 'active')
       .maybeSingle()
 
-    if (!callerMembership || !['spieler', 'management'].includes(callerMembership.role)) {
+    if (!callerMembership) {
+      return json({ error: 'Keine Berechtigung, Mitglieder für dieses Team einzuladen.' }, 403)
+    }
+
+    const { data: canInvite } = await asCaller.rpc('role_has_permission', {
+      target_org_id: orgId,
+      target_role: callerMembership.role,
+      perm_key: 'invite_members',
+    })
+    if (!canInvite) {
       return json({ error: 'Keine Berechtigung, Mitglieder für dieses Team einzuladen.' }, 403)
     }
 

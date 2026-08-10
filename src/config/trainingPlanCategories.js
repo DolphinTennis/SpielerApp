@@ -1,32 +1,28 @@
 // `textColor` is optional (default white) — light background colors
-// (Tennis, Spiel) need dark text instead to stay readable.
+// (Tennis, Spiel) need dark text instead to stay readable. labelKey points
+// into src/locales/*.json (calendar.trainingCategories.<key>).
 export const CATEGORIES = [
-  { key: 'tennis', label: 'Tennis', color: '#D9A916', textColor: 'var(--ink)' },
-  { key: 'kondi', label: 'Kondi', color: '#E08E45' },
-  { key: 'physio', label: 'Physio', color: '#2FA84F' },
-  { key: 'mental', label: 'Mental', color: '#8E5FD1' },
-  { key: 'spiel', label: 'Spiel', color: '#C4A484', textColor: 'var(--ink)' },
-  { key: 'turnier_national', label: 'Turnier national', color: '#1C63B7' },
-  { key: 'turnier_international', label: 'Turnier international', color: '#17A2A2' },
-  { key: 'sonstiges', label: 'Sonstiges', color: '#C0392B' },
+  { key: 'tennis', labelKey: 'calendar.trainingCategories.tennis', color: '#D9A916', textColor: 'var(--ink)' },
+  { key: 'kondi', labelKey: 'calendar.trainingCategories.kondi', color: '#E08E45' },
+  { key: 'physio', labelKey: 'calendar.trainingCategories.physio', color: '#2FA84F' },
+  { key: 'mental', labelKey: 'calendar.trainingCategories.mental', color: '#8E5FD1' },
+  { key: 'spiel', labelKey: 'calendar.trainingCategories.spiel', color: '#C4A484', textColor: 'var(--ink)' },
+  { key: 'turnier_national', labelKey: 'calendar.trainingCategories.turnier_national', color: '#1C63B7' },
+  { key: 'turnier_international', labelKey: 'calendar.trainingCategories.turnier_international', color: '#17A2A2' },
+  { key: 'sonstiges', labelKey: 'calendar.trainingCategories.sonstiges', color: '#C0392B' },
 ]
 
 export const CATEGORY_BY_KEY = Object.fromEntries(CATEGORIES.map((c) => [c.key, c]))
 
 // value = JS Date#getDay() (0=So..6=Sa); order here is display order (Mo-So).
 export const WEEKDAYS = [
-  { value: 1, label: 'Mo' },
-  { value: 2, label: 'Di' },
-  { value: 3, label: 'Mi' },
-  { value: 4, label: 'Do' },
-  { value: 5, label: 'Fr' },
-  { value: 6, label: 'Sa' },
-  { value: 0, label: 'So' },
-]
-
-// Indexed by JS Date#getDay().
-export const WEEKDAY_FULL_NAMES = [
-  'Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag',
+  { value: 1, labelKey: 'calendar.weekdaysShort.mo' },
+  { value: 2, labelKey: 'calendar.weekdaysShort.di' },
+  { value: 3, labelKey: 'calendar.weekdaysShort.mi' },
+  { value: 4, labelKey: 'calendar.weekdaysShort.do' },
+  { value: 5, labelKey: 'calendar.weekdaysShort.fr' },
+  { value: 6, labelKey: 'calendar.weekdaysShort.sa' },
+  { value: 0, labelKey: 'calendar.weekdaysShort.so' },
 ]
 
 export const UPCOMING_COUNT_OPTIONS = [3, 6, 9, 12]

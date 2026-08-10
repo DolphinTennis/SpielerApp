@@ -1,23 +1,25 @@
 // Each card's `blocks` array preserves the reference app's exact visual order:
 // a block is either {type:'fields', fields:[...]} (plain qgroups) or
 // {type:'subgroup', title, fields:[...]} (a titled, left-bordered cluster).
+// titleKey/labelKey point into src/locales/*.json — actual text lives there
+// so it can be translated; consumers (FormCard.jsx, MatchEditor.jsx) call t().
 export const FORM1_CARDS = [
   {
-    title: 'Ich — Allgemein',
+    titleKey: 'matchanalyse.form1.card1.title',
     num: 1,
     blocks: [
       {
         type: 'fields',
         fields: [
-          { key: 'allg1', label: 'Was hat gut funktioniert, das bereits trainiert wird?' },
-          { key: 'allg2', label: 'Was hat nicht funktioniert, obwohl es trainiert wird?' },
-          { key: 'allg3', label: 'Was hat gefehlt, das bisher noch nicht trainiert wurde?' },
+          { key: 'allg1', labelKey: 'matchanalyse.form1.fields.allg1' },
+          { key: 'allg2', labelKey: 'matchanalyse.form1.fields.allg2' },
+          { key: 'allg3', labelKey: 'matchanalyse.form1.fields.allg3' },
         ],
       },
     ],
   },
   {
-    title: 'Ich im Match',
+    titleKey: 'matchanalyse.form1.card2.title',
     num: 2,
     blocks: [
       {
@@ -26,20 +28,20 @@ export const FORM1_CARDS = [
         type: 'boundedGroup',
         sections: [
           {
-            title: 'Taktik',
+            titleKey: 'matchanalyse.form1.card2.taktikTitle',
             fields: [
-              { key: 'taktik1', label: 'Was war meine taktische Ausrichtung?' },
-              { key: 'taktik2', label: 'Wie gut konnte ich diese umsetzen?' },
+              { key: 'taktik1', labelKey: 'matchanalyse.form1.fields.taktik1' },
+              { key: 'taktik2', labelKey: 'matchanalyse.form1.fields.taktik2' },
             ],
           },
           {
-            fields: [{ key: 'schlaege', label: 'Wie waren meine Schläge (Vorhand, Rückhand, Aufschlag, Volley …)?' }],
+            fields: [{ key: 'schlaege', labelKey: 'matchanalyse.form1.fields.schlaege' }],
           },
           {
-            title: 'Feeling',
+            titleKey: 'matchanalyse.form1.card2.feelingTitle',
             fields: [
-              { key: 'feeling1', label: 'Wie habe ich mich körperlich auf dem Platz gefühlt? (Energie, Beweglichkeit …)' },
-              { key: 'feeling2', label: 'Wie habe ich mich mental auf dem Platz gefühlt? (Fokus, Selbstvertrauen …)' },
+              { key: 'feeling1', labelKey: 'matchanalyse.form1.fields.feeling1' },
+              { key: 'feeling2', labelKey: 'matchanalyse.form1.fields.feeling2' },
             ],
           },
         ],
@@ -47,15 +49,15 @@ export const FORM1_CARDS = [
     ],
   },
   {
-    title: 'Meine Gegnerin',
+    titleKey: 'matchanalyse.form1.card3.title',
     num: 3,
     blocks: [
       {
         type: 'fields',
         fields: [
-          { key: 'gegner1', label: 'Wie hat meine Gegnerin gespielt? (Taktik …)' },
-          { key: 'gegner2', label: 'Was waren ihre Stärken?' },
-          { key: 'gegner3', label: 'Was waren ihre Schwächen?' },
+          { key: 'gegner1', labelKey: 'matchanalyse.form1.fields.gegner1' },
+          { key: 'gegner2', labelKey: 'matchanalyse.form1.fields.gegner2' },
+          { key: 'gegner3', labelKey: 'matchanalyse.form1.fields.gegner3' },
         ],
       },
     ],
@@ -63,12 +65,11 @@ export const FORM1_CARDS = [
 ]
 
 export const FORM2_FIELDS = {
-  gut: 'Was lief gut?',
-  nicht: 'Was lief nicht optimal?',
-  warum:
-    'Warum lief es nicht optimal? (ehrlich, sachlich, objektiv — z. B. Gegnerin kam mit den Bedingungen besser klar, war strategisch stärker …)',
-  zieleMatch: 'Ziele fürs nächste Match',
-  zieleTraining: 'Ziele fürs nächste Training',
+  gut: 'matchanalyse.form2.fields.gut',
+  nicht: 'matchanalyse.form2.fields.nicht',
+  warum: 'matchanalyse.form2.fields.warum',
+  zieleMatch: 'matchanalyse.form2.fields.zieleMatch',
+  zieleTraining: 'matchanalyse.form2.fields.zieleTraining',
 }
 
 export function blankForm1() {

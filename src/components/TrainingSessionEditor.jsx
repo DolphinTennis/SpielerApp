@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { CATEGORIES, WEEKDAYS } from '../config/trainingPlanCategories'
 import { formatOccurrenceDateLong } from '../lib/trainingPlanOccurrences'
 
@@ -8,13 +9,14 @@ export default function TrainingSessionEditor({
   occurrenceDate,
   status,
   isRecurring,
-  isAdmin,
+  canConfirm,
   onClose,
   onSave,
   onConfirm,
   onCancelOccurrence,
   onDeleteSeries,
 }) {
+  const { t } = useTranslation()
   const [category, setCategory] = useState(initial.category)
   const [location, setLocation] = useState(initial.location || '')
   const [withWhom, setWithWhom] = useState(initial.withWhom || '')
@@ -57,23 +59,23 @@ export default function TrainingSessionEditor({
     )
   }
 
-  const heading = mode === 'create' ? 'Neuer Termin' : isRecurring ? 'Serie bearbeiten' : 'Termin bearbeiten'
+  const heading = mode === 'create' ? t('trainingSessionEditor.headingCreate') : isRecurring ? t('trainingSessionEditor.headingEditSeries') : t('trainingSessionEditor.headingEdit')
 
   return (
     <div className="trainingplan-popover-backdrop" onClick={onClose}>
       <div className="trainingplan-popover" onClick={(e) => e.stopPropagation()}>
         <h3>{heading}</h3>
         {isRecurring && occurrenceDate && (
-          <p className="trainingplan-popover-subtitle">Einheit: {formatOccurrenceDateLong(occurrenceDate)}</p>
+          <p className="trainingplan-popover-subtitle">{t('trainingSessionEditor.unit', { date: formatOccurrenceDateLong(occurrenceDate) })}</p>
         )}
-        {status === 'proposed' && <span className="proposed-badge">Vorschlag — noch nicht bestätigt</span>}
+        {status === 'proposed' && <span className="proposed-badge">{t('trainingSessionEditor.proposedBadge')}</span>}
 
         <div className="field" style={{ marginBottom: 12 }}>
-          <label htmlFor="ts-category">Thema</label>
+          <label htmlFor="ts-category">{t('trainingSessionEditor.topic')}</label>
           <select id="ts-category" value={category} onChange={(e) => setCategory(e.target.value)}>
             {CATEGORIES.map((c) => (
               <option key={c.key} value={c.key}>
-                {c.label}
+                {t(c.labelKey)}
               </option>
             ))}
           </select>
@@ -81,22 +83,34 @@ export default function TrainingSessionEditor({
 
         <div className="trainingplan-field-row">
           <div className="field">
-            <label htmlFor="ts-location">Ort</label>
-            <input id="ts-location" type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="z. B. Tennishalle" />
+            <label htmlFor="ts-location">{t('trainingSessionEditor.location')}</label>
+            <input
+              id="ts-location"
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder={t('trainingSessionEditor.locationPlaceholder')}
+            />
           </div>
           <div className="field">
-            <label htmlFor="ts-with-whom">Mit wem</label>
-            <input id="ts-with-whom" type="text" value={withWhom} onChange={(e) => setWithWhom(e.target.value)} placeholder="z. B. Trainer Michael" />
+            <label htmlFor="ts-with-whom">{t('trainingSessionEditor.withWhom')}</label>
+            <input
+              id="ts-with-whom"
+              type="text"
+              value={withWhom}
+              onChange={(e) => setWithWhom(e.target.value)}
+              placeholder={t('trainingSessionEditor.withWhomPlaceholder')}
+            />
           </div>
         </div>
 
         <div className="trainingplan-field-row">
           <div className="field">
-            <label htmlFor="ts-start-time">Startzeit</label>
+            <label htmlFor="ts-start-time">{t('trainingSessionEditor.startTime')}</label>
             <input id="ts-start-time" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
           </div>
           <div className="field">
-            <label htmlFor="ts-end-time">Endzeit</label>
+            <label htmlFor="ts-end-time">{t('trainingSessionEditor.endTime')}</label>
             <input id="ts-end-time" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
           </div>
         </div>
@@ -104,20 +118,20 @@ export default function TrainingSessionEditor({
         <label className="trainingplan-oneoff-toggle">
           <input type="checkbox" checked={oneOff} onChange={(e) => setOneOff(e.target.checked)} />
           <span>
-            Einmaliger Termin
-            <span className="trainingplan-oneoff-hint"> — sonst wöchentlich wiederholend</span>
+            <span>{t('trainingSessionEditor.oneOff')}</span>
+            <span className="trainingplan-oneoff-hint">{t('trainingSessionEditor.oneOffHint')}</span>
           </span>
         </label>
 
         {oneOff ? (
           <div className="field" style={{ marginBottom: 12 }}>
-            <label htmlFor="ts-date">Datum</label>
+            <label htmlFor="ts-date">{t('trainingSessionEditor.date')}</label>
             <input id="ts-date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
           </div>
         ) : (
           <>
             <div className="field" style={{ marginBottom: 8 }}>
-              <label>Wochentage</label>
+              <label>{t('trainingSessionEditor.weekdays')}</label>
               <div className="trainingplan-weekday-picker">
                 {WEEKDAYS.map((w) => (
                   <button
@@ -126,18 +140,18 @@ export default function TrainingSessionEditor({
                     className={weekdays.includes(w.value) ? 'active' : ''}
                     onClick={() => toggleWeekday(w.value)}
                   >
-                    {w.label}
+                    {t(w.labelKey)}
                   </button>
                 ))}
               </div>
             </div>
             <div className="trainingplan-field-row">
               <div className="field">
-                <label htmlFor="ts-start-date">Start ab</label>
+                <label htmlFor="ts-start-date">{t('trainingSessionEditor.startFrom')}</label>
                 <input id="ts-start-date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
               </div>
               <div className="field">
-                <label htmlFor="ts-end-date">Bis (optional)</label>
+                <label htmlFor="ts-end-date">{t('trainingSessionEditor.until')}</label>
                 <input id="ts-end-date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
               </div>
             </div>
@@ -145,31 +159,37 @@ export default function TrainingSessionEditor({
         )}
 
         <div className="field">
-          <label htmlFor="ts-note">Notiz (optional)</label>
-          <textarea id="ts-note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="z. B. Aufschlagtraining" style={{ minHeight: 60 }} />
+          <label htmlFor="ts-note">{t('trainingSessionEditor.note')}</label>
+          <textarea
+            id="ts-note"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder={t('trainingSessionEditor.notePlaceholder')}
+            style={{ minHeight: 60 }}
+          />
         </div>
 
         <div className="trainingplan-popover-actions">
-          {isAdmin && status === 'proposed' && (
+          {canConfirm && status === 'proposed' && (
             <button type="button" className="btn btn-primary" disabled={busy} onClick={() => run(onConfirm)}>
-              ✓ Bestätigen
+              {t('trainingSessionEditor.confirm')}
             </button>
           )}
           <button type="button" className="btn btn-outline" disabled={busy} onClick={handleSave}>
-            Speichern
+            {t('trainingSessionEditor.save')}
           </button>
           {mode === 'edit' && isRecurring && (
             <button type="button" className="btn btn-clay" disabled={busy} onClick={() => run(onCancelOccurrence)}>
-              Nur diesen Termin absagen
+              {t('trainingSessionEditor.cancelOccurrence')}
             </button>
           )}
           {mode === 'edit' && (
             <button type="button" className="btn btn-clay" disabled={busy} onClick={() => run(onDeleteSeries)}>
-              {isRecurring ? 'Ganze Serie löschen' : 'Löschen'}
+              {isRecurring ? t('trainingSessionEditor.deleteSeries') : t('trainingSessionEditor.delete')}
             </button>
           )}
           <button type="button" className="btn btn-ghost" disabled={busy} onClick={onClose}>
-            Abbrechen
+            {t('trainingSessionEditor.cancel')}
           </button>
         </div>
       </div>

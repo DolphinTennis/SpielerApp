@@ -1,21 +1,28 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import FormCard from '../components/FormCard'
 import { FORM1_CARDS, FORM2_FIELDS } from '../config/matchFormFields'
-import { blankMatch, createMatch, getMatch, updateMatch } from '../lib/matchesApi'
+import { blankMatch, createMatch, getMatch, translateMatch, updateMatch } from '../lib/matchesApi'
 import { buildMailBody, printInPage } from '../lib/matchExport'
 import { syncGoalsForMatch } from '../lib/trainingGoalsApi'
 import { formatDate } from '../lib/format'
 import { useToast } from '../lib/ToastContext'
 import { useAuth } from '../lib/AuthContext'
 import { useOrg } from '../lib/OrgContext'
+import { useLanguage } from '../lib/useLanguage'
 
 export default function MatchEditor({ matchId, onBack }) {
+  const { t } = useTranslation()
+  const { language } = useLanguage()
   const { session } = useAuth()
   const { orgId, playerName } = useOrg()
   const toast = useToast()
   const [record, setRecord] = useState(null)
   const [tab, setTab] = useState(1)
   const [saving, setSaving] = useState(false)
+  const [translation, setTranslation] = useState(null)
+  const [translating, setTranslating] = useState(false)
+  const [showTranslation, setShowTranslation] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -33,12 +40,14 @@ export default function MatchEditor({ matchId, onBack }) {
         })
         .catch((err) => {
           console.error(err)
-          toast('Match konnte nicht geladen werden.')
+          toast(t('matchanalyse.editor.loadFailed'))
         })
     } else {
       setRecord(blankMatch(session.user.id, orgId, playerName))
     }
     setTab(1)
+    setTranslation(null)
+    setShowTranslation(false)
     return () => {
       cancelled = true
     }
@@ -61,13 +70,16 @@ export default function MatchEditor({ matchId, onBack }) {
       let saved
       if (rec.id) {
         const { id, created_at, updated_at, ...patch } = rec
+        // Any save can change form1/form2, so any cached translation could
+        // now be stale — clear it, the next "Übersetzen" click regenerates it.
+        patch.translations = {}
         saved = await updateMatch(id, patch)
       } else {
         saved = await createMatch(rec)
       }
       setRecord(saved)
       if (msg) toast(msg)
-      else if (!silent) toast('Matchanalyse gespeichert.')
+      else if (!silent) toast(t('matchanalyse.editor.saved'))
       // Keeps the checkable goal list in Terminplanung in sync — doesn't
       // block the save flow if it fails, just logs it.
       syncGoalsForMatch({
@@ -80,7 +92,7 @@ export default function MatchEditor({ matchId, onBack }) {
       return saved
     } catch (err) {
       console.error(err)
-      toast('Speichern fehlgeschlagen.')
+      toast(t('matchanalyse.editor.saveFailed'))
       throw err
     } finally {
       setSaving(false)
@@ -99,7 +111,7 @@ export default function MatchEditor({ matchId, onBack }) {
     try {
       const saved = await persist(record, true)
       printInPage(saved, formNumber)
-      toast('Druckdialog wird geöffnet — dort „Als PDF speichern" wählen.')
+      toast(t('matchanalyse.editor.printDialog'))
     } catch (err) {
       if (err?.message) toast(err.message)
     }
@@ -110,7 +122,7 @@ export default function MatchEditor({ matchId, onBack }) {
       const saved = await persist(record, true)
       const subject = encodeURIComponent('Matchanalyse ' + saved.spieler + ' - ' + (saved.gegner || '') + ' (' + formatDate(saved.datum) + ')')
       window.location.href = 'mailto:?subject=' + subject + '&body=' + buildMailBody(saved)
-      toast('E-Mail-Programm wird geöffnet. Tipp: Für den PDF-Anhang zuerst „Als PDF drucken" nutzen und die Datei anhängen.')
+      toast(t('matchanalyse.editor.mailOpened'))
     } catch {
       /* toasted in persist */
     }
@@ -120,9 +132,32 @@ export default function MatchEditor({ matchId, onBack }) {
     const updated = { ...record, filed: !record.filed }
     setRecord(updated)
     try {
-      await persist(updated, true, updated.filed ? 'Als abgelegt markiert.' : 'Ablage-Markierung entfernt.')
+      await persist(updated, true, updated.filed ? t('matchanalyse.editor.filedMsg') : t('matchanalyse.editor.unfiledMsg'))
     } catch {
       /* toasted in persist */
+    }
+  }
+
+  async function handleTranslate() {
+    if (showTranslation) {
+      setShowTranslation(false)
+      return
+    }
+    if (translation) {
+      setShowTranslation(true)
+      return
+    }
+    setTranslating(true)
+    try {
+      const saved = await persist(record, true)
+      const result = await translateMatch(saved.id, language)
+      setTranslation(result)
+      setShowTranslation(true)
+    } catch (err) {
+      console.error(err)
+      toast(err?.message || t('matchanalyse.editor.translateFailed'))
+    } finally {
+      setTranslating(false)
     }
   }
 
@@ -131,7 +166,7 @@ export default function MatchEditor({ matchId, onBack }) {
       await persist(record, true)
       setRecord(blankMatch(session.user.id, orgId, playerName))
       setTab(1)
-      toast('Neues Formular angelegt.')
+      toast(t('matchanalyse.editor.newFormMsg'))
     } catch {
       /* toasted in persist */
     }
@@ -139,17 +174,25 @@ export default function MatchEditor({ matchId, onBack }) {
 
   if (!record) return null
 
+  const displayForm1 = showTranslation && translation ? translation.form1 : record.form1
+  const displayForm2 = showTranslation && translation ? translation.form2 : record.form2
+
   return (
     <div className="view">
-      <h1 className="section-title">Matchanalyse</h1>
+      <h1 className="section-title">{t('matchanalyse.editor.title')}</h1>
       <p className="section-sub">{playerName}</p>
+      {showTranslation && (
+        <div className="aaa-note" style={{ marginBottom: 14 }}>
+          {t('matchanalyse.editor.translatedBanner')}
+        </div>
+      )}
 
       <div className="editor-header">
         <div className="field">
-          <label htmlFor="e-verlauf">Spielverlauf</label>
+          <label htmlFor="e-verlauf">{t('matchanalyse.editor.matchProgress')}</label>
           <textarea
             id="e-verlauf"
-            placeholder="Kurzer Überblick über den Spielverlauf …"
+            placeholder={t('matchanalyse.editor.matchProgressPlaceholder')}
             style={{ minHeight: 52 }}
             value={record.verlauf || ''}
             onChange={(e) => updateField('verlauf', e.target.value)}
@@ -157,106 +200,156 @@ export default function MatchEditor({ matchId, onBack }) {
         </div>
         <div className="grid-fields">
           <div className="field">
-            <label htmlFor="e-date">Spieldatum</label>
+            <label htmlFor="e-date">{t('matchanalyse.editor.matchDate')}</label>
             <input id="e-date" type="date" value={record.datum || ''} onChange={(e) => updateField('datum', e.target.value)} />
           </div>
           <div className="field">
-            <label htmlFor="e-opp">Name Gegnerin</label>
-            <input id="e-opp" type="text" placeholder="Gegnerin" value={record.gegner || ''} onChange={(e) => updateField('gegner', e.target.value)} />
+            <label htmlFor="e-opp">{t('matchanalyse.editor.opponentName')}</label>
+            <input
+              id="e-opp"
+              type="text"
+              placeholder={t('matchanalyse.editor.opponentPlaceholder')}
+              value={record.gegner || ''}
+              onChange={(e) => updateField('gegner', e.target.value)}
+            />
           </div>
           <div className="field">
-            <label htmlFor="e-result">Spielergebnis</label>
+            <label htmlFor="e-result">{t('matchanalyse.editor.result')}</label>
             <input
               id="e-result"
               type="text"
-              placeholder="z. B. 6:4, 3:6, 6:2"
+              placeholder={t('matchanalyse.editor.resultPlaceholder')}
               value={record.ergebnis || ''}
               onChange={(e) => updateField('ergebnis', e.target.value)}
             />
           </div>
           <div className="field">
-            <label htmlFor="e-tourn">Turnier</label>
-            <input id="e-tourn" type="text" placeholder="Turniername" value={record.turnier || ''} onChange={(e) => updateField('turnier', e.target.value)} />
+            <label htmlFor="e-tourn">{t('matchanalyse.editor.tournament')}</label>
+            <input
+              id="e-tourn"
+              type="text"
+              placeholder={t('matchanalyse.editor.tournamentPlaceholder')}
+              value={record.turnier || ''}
+              onChange={(e) => updateField('turnier', e.target.value)}
+            />
           </div>
         </div>
       </div>
 
       <div className="tabs">
         <div className={`tab${tab === 1 ? ' active' : ''}`} onClick={() => setTab(1)}>
-          Formular 1 · Spielreflexion
+          {t('matchanalyse.editor.tab1')}
         </div>
         <div className={`tab${tab === 2 ? ' active' : ''}`} onClick={() => setTab(2)}>
-          Formular 2 · Triple-A-Analyse
+          {t('matchanalyse.editor.tab2')}
         </div>
       </div>
 
       <div className={`form-panel${tab === 1 ? ' active' : ''}`}>
         {FORM1_CARDS.map((card) => (
-          <FormCard key={card.title} card={card} values={record.form1} onChange={updateForm1} />
+          <FormCard key={card.titleKey} card={card} values={displayForm1} onChange={updateForm1} readOnly={showTranslation} />
         ))}
+        <FormCard
+          card={{
+            titleKey: 'matchanalyse.editor.goalsCardTitle',
+            num: 4,
+            blocks: [
+              {
+                type: 'fields',
+                fields: [
+                  { key: 'zieleMatch', labelKey: FORM2_FIELDS.zieleMatch },
+                  { key: 'zieleTraining', labelKey: FORM2_FIELDS.zieleTraining },
+                ],
+              },
+            ],
+          }}
+          values={displayForm2}
+          onChange={updateForm2}
+          readOnly={showTranslation}
+        />
       </div>
 
       <div className={`form-panel${tab === 2 ? ' active' : ''}`}>
         <div className="form-card">
-          <h4>Triple-A-Analyse</h4>
-          <p className="hint">Nach der Triple-A-Methode von Stefanie Sziburies.</p>
-          <div className="aaa-note">
-            Am besten frühestens einen Tag nach dem Match ausfüllen — mit etwas Abstand fällt die ehrliche, sachliche Einordnung leichter.
-          </div>
+          <h4>{t('matchanalyse.editor.tripleATitle')}</h4>
+          <p className="hint">{t('matchanalyse.editor.tripleAHint')}</p>
+          <div className="aaa-note">{t('matchanalyse.editor.tripleANote')}</div>
           <div className="two-col">
             <div className="qgroup">
-              <label className="qlabel">{FORM2_FIELDS.gut}</label>
-              <textarea style={{ minHeight: 110 }} value={record.form2.gut} onChange={(e) => updateForm2('gut', e.target.value)} />
+              <label className="qlabel">{t(FORM2_FIELDS.gut)}</label>
+              {showTranslation ? (
+                <div className="qvalue">{displayForm2.gut || '–'}</div>
+              ) : (
+                <textarea style={{ minHeight: 110 }} value={record.form2.gut} onChange={(e) => updateForm2('gut', e.target.value)} />
+              )}
             </div>
             <div className="qgroup">
-              <label className="qlabel">{FORM2_FIELDS.nicht}</label>
-              <textarea style={{ minHeight: 110 }} value={record.form2.nicht} onChange={(e) => updateForm2('nicht', e.target.value)} />
+              <label className="qlabel">{t(FORM2_FIELDS.nicht)}</label>
+              {showTranslation ? (
+                <div className="qvalue">{displayForm2.nicht || '–'}</div>
+              ) : (
+                <textarea style={{ minHeight: 110 }} value={record.form2.nicht} onChange={(e) => updateForm2('nicht', e.target.value)} />
+              )}
             </div>
           </div>
           <div className="qgroup">
-            <label className="qlabel">{FORM2_FIELDS.warum}</label>
-            <textarea value={record.form2.warum} onChange={(e) => updateForm2('warum', e.target.value)} />
+            <label className="qlabel">{t(FORM2_FIELDS.warum)}</label>
+            {showTranslation ? (
+              <div className="qvalue">{displayForm2.warum || '–'}</div>
+            ) : (
+              <textarea value={record.form2.warum} onChange={(e) => updateForm2('warum', e.target.value)} />
+            )}
           </div>
           <div className="qgroup">
-            <label className="qlabel">{FORM2_FIELDS.zieleMatch}</label>
-            <textarea value={record.form2.zieleMatch} onChange={(e) => updateForm2('zieleMatch', e.target.value)} />
+            <label className="qlabel">{t(FORM2_FIELDS.zieleMatch)}</label>
+            {showTranslation ? (
+              <div className="qvalue">{displayForm2.zieleMatch || '–'}</div>
+            ) : (
+              <textarea value={record.form2.zieleMatch} onChange={(e) => updateForm2('zieleMatch', e.target.value)} />
+            )}
           </div>
           <div className="qgroup">
-            <label className="qlabel">{FORM2_FIELDS.zieleTraining}</label>
-            <textarea value={record.form2.zieleTraining} onChange={(e) => updateForm2('zieleTraining', e.target.value)} />
+            <label className="qlabel">{t(FORM2_FIELDS.zieleTraining)}</label>
+            {showTranslation ? (
+              <div className="qvalue">{displayForm2.zieleTraining || '–'}</div>
+            ) : (
+              <textarea value={record.form2.zieleTraining} onChange={(e) => updateForm2('zieleTraining', e.target.value)} />
+            )}
           </div>
-          <div className="attrib">© Stefanie Sziburies — Triple-A-Analyse</div>
         </div>
       </div>
 
       <div className="action-bar">
         <div className="left-actions">
           <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-            💾 Speichern
+            {t('matchanalyse.editor.save')}
           </button>
           <button className="btn btn-outline" onClick={() => handlePrint(1)} disabled={saving}>
-            🖨️ Formular 1 als PDF
+            {t('matchanalyse.editor.printForm1')}
           </button>
           <button className="btn btn-outline" onClick={() => handlePrint(2)} disabled={saving}>
-            🖨️ Formular 2 als PDF
+            {t('matchanalyse.editor.printForm2')}
           </button>
           <button className="btn btn-outline" onClick={handleMail} disabled={saving}>
-            ✉️ Per E-Mail senden
+            {t('matchanalyse.editor.sendMail')}
+          </button>
+          <button className="btn btn-outline" onClick={handleTranslate} disabled={saving || translating}>
+            {translating ? t('matchanalyse.editor.translating') : showTranslation ? t('matchanalyse.editor.showOriginal') : t('matchanalyse.editor.translate')}
           </button>
         </div>
         <div className="right-actions">
           <button className="btn btn-ghost" onClick={handleFile} disabled={saving}>
-            🗂️ Ablegen
+            {t('matchanalyse.editor.file')}
           </button>
           <button className="btn btn-clay" onClick={handleNewForm} disabled={saving}>
-            ➕ Neues Formular
+            {t('matchanalyse.editor.newForm')}
           </button>
         </div>
       </div>
 
       <div className="breadcrumb-inline" style={{ marginTop: 14 }}>
         <button type="button" className="btn btn-ghost btn-sm" onClick={onBack}>
-          ← Zurück zur Liste
+          {t('matchanalyse.editor.backToList')}
         </button>
       </div>
     </div>

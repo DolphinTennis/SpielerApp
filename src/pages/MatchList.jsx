@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import MatchRow from '../components/MatchRow'
 import { deleteMatch, listMatches } from '../lib/matchesApi'
 import { useToast } from '../lib/ToastContext'
 import { useOrg } from '../lib/OrgContext'
 
 export default function MatchList({ onOpenMatch, onNewMatch }) {
+  const { t } = useTranslation()
   const { orgId, playerName } = useOrg()
   const [matches, setMatches] = useState([])
   const [loading, setLoading] = useState(true)
@@ -20,7 +22,7 @@ export default function MatchList({ onOpenMatch, onNewMatch }) {
       })
       .catch((err) => {
         console.error(err)
-        toast('Matchanalysen konnten nicht geladen werden.')
+        toast(t('matchanalyse.list.loadFailed'))
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -28,6 +30,7 @@ export default function MatchList({ onOpenMatch, onNewMatch }) {
     return () => {
       cancelled = true
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orgId, toast])
 
   const filtered = useMemo(() => {
@@ -42,36 +45,36 @@ export default function MatchList({ onOpenMatch, onNewMatch }) {
   }, [matches, filters])
 
   async function handleDelete(match) {
-    const label = 'vs. ' + (match.gegner || 'Unbekannt') + (match.datum ? ' (' + match.datum + ')' : '')
-    if (!window.confirm('Matchanalyse „' + label + '" wirklich löschen? Das kann nicht rückgängig gemacht werden.')) return
+    const label = 'vs. ' + (match.gegner || t('matchanalyse.list.unknown')) + (match.datum ? ' (' + match.datum + ')' : '')
+    if (!window.confirm(t('matchanalyse.list.deleteConfirm', { label }))) return
     try {
       await deleteMatch(match.id)
       setMatches((prev) => prev.filter((m) => m.id !== match.id))
-      toast('Matchanalyse gelöscht.')
+      toast(t('matchanalyse.list.deleted'))
     } catch (err) {
       console.error(err)
-      toast('Löschen fehlgeschlagen.')
+      toast(t('matchanalyse.list.deleteFailed'))
     }
   }
 
   return (
     <div className="view">
-      <h1 className="section-title">Matchanalyse</h1>
-      <p className="section-sub">Alle erfassten Spiele von {playerName} — durchsuchen, filtern, auswerten.</p>
+      <h1 className="section-title">{t('matchanalyse.list.title')}</h1>
+      <p className="section-sub">{t('matchanalyse.list.subtitle', { name: playerName })}</p>
 
       <div className="filter-bar">
         <div className="field">
-          <label htmlFor="f-opp">Name Gegnerin</label>
+          <label htmlFor="f-opp">{t('matchanalyse.list.opponentName')}</label>
           <input
             id="f-opp"
             type="text"
-            placeholder="z. B. Meier"
+            placeholder={t('matchanalyse.list.opponentPlaceholder')}
             value={filters.opp}
             onChange={(e) => setFilters((f) => ({ ...f, opp: e.target.value }))}
           />
         </div>
         <div className="field">
-          <label htmlFor="f-date">Spieldatum</label>
+          <label htmlFor="f-date">{t('matchanalyse.list.matchDate')}</label>
           <input
             id="f-date"
             type="date"
@@ -80,26 +83,26 @@ export default function MatchList({ onOpenMatch, onNewMatch }) {
           />
         </div>
         <div className="field">
-          <label htmlFor="f-tourn">Turnier</label>
+          <label htmlFor="f-tourn">{t('matchanalyse.list.tournament')}</label>
           <input
             id="f-tourn"
             type="text"
-            placeholder="z. B. Bezirksmeisterschaft"
+            placeholder={t('matchanalyse.list.tournamentPlaceholder')}
             value={filters.tourn}
             onChange={(e) => setFilters((f) => ({ ...f, tourn: e.target.value }))}
           />
         </div>
         <button className="btn btn-ghost" onClick={() => setFilters({ opp: '', date: '', tourn: '' })}>
-          Filter löschen
+          {t('matchanalyse.list.clearFilters')}
         </button>
       </div>
 
       <div className="list-head">
         <span style={{ fontSize: 13, color: 'var(--text-soft)', fontWeight: 600 }}>
-          {loading ? 'Lädt …' : `${filtered.length} ${filtered.length === 1 ? 'Spiel' : 'Spiele'}`}
+          {loading ? t('common.loading') : `${filtered.length} ${filtered.length === 1 ? t('matchanalyse.list.countGame') : t('matchanalyse.list.countGames')}`}
         </span>
         <button className="btn btn-primary" onClick={onNewMatch}>
-          + Neue Matchanalyse
+          {t('matchanalyse.list.newMatch')}
         </button>
       </div>
 
@@ -107,9 +110,9 @@ export default function MatchList({ onOpenMatch, onNewMatch }) {
         <div className="empty-state">
           <div className="big-emoji">🎾</div>
           <p>
-            <strong>Noch keine Matchanalysen gefunden.</strong>
+            <strong>{t('matchanalyse.list.emptyTitle')}</strong>
           </p>
-          <p>Erfasse dein erstes Spiel über „Neue Matchanalyse".</p>
+          <p>{t('matchanalyse.list.emptyDesc')}</p>
         </div>
       )}
 

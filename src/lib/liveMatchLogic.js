@@ -1,3 +1,5 @@
+import i18n from '../i18n'
+
 // A set is won at 6 games with a 2-game lead, or 7:5. At 6:6 the set moves
 // into a tiebreak instead (handled in addLivePoint).
 export function isSetOver(a, b) {
@@ -73,12 +75,12 @@ function finalizeSet(m, setEntry) {
   let message
   if (setsWonA >= next.setsToWin || setsWonB >= next.setsToWin) {
     next = { ...next, decided: true }
-    message = 'Match entschieden: ' + formatSetScore(setEntry) + ' im letzten Satz.'
+    message = i18n.t('liveMatchLogic.matchDecidedInLastSet', { score: formatSetScore(setEntry) })
   } else if (next.mode === 'matchtiebreak' && next.sets.length === 2 && setsWonA === 1 && setsWonB === 1) {
     next = { ...next, matchTiebreak: { pointsA: 0, pointsB: 0, history: [] } }
-    message = 'Sätze stehen 1:1 — Match-Tiebreak entscheidet (bis 10, 2 Punkte Vorsprung)!'
+    message = i18n.t('liveMatchLogic.oneOneMatchTiebreak')
   } else {
-    message = 'Satz beendet: ' + formatSetScore(setEntry) + ' — neuer Satz gestartet.'
+    message = i18n.t('liveMatchLogic.setOverNewSet', { score: formatSetScore(setEntry) })
   }
   return { next, message }
 }
@@ -95,7 +97,7 @@ function finalizeMatchTiebreak(m) {
     setsWonA: winnerIsA ? m.setsWonA + 1 : m.setsWonA,
     setsWonB: winnerIsA ? m.setsWonB : m.setsWonB + 1,
   }
-  return { next, message: 'Match entschieden im Match-Tiebreak: ' + mtb.pointsA + ':' + mtb.pointsB + '.' }
+  return { next, message: i18n.t('liveMatchLogic.decidedInMatchTiebreak', { a: mtb.pointsA, b: mtb.pointsB }) }
 }
 
 export function addLivePoint(m, side) {
@@ -141,7 +143,7 @@ export function addLivePoint(m, side) {
   if (gamesA === 6 && gamesB === 6) {
     return {
       next: { ...working, tiebreak: { pointsA: 0, pointsB: 0, history: [] } },
-      message: '6:6 im Satz — Tiebreak beginnt! Die Buttons zählen jetzt Tiebreak-Punkte.',
+      message: i18n.t('liveMatchLogic.tiebreakStarts'),
     }
   }
   if (isSetOver(gamesA, gamesB)) {

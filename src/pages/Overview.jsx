@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import OverviewCard from '../components/OverviewCard'
 import { OVERVIEW_ITEMS } from '../config/overviewItems'
 import { useOrg } from '../lib/OrgContext'
@@ -9,9 +10,13 @@ function beispieleLastSeenKey(orgId) {
 }
 
 export default function Overview({ onNavigate }) {
-  const { playerName, isAdmin, orgId } = useOrg()
+  const { t } = useTranslation()
+  const { playerName, isAdmin, orgId, permissions } = useOrg()
   const [hasNewBeispiele, setHasNewBeispiele] = useState(false)
-  const items = OVERVIEW_ITEMS.filter((item) => !item.adminOnly || isAdmin)
+  const visibleTiles = permissions?.visible_tiles
+  const items = OVERVIEW_ITEMS.filter((item) => !item.adminOnly || isAdmin).filter(
+    (item) => !visibleTiles || visibleTiles.includes(item.key)
+  )
 
   // Checking the shared mailbox here (rather than only on the Beispiele
   // page) means it happens whenever someone logs in or comes back to the
@@ -39,8 +44,10 @@ export default function Overview({ onNavigate }) {
 
   return (
     <div className="view">
-      <h1 className="section-title">Übersicht</h1>
-      <p className="section-sub">Aktuelle Themen rund um {playerName ? playerName + 's' : 'die'} Saison.</p>
+      <h1 className="section-title">{t('overview.title')}</h1>
+      <p className="section-sub">
+        {playerName ? t('overview.subtitleWithName', { name: playerName }) : t('overview.subtitleNoName')}
+      </p>
       <div className="grid">
         {items.map((item) => {
           const badge = item.key === 'videos' && hasNewBeispiele ? 'neu' : item.implemented ? item.badge : null
@@ -48,8 +55,8 @@ export default function Overview({ onNavigate }) {
             <OverviewCard
               key={item.key}
               icon={item.icon}
-              title={item.title}
-              desc={item.desc}
+              title={t(item.titleKey)}
+              desc={t(item.descKey)}
               badge={badge}
               active={item.implemented}
               onClick={() => onNavigate(item.key)}

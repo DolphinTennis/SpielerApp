@@ -1,0 +1,35 @@
+<div style="background:#F4F7FB;padding:32px 16px;font-family:Arial,Helvetica,sans-serif;">
+  <div style="max-width:480px;margin:0 auto;background:#FFFFFF;border-radius:14px;overflow:hidden;border:1px solid #D7DEE6;">
+    <div style="background:linear-gradient(160deg,#1C63B7 0%,#123F73 100%);padding:28px 24px;text-align:center;">
+      <div style="font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:28px;color:#FFFFFF;letter-spacing:0.5px;">
+        Dolphin<span style="color:#D7F23D;">.</span>
+      </div>
+      <div style="margin-top:6px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.75);">
+        Dein Spielerportal
+      </div>
+    </div>
+    <div style="padding:32px 28px;">
+      <h1 style="margin:0 0 12px;font-size:20px;color:#16232E;">Du wurdest eingeladen</h1>
+      <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:#5B6875;">
+        Du wurdest eingeladen, einem Team auf Dolphin Tennis beizutreten. Klicke auf den Button unten, um ein
+        Passwort festzulegen und loszulegen.
+      </p>
+      <div style="text-align:center;margin-bottom:24px;">
+        <a href="{{ .ConfirmationURL }}"
+           style="display:inline-block;background:#D7F23D;color:#0F2740;font-weight:700;font-size:14px;
+                  padding:13px 28px;border-radius:9px;text-decoration:none;">
+          Einladung annehmen
+        </a>
+      </div>
+      <p style="margin:0;font-size:12px;line-height:1.5;color:#8B97A3;">
+        Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:<br>
+        <a href="{{ .ConfirmationURL }}" style="color:#1C63B7;word-break:break-all;">{{ .ConfirmationURL }}</a>
+      </p>
+    </div>
+    <div style="padding:16px 28px;border-top:1px solid #D7DEE6;text-align:center;">
+      <p style="margin:0;font-size:11px;color:#8B97A3;">
+        Falls du diese Einladung nicht erwartet hast, kannst du diese E-Mail einfach ignorieren.
+      </p>
+    </div>
+  </div>
+</div>

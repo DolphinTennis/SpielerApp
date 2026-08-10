@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import FullCalendar from '@fullcalendar/react'
 import multiMonthPlugin from '@fullcalendar/multimonth'
 import dayGridPlugin from '@fullcalendar/daygrid'
@@ -17,6 +18,7 @@ import {
   upsertTrainingSessionException,
 } from '../lib/trainingPlanApi'
 import { expandOccurrences, parseOccurrenceId, formatOccurrenceDateShort, formatTimeRange, todayIso, addDaysIso } from '../lib/trainingPlanOccurrences'
+import { buildIcs, downloadIcs } from '../lib/icalExport'
 import { CATEGORY_BY_KEY, UPCOMING_COUNT_OPTIONS } from '../config/trainingPlanCategories'
 import { listGoals, deleteGoal } from '../lib/trainingGoalsApi'
 import TrainingSessionEditor from '../components/TrainingSessionEditor'
@@ -46,9 +48,12 @@ function addMinutesToTime(hhmm, minutes) {
 }
 
 export default function Trainingsplan() {
+  const { t, i18n } = useTranslation()
   const { session } = useAuth()
-  const { orgId, isAdmin } = useOrg()
+  const { orgId, permissions } = useOrg()
   const toast = useToast()
+  const canConfirm = !!permissions?.confirm_termine
+  const canCreate = canConfirm || !!permissions?.calendar_entries
 
   const [sessions, setSessions] = useState([])
   const [exceptions, setExceptions] = useState([])
@@ -71,7 +76,7 @@ export default function Trainingsplan() {
       })
       .catch((err) => {
         console.error(err)
-        toast('Terminplanung konnte nicht geladen werden.')
+        toast(t('trainingsplan.loadFailed'))
       })
       .finally(() => !cancelled && setLoading(false))
     return () => {
@@ -86,7 +91,7 @@ export default function Trainingsplan() {
       await deleteGoal(goal.id)
     } catch (err) {
       console.error(err)
-      toast('Konnte nicht als erledigt markiert werden.')
+      toast(t('trainingsplan.goalCompleteFailed'))
       setGoals((prev) => [...prev, goal])
     }
   }
@@ -153,6 +158,7 @@ export default function Trainingsplan() {
   }
 
   function handleSelect(info) {
+    if (!canCreate) return
     const dateIso = info.startStr.slice(0, 10)
     const hasTime = info.startStr.length > 10
     const startTime = hasTime ? info.startStr.slice(11, 16) : '17:00'
@@ -189,10 +195,10 @@ export default function Trainingsplan() {
         })
         setExceptions((prev) => [...prev.filter((e) => e.id !== saved.id), saved])
       }
-      toast('Termin aktualisiert.')
+      toast(t('trainingsplan.eventUpdated'))
     } catch (err) {
       console.error(err)
-      toast('Verschieben fehlgeschlagen.')
+      toast(t('trainingsplan.moveFailed'))
       info.revert()
     }
   }
@@ -214,7 +220,7 @@ export default function Trainingsplan() {
           created_by_label: session.user.email,
         })
         setSessions((prev) => [...prev, created])
-        toast('Termin angelegt.')
+        toast(t('trainingsplan.eventCreated'))
       } else {
         const updated = await updateTrainingSession(editingTarget.session.id, {
           category: values.category,
@@ -229,12 +235,12 @@ export default function Trainingsplan() {
           created_by_label: session.user.email,
         })
         setSessions((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
-        toast('Gespeichert.')
+        toast(t('trainingsplan.saved'))
       }
       setEditingTarget(null)
     } catch (err) {
       console.error(err)
-      toast('Speichern fehlgeschlagen.')
+      toast(t('trainingsplan.saveFailed'))
     }
   }
 
@@ -268,11 +274,11 @@ export default function Trainingsplan() {
         })
         setSessions((prev) => prev.map((sess) => (sess.id === updated.id ? updated : sess)))
       }
-      toast('Bestätigt.')
+      toast(t('trainingsplan.confirmed'))
       setEditingTarget(null)
     } catch (err) {
       console.error(err)
-      toast('Bestätigen fehlgeschlagen.')
+      toast(t('trainingsplan.confirmFailed'))
     }
   }
 
@@ -284,11 +290,11 @@ export default function Trainingsplan() {
         cancelled: true,
       })
       setExceptions((prev) => [...prev.filter((e) => e.id !== saved.id), saved])
-      toast('Termin abgesagt.')
+      toast(t('trainingsplan.cancelled'))
       setEditingTarget(null)
     } catch (err) {
       console.error(err)
-      toast('Absagen fehlgeschlagen.')
+      toast(t('trainingsplan.cancelFailed'))
     }
   }
 
@@ -298,22 +304,35 @@ export default function Trainingsplan() {
       await deleteTrainingSession(id)
       setSessions((prev) => prev.filter((s) => s.id !== id))
       setExceptions((prev) => prev.filter((e) => e.session_id !== id))
-      toast(editingTarget.isRecurring ? 'Serie gelöscht.' : 'Termin gelöscht.')
+      toast(editingTarget.isRecurring ? t('trainingsplan.seriesDeleted') : t('trainingsplan.eventDeleted'))
       setEditingTarget(null)
     } catch (err) {
       console.error(err)
-      toast('Löschen fehlgeschlagen.')
+      toast(t('trainingsplan.deleteFailed'))
     }
+  }
+
+  function handleExportIcs() {
+    const start = todayIso()
+    const end = addDaysIso(start, 365)
+    const events = expandOccurrences(sessions, exceptions, start, end)
+    downloadIcs('terminplanung.ics', buildIcs(events))
   }
 
   return (
     <div className="view">
-      <h1 className="section-title">Terminplanung</h1>
-      <p className="section-sub">Trainings- und Spieltermine an einem Ort.</p>
+      <h1 className="section-title">{t('trainingsplan.title')}</h1>
+      <p className="section-sub">{t('trainingsplan.subtitle')}</p>
+
+      <div style={{ marginBottom: 16 }}>
+        <button type="button" className="btn btn-outline btn-sm" onClick={handleExportIcs}>
+          {t('trainingsplan.exportIcs')}
+        </button>
+      </div>
 
       <div className="trainingplan-upcoming">
         <div className="trainingplan-upcoming-header">
-          <h2>Nächste Termine</h2>
+          <h2>{t('trainingsplan.upcoming')}</h2>
           <div className="trainingplan-count-picker">
             {UPCOMING_COUNT_OPTIONS.map((n) => (
               <button key={n} type="button" className={upcomingCount === n ? 'active' : ''} onClick={() => setUpcomingCount(n)}>
@@ -323,7 +342,7 @@ export default function Trainingsplan() {
           </div>
         </div>
         {upcomingEvents.length === 0 ? (
-          <p className="trainingplan-upcoming-empty">{loading ? 'Lädt…' : 'Noch keine Termine eingetragen.'}</p>
+          <p className="trainingplan-upcoming-empty">{loading ? t('common.loading') : t('trainingsplan.empty')}</p>
         ) : (
           <ul className="trainingplan-upcoming-list">
             {upcomingEvents.map((ev) => (
@@ -331,12 +350,12 @@ export default function Trainingsplan() {
                 <span className="trainingplan-upcoming-date">{formatOccurrenceDateShort(ev.extendedProps.occurrenceDate)}</span>
                 <span className="trainingplan-upcoming-time">{formatTimeRange(ev.extendedProps.startTime, ev.extendedProps.endTime)}</span>
                 <span className="trainingplan-upcoming-category" style={{ '--cat-color': CATEGORY_BY_KEY[ev.extendedProps.category].color }}>
-                  {CATEGORY_BY_KEY[ev.extendedProps.category].label}
+                  {t(CATEGORY_BY_KEY[ev.extendedProps.category].labelKey)}
                 </span>
-                {ev.extendedProps.withWhom && <span className="trainingplan-upcoming-detail">mit {ev.extendedProps.withWhom}</span>}
+                {ev.extendedProps.withWhom && <span className="trainingplan-upcoming-detail">{t('trainingsplan.with', { name: ev.extendedProps.withWhom })}</span>}
                 {ev.extendedProps.location && <span className="trainingplan-upcoming-detail">{ev.extendedProps.location}</span>}
                 {ev.extendedProps.note && <span className="trainingplan-upcoming-note">{ev.extendedProps.note}</span>}
-                {ev.extendedProps.status === 'proposed' && <span className="trainingplan-upcoming-flag">Vorschlag</span>}
+                {ev.extendedProps.status === 'proposed' && <span className="trainingplan-upcoming-flag">{t('trainingsplan.proposed')}</span>}
               </li>
             ))}
           </ul>
@@ -350,12 +369,12 @@ export default function Trainingsplan() {
           plugins={[multiMonthPlugin, dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="timeGridWeek"
           headerToolbar={{ left: 'prev,next today', center: 'title', right: 'multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay' }}
-          locale={deLocale}
+          locale={i18n.language === 'en' ? undefined : deLocale}
           firstDay={1}
           slotMinTime="07:00:00"
           slotMaxTime="21:00:00"
           height="auto"
-          selectable
+          selectable={canCreate}
           selectMirror
           editable
           eventResizableFromStart
@@ -380,7 +399,7 @@ export default function Trainingsplan() {
           occurrenceDate={editingTarget.occurrenceDate}
           status={editingTarget.mode === 'edit' ? editingTarget.status : null}
           isRecurring={editingTarget.mode === 'edit' ? editingTarget.isRecurring : false}
-          isAdmin={isAdmin}
+          canConfirm={canConfirm}
           onClose={() => setEditingTarget(null)}
           onSave={handleEditorSave}
           onConfirm={handleEditorConfirm}

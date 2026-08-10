@@ -10,6 +10,29 @@ export async function listMembers(orgId) {
   return data
 }
 
+export async function getRolePermissions(orgId) {
+  const { data, error } = await supabase.from('organizations').select('role_permissions').eq('id', orgId).single()
+  if (error) throw error
+  return data.role_permissions
+}
+
+// Patch is merged into the existing role_permissions on the client before
+// this is called (see TeamManage.jsx) — this just writes the full object.
+export async function updateRolePermissions(orgId, rolePermissions) {
+  const { error } = await supabase.from('organizations').update({ role_permissions: rolePermissions }).eq('id', orgId)
+  if (error) throw error
+}
+
+export async function updatePlayerName(orgId, playerName) {
+  const { error } = await supabase.from('organizations').update({ player_name: playerName }).eq('id', orgId)
+  if (error) throw error
+}
+
+export async function updateTheme(orgId, theme) {
+  const { error } = await supabase.from('organizations').update({ theme }).eq('id', orgId)
+  if (error) throw error
+}
+
 // Calling Edge Functions via plain fetch (rather than functions.invoke())
 // so the Authorization header is exactly what we set — invoke() was
 // silently not forwarding the caller's session token as expected.
@@ -33,8 +56,12 @@ async function callFunction(name, body) {
   return data
 }
 
+// Always the real public app URL, never window.location.origin — inviting
+// while developing locally would otherwise send invited members a link to
+// the inviter's own localhost, which nobody else can reach.
 export async function inviteMember({ email, role, orgId }) {
-  const redirectTo = `${window.location.origin}/accept-invite`
+  const appUrl = import.meta.env.VITE_APP_URL || window.location.origin
+  const redirectTo = `${appUrl}/accept-invite`
   return callFunction('invite-member', { email, role, orgId, redirectTo })
 }
 
@@ -44,4 +71,10 @@ export async function inviteMember({ email, role, orgId }) {
 // handled the same way invite-member handles its own privileged operations.
 export async function activateOwnMembership() {
   return callFunction('activate-membership', {})
+}
+
+// Fire-and-forget from OrgContext.jsx right after a new team is created —
+// failure here shouldn't block onboarding, so callers should .catch() it.
+export async function notifyRegistration(orgId) {
+  return callFunction('notify-registration', { orgId })
 }

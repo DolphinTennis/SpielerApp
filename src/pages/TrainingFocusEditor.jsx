@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { blankEntry, createEntry, getEntry, updateEntry } from '../lib/trainingFocusApi'
 import { printInPage } from '../lib/trainingFocusExport'
 import { useToast } from '../lib/ToastContext'
@@ -6,6 +7,7 @@ import { useAuth } from '../lib/AuthContext'
 import { useOrg } from '../lib/OrgContext'
 
 export default function TrainingFocusEditor({ entryId, onBack }) {
+  const { t } = useTranslation()
   const { session } = useAuth()
   const { orgId, playerName } = useOrg()
   const toast = useToast()
@@ -21,7 +23,7 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
         })
         .catch((err) => {
           console.error(err)
-          toast('Eintrag konnte nicht geladen werden.')
+          toast(t('trainingsfokus.entryLoadFailed'))
         })
     } else {
       setRecord(blankEntry(session.user.id, orgId, playerName))
@@ -48,11 +50,11 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
       }
       setRecord(saved)
       if (msg) toast(msg)
-      else if (!silent) toast('Trainingsfokus gespeichert.')
+      else if (!silent) toast(t('trainingsfokus.saved'))
       return saved
     } catch (err) {
       console.error(err)
-      toast('Speichern fehlgeschlagen.')
+      toast(t('trainingsfokus.saveFailed'))
       throw err
     } finally {
       setSaving(false)
@@ -71,7 +73,7 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
     try {
       const saved = await persist(record, true)
       printInPage(saved)
-      toast('Druckdialog wird geöffnet — dort „Als PDF speichern" wählen.')
+      toast(t('trainingsfokus.printDialog'))
     } catch (err) {
       if (err?.message) toast(err.message)
     }
@@ -81,7 +83,7 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
     const updated = { ...record, filed: !record.filed }
     setRecord(updated)
     try {
-      await persist(updated, true, updated.filed ? 'Als abgelegt markiert.' : 'Ablage-Markierung entfernt.')
+      await persist(updated, true, updated.filed ? t('trainingsfokus.filedMsg') : t('trainingsfokus.unfiledMsg'))
     } catch {
       /* toasted in persist */
     }
@@ -91,7 +93,7 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
     try {
       await persist(record, true)
       setRecord(blankEntry(session.user.id, orgId, playerName))
-      toast('Neuer Eintrag angelegt.')
+      toast(t('trainingsfokus.newEntryMsg'))
     } catch {
       /* toasted in persist */
     }
@@ -101,17 +103,17 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
 
   return (
     <div className="view">
-      <h1 className="section-title">Trainingsfokus</h1>
+      <h1 className="section-title">{t('trainingsfokus.title')}</h1>
       <p className="section-sub">{playerName}</p>
 
       <div className="editor-header">
         <div className="grid-fields">
           <div className="field">
-            <label htmlFor="tf-date">Datum</label>
+            <label htmlFor="tf-date">{t('trainingsfokus.date')}</label>
             <input id="tf-date" type="date" value={record.datum || ''} onChange={(e) => updateField('datum', e.target.value)} />
           </div>
           <div className="field">
-            <label htmlFor="tf-energie-mental">Energie mental (1–10)</label>
+            <label htmlFor="tf-energie-mental">{t('trainingsfokus.energyMental')}</label>
             <input
               id="tf-energie-mental"
               type="number"
@@ -122,7 +124,7 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
             />
           </div>
           <div className="field">
-            <label htmlFor="tf-energie-physisch">Energie physisch (1–10)</label>
+            <label htmlFor="tf-energie-physisch">{t('trainingsfokus.energyPhysical')}</label>
             <input
               id="tf-energie-physisch"
               type="number"
@@ -133,7 +135,7 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
             />
           </div>
           <div className="field">
-            <label htmlFor="tf-einsatz">Wie viel habe ich gegeben (in %)</label>
+            <label htmlFor="tf-einsatz">{t('trainingsfokus.effort')}</label>
             <input
               id="tf-einsatz"
               type="number"
@@ -149,19 +151,19 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
       <div className="form-panel active">
         <div className="form-card">
           <div className="qgroup">
-            <label className="qlabel">Mein Trainingsziel</label>
+            <label className="qlabel">{t('trainingsfokus.myGoal')}</label>
             <textarea value={record.trainingsziel || ''} onChange={(e) => updateField('trainingsziel', e.target.value)} />
           </div>
           <div className="qgroup">
-            <label className="qlabel">Was haben wir geübt</label>
+            <label className="qlabel">{t('trainingsfokus.whatWePracticed')}</label>
             <textarea value={record.geuebt || ''} onChange={(e) => updateField('geuebt', e.target.value)} />
           </div>
           <div className="qgroup">
-            <label className="qlabel">Was war gut</label>
+            <label className="qlabel">{t('trainingsfokus.whatWasGood')}</label>
             <textarea value={record.gut || ''} onChange={(e) => updateField('gut', e.target.value)} />
           </div>
           <div className="qgroup">
-            <label className="qlabel">Was kann ich verbessern</label>
+            <label className="qlabel">{t('trainingsfokus.whatToImprove')}</label>
             <textarea value={record.verbessern || ''} onChange={(e) => updateField('verbessern', e.target.value)} />
           </div>
         </div>
@@ -170,25 +172,25 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
       <div className="action-bar">
         <div className="left-actions">
           <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-            💾 Speichern
+            {t('trainingsfokus.save')}
           </button>
           <button className="btn btn-outline" onClick={handlePrint} disabled={saving}>
-            🖨️ Als PDF drucken
+            {t('trainingsfokus.printPdf')}
           </button>
         </div>
         <div className="right-actions">
           <button className="btn btn-ghost" onClick={handleFile} disabled={saving}>
-            🗂️ Ablegen
+            {t('trainingsfokus.file')}
           </button>
           <button className="btn btn-clay" onClick={handleNewEntry} disabled={saving}>
-            ➕ Neuer Eintrag
+            {t('trainingsfokus.newEntryBtn')}
           </button>
         </div>
       </div>
 
       <div className="breadcrumb-inline" style={{ marginTop: 14 }}>
         <button type="button" className="btn btn-ghost btn-sm" onClick={onBack}>
-          ← Zurück zur Liste
+          {t('trainingsfokus.backToList')}
         </button>
       </div>
     </div>

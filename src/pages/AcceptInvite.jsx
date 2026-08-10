@@ -30,12 +30,21 @@ export default function AcceptInvite() {
   if (loading) return null
 
   if (!session) {
+    // Supabase redirects failed/expired invite links here with the reason
+    // in the URL hash (e.g. #error=access_denied&error_code=otp_expired) —
+    // most often the link is simply older than a few days, or an email
+    // client (e.g. Apple Mail's link previews) already "clicked" it once.
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+    const isExpired = hashParams.get('error_code') === 'otp_expired'
+
     return (
       <div style={styles.page}>
         <div style={styles.card}>
-          <h2 style={styles.title}>Link ungültig oder abgelaufen</h2>
-          <p style={{ color: 'var(--text-soft)', fontSize: 14 }}>
-            Bitte bitte die Person, die dich eingeladen hat, um eine neue Einladung.
+          <h2 style={styles.title}>{isExpired ? 'Link abgelaufen' : 'Link ungültig'}</h2>
+          <p style={{ color: 'var(--text-soft)', fontSize: 14, lineHeight: 1.5 }}>
+            {isExpired
+              ? 'Dieser Einladungslink wurde schon verwendet oder ist abgelaufen. Bitte die Person, die dich eingeladen hat, um eine neue Einladung.'
+              : 'Bitte die Person, die dich eingeladen hat, um eine neue Einladung.'}
           </p>
         </div>
       </div>

@@ -5,15 +5,18 @@ import { OrgProvider } from './lib/OrgContext'
 import ConfigWarning from './components/ConfigWarning'
 import Login from './components/Login'
 import Register from './components/Register'
-import Landing from './pages/Landing'
 import AcceptInvite from './pages/AcceptInvite'
 import AppShell from './components/AppShell'
 
+// Landing.jsx (marketing text + pricing) is intentionally not routed right
+// now — pricing/self-service registration isn't ready yet, see
+// OrgContext.jsx's approval gate. Kept in the codebase to re-enable later
+// by pointing this back at <Landing />.
 function RootRoute() {
   const { session, loading } = useAuth()
   if (loading) return null
   if (session) return <Navigate to="/app" replace />
-  return <Landing />
+  return <Navigate to="/login" replace />
 }
 
 function PublicOnlyRoute({ children }) {

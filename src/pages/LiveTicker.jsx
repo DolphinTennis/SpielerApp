@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../lib/AuthContext'
 import { useOrg } from '../lib/OrgContext'
 import { useToast } from '../lib/ToastContext'
@@ -13,6 +14,7 @@ import {
 } from '../lib/liveMatchLogic'
 
 export default function LiveTicker({ onMatchCreated }) {
+  const { t } = useTranslation()
   const { session } = useAuth()
   const { orgId, playerName } = useOrg()
   const toast = useToast()
@@ -33,7 +35,7 @@ export default function LiveTicker({ onMatchCreated }) {
       })
       .catch((err) => {
         console.error(err)
-        toast('Live-Match konnte nicht geladen werden.')
+        toast(t('liveTicker.loadFailed'))
         if (!cancelled) setLiveMatch(null)
       })
     return () => {
@@ -48,7 +50,7 @@ export default function LiveTicker({ onMatchCreated }) {
       await saveLiveMatch(userId, orgId, next)
     } catch (err) {
       console.error(err)
-      toast('Fehler beim Speichern des Punktes.')
+      toast(t('liveTicker.saveFailed'))
     }
   }
 
@@ -58,10 +60,10 @@ export default function LiveTicker({ onMatchCreated }) {
       const next = blankLiveMatch({ datum: setupDate, gegner: setupOpp, turnier: setupTourn, mode: setupMode })
       await saveLiveMatch(userId, orgId, next)
       setLiveMatch(next)
-      toast('Live-Tracking gestartet.')
+      toast(t('liveTicker.started'))
     } catch (err) {
       console.error(err)
-      toast('Fehler beim Starten des Live-Trackings. Bitte erneut versuchen.')
+      toast(t('liveTicker.startFailed'))
     } finally {
       setBusy(false)
     }
@@ -96,11 +98,11 @@ export default function LiveTicker({ onMatchCreated }) {
       const saved = await createMatch(record)
       await clearLiveMatch(userId, orgId)
       setLiveMatch(null)
-      toast('Match beendet — Ergebnis wurde in die Matchanalyse übernommen.')
+      toast(t('liveTicker.matchEnded'))
       onMatchCreated(saved.id)
     } catch (err) {
       console.error(err)
-      toast('Fehler beim Beenden des Matches.')
+      toast(t('liveTicker.endFailed'))
     } finally {
       setBusy(false)
     }
@@ -111,37 +113,47 @@ export default function LiveTicker({ onMatchCreated }) {
   if (!liveMatch || !liveMatch.active) {
     return (
       <div className="view">
-        <h1 className="section-title">Matchticker</h1>
-        <p className="section-sub">Verfolge das aktuelle Match von {playerName} live mit.</p>
+        <h1 className="section-title">{t('liveTicker.title')}</h1>
+        <p className="section-sub">{t('liveTicker.subtitle', { name: playerName })}</p>
 
         <div className="live-setup-card">
-          <h3 style={{ fontSize: 19, color: 'var(--ink)', margin: '0 0 4px' }}>Neues Match anlegen</h3>
-          <p style={{ fontSize: 13, color: 'var(--text-soft)', margin: 0 }}>
-            Trage die Eckdaten ein und starte das Live-Tracking.
-          </p>
+          <h3 style={{ fontSize: 19, color: 'var(--ink)', margin: '0 0 4px' }}>{t('liveTicker.newMatchTitle')}</h3>
+          <p style={{ fontSize: 13, color: 'var(--text-soft)', margin: 0 }}>{t('liveTicker.newMatchHint')}</p>
           <div className="grid-fields">
             <div className="field">
-              <label htmlFor="live-date">Spiel Datum</label>
+              <label htmlFor="live-date">{t('liveTicker.matchDate')}</label>
               <input id="live-date" type="date" value={setupDate} onChange={(e) => setSetupDate(e.target.value)} />
             </div>
             <div className="field">
-              <label htmlFor="live-opp">Name Gegnerin</label>
-              <input id="live-opp" type="text" placeholder="Gegnerin" value={setupOpp} onChange={(e) => setSetupOpp(e.target.value)} />
+              <label htmlFor="live-opp">{t('liveTicker.opponentName')}</label>
+              <input
+                id="live-opp"
+                type="text"
+                placeholder={t('liveTicker.opponentPlaceholder')}
+                value={setupOpp}
+                onChange={(e) => setSetupOpp(e.target.value)}
+              />
             </div>
             <div className="field">
-              <label htmlFor="live-tourn">Turnier</label>
-              <input id="live-tourn" type="text" placeholder="Turniername" value={setupTourn} onChange={(e) => setSetupTourn(e.target.value)} />
+              <label htmlFor="live-tourn">{t('liveTicker.tournament')}</label>
+              <input
+                id="live-tourn"
+                type="text"
+                placeholder={t('liveTicker.tournamentPlaceholder')}
+                value={setupTourn}
+                onChange={(e) => setSetupTourn(e.target.value)}
+              />
             </div>
             <div className="field">
-              <label htmlFor="live-satzmodus">Satzmodus</label>
+              <label htmlFor="live-satzmodus">{t('liveTicker.setMode')}</label>
               <select id="live-satzmodus" value={setupMode} onChange={(e) => setSetupMode(e.target.value)}>
-                <option value="bo3">Best of 3 (2 Gewinnsätze)</option>
-                <option value="matchtiebreak">Match-Tiebreak</option>
+                <option value="bo3">{t('liveTicker.bo3')}</option>
+                <option value="matchtiebreak">{t('liveTicker.matchTiebreak')}</option>
               </select>
             </div>
           </div>
           <button className="btn btn-primary" onClick={handleStart} disabled={busy}>
-            ▶ Live-Tracking starten
+            {t('liveTicker.startTracking')}
           </button>
         </div>
       </div>
@@ -154,35 +166,39 @@ export default function LiveTicker({ onMatchCreated }) {
 
   let numA = liveMatch.gamesA
   let numB = liveMatch.gamesB
-  let caption = 'Spiele im aktuellen Satz'
+  let caption = t('liveTicker.gamesInSet')
   if (inMatchTiebreak) {
     numA = liveMatch.matchTiebreak.pointsA
     numB = liveMatch.matchTiebreak.pointsB
-    caption = 'Punkte im Match-Tiebreak (bis 10, 2 Punkte Vorsprung)'
+    caption = t('liveTicker.pointsInMatchTiebreak')
   } else if (inTiebreak) {
     numA = liveMatch.tiebreak.pointsA
     numB = liveMatch.tiebreak.pointsB
-    caption = 'Punkte im Tiebreak (bei 6:6)'
+    caption = t('liveTicker.pointsInTiebreak')
   }
 
   let listSource, progressTitle
   if (inMatchTiebreak) {
     listSource = liveMatch.matchTiebreak.history
-    progressTitle = 'Match-Tiebreak-Punkte'
+    progressTitle = t('liveTicker.matchTiebreakPoints')
   } else if (inTiebreak) {
     listSource = liveMatch.tiebreak.history
-    progressTitle = 'Tiebreak-Punkte · Satz ' + (liveMatch.sets.length + 1)
+    progressTitle = t('liveTicker.tiebreakPointsSet', { n: liveMatch.sets.length + 1 })
   } else {
     listSource = liveMatch.history
-    progressTitle = 'Spielverlauf · Satz ' + (liveMatch.sets.length + (liveMatch.decided ? 0 : 1))
+    progressTitle = t('liveTicker.matchProgressSet', { n: liveMatch.sets.length + (liveMatch.decided ? 0 : 1) })
   }
 
-  const winner = liveMatch.decided ? (liveMatch.setsWonA > liveMatch.setsWonB ? playerName : liveMatch.gegner || 'Gegnerin') : null
+  const winner = liveMatch.decided
+    ? liveMatch.setsWonA > liveMatch.setsWonB
+      ? playerName
+      : liveMatch.gegner || t('liveTicker.opponentPlaceholder')
+    : null
 
   return (
     <div className="view">
-      <h1 className="section-title">Matchticker</h1>
-      <p className="section-sub">Verfolge das aktuelle Match von {playerName} live mit.</p>
+      <h1 className="section-title">{t('liveTicker.title')}</h1>
+      <p className="section-sub">{t('liveTicker.subtitle', { name: playerName })}</p>
 
       <div className="live-hero">
         <div className="matchup">
@@ -193,27 +209,27 @@ export default function LiveTicker({ onMatchCreated }) {
         <div className="sets-row">
           {liveMatch.sets.map((s, i) => (
             <div className={`set-chip ${s.a > s.b ? 'won-a' : 'won-b'}`} key={i}>
-              <div className="set-label">{s.matchTiebreak ? 'Match-TB' : 'Satz ' + (i + 1)}</div>
+              <div className="set-label">{s.matchTiebreak ? t('liveTicker.matchTiebreak') : t('liveTicker.set', { n: i + 1 })}</div>
               <div className="set-score">{formatSetScore(s)}</div>
             </div>
           ))}
           {!liveMatch.decided &&
             (inMatchTiebreak ? (
               <div className="set-chip current">
-                <div className="set-label">Match-Tiebreak (läuft)</div>
+                <div className="set-label">{t('liveTicker.matchTiebreakRunning')}</div>
                 <div className="set-score">
                   {liveMatch.matchTiebreak.pointsA}:{liveMatch.matchTiebreak.pointsB}
                 </div>
               </div>
             ) : (
               <div className="set-chip current">
-                <div className="set-label">Satz {liveMatch.sets.length + 1} (läuft)</div>
+                <div className="set-label">{t('liveTicker.setRunning', { n: liveMatch.sets.length + 1 })}</div>
                 <div className="set-score">
                   {liveMatch.gamesA}:{liveMatch.gamesB}
                 </div>
                 {inTiebreak && (
                   <div className="set-tb">
-                    TB {liveMatch.tiebreak.pointsA}:{liveMatch.tiebreak.pointsB}
+                    {t('liveTicker.tiebreakAbbrev', { a: liveMatch.tiebreak.pointsA, b: liveMatch.tiebreak.pointsB })}
                   </div>
                 )}
               </div>
@@ -222,41 +238,41 @@ export default function LiveTicker({ onMatchCreated }) {
 
         <div className="live-score">
           <div className="side">
-            <div className="label">{(playerName || 'SPIELER:IN').toUpperCase()}</div>
+            <div className="label">{(playerName || t('liveTicker.playerLabelFallback')).toUpperCase()}</div>
             <div className="num">{numA}</div>
           </div>
           <div className="sep">:</div>
           <div className="side">
-            <div className="label">{(liveMatch.gegner || 'GEGNERIN').toUpperCase()}</div>
+            <div className="label">{(liveMatch.gegner || t('liveTicker.opponentLabelFallback')).toUpperCase()}</div>
             <div className="num">{numB}</div>
           </div>
         </div>
         <div className="live-score-caption">{caption}</div>
 
-        {inTiebreak && !liveMatch.decided && <div className="live-tiebreak-badge">🎾 Tiebreak bei 6:6</div>}
-        {inMatchTiebreak && !liveMatch.decided && (
-          <div className="live-tiebreak-badge">🎾 Match-Tiebreak entscheidet (bis 10, 2 Punkte Vorsprung)</div>
-        )}
+        {inTiebreak && !liveMatch.decided && <div className="live-tiebreak-badge">{t('liveTicker.tiebreakBadge')}</div>}
+        {inMatchTiebreak && !liveMatch.decided && <div className="live-tiebreak-badge">{t('liveTicker.matchTiebreakBadge')}</div>}
         {liveMatch.decided && (
           <div className="live-decided-banner">
-            🏆 Match entschieden: {winner} gewinnt {liveMatch.setsWonA}:{liveMatch.setsWonB} nach Sätzen
+            {t('liveTicker.decidedBanner', { winner, a: liveMatch.setsWonA, b: liveMatch.setsWonB })}
           </div>
         )}
 
         <div className="point-buttons">
           <button className="point-btn" disabled={liveMatch.decided} onClick={() => handlePoint('a')}>
-            {pointMode ? '+ Punkt ' + playerName : '+ Spiel ' + playerName}
+            {pointMode ? t('liveTicker.pointFor', { name: playerName }) : t('liveTicker.gameFor', { name: playerName })}
           </button>
           <button className="point-btn opp" disabled={liveMatch.decided} onClick={() => handlePoint('b')}>
-            {pointMode ? '+ Punkt Gegnerin' : '+ Spiel Gegnerin'}
+            {pointMode
+              ? t('liveTicker.pointFor', { name: t('liveTicker.opponentPlaceholder') })
+              : t('liveTicker.gameFor', { name: t('liveTicker.opponentPlaceholder') })}
           </button>
         </div>
         <div className="live-subtools">
           <button className="btn btn-ghost btn-sm" onClick={handleUndo}>
-            ↩ Rückgängig
+            {t('liveTicker.undo')}
           </button>
           <button className="btn btn-clay btn-sm" onClick={handleEnd} disabled={busy}>
-            ■ Match beenden
+            {t('liveTicker.endMatch')}
           </button>
         </div>
       </div>
@@ -264,9 +280,7 @@ export default function LiveTicker({ onMatchCreated }) {
       <div className="live-progress-title">{progressTitle}</div>
       <div className="live-progress-list">
         {listSource.length === 0 ? (
-          <span className="live-empty-note">
-            {pointMode ? 'Noch keine Punkte erfasst.' : 'Noch keine Spielstände in diesem Satz erfasst.'}
-          </span>
+          <span className="live-empty-note">{pointMode ? t('liveTicker.noPointsYet') : t('liveTicker.noGamesYet')}</span>
         ) : (
           listSource.map((h, i) => (
             <span key={i} className={`live-progress-chip${h.a > h.b ? ' leading-a' : h.b > h.a ? ' leading-b' : ''}`}>
