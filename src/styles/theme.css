@@ -1,4 +1,5 @@
-:root {
+:root,
+[data-theme='hardcourt'] {
   --ink: #0f2740;
   --court: #1c63b7;
   --court-dark: #123f73;
@@ -14,6 +15,38 @@
   --shadow: 0 1px 2px rgba(15, 39, 64, 0.06), 0 8px 24px rgba(15, 39, 64, 0.08);
 }
 
+[data-theme='gras'] {
+  --ink: #16321f;
+  --court: #2e8b47;
+  --court-dark: #1e5c2e;
+  --chalk: #f3f8f1;
+  --paper: #ffffff;
+  --ball: #d7f23d;
+  --ball-dark: #afc81c;
+  --clay: #c0392b;
+  --line: #d9e5d9;
+  --text: #1c2e20;
+  --text-soft: #5b6b5d;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(22, 50, 31, 0.06), 0 8px 24px rgba(22, 50, 31, 0.08);
+}
+
+[data-theme='sand'] {
+  --ink: #3a2415;
+  --court: #c97a3d;
+  --court-dark: #9c5a28;
+  --chalk: #fbf5ec;
+  --paper: #ffffff;
+  --ball: #d7f23d;
+  --ball-dark: #afc81c;
+  --clay: #c0392b;
+  --line: #e8dcc8;
+  --text: #2e2013;
+  --text-soft: #6b5d4d;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(58, 36, 21, 0.06), 0 8px 24px rgba(58, 36, 21, 0.08);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -24,6 +57,7 @@ body,
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 body {

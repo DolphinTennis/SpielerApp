@@ -189,6 +189,37 @@
   font-weight: 600;
   box-shadow: none !important;
 }
+.trainingplan-calendar .fc-toolbar {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+.trainingplan-calendar .fc-toolbar-chunk {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+@media (max-width: 640px) {
+  .trainingplan-calendar {
+    padding: 10px;
+  }
+  .trainingplan-calendar .fc-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .trainingplan-calendar .fc-toolbar-chunk {
+    justify-content: center;
+    gap: 4px;
+  }
+  .trainingplan-calendar .fc-toolbar-title {
+    font-size: 17px;
+    text-align: center;
+  }
+  .trainingplan-calendar .fc-button {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
 .trainingplan-calendar .fc-event {
   border-radius: 6px;
   border-width: 0;
@@ -279,12 +310,22 @@
 }
 .trainingplan-oneoff-toggle {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   font-size: 13px;
   color: var(--text);
   margin-bottom: 12px;
   cursor: pointer;
+}
+.trainingplan-oneoff-toggle input {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.trainingplan-oneoff-toggle > span {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 .trainingplan-oneoff-hint {
   color: var(--text-soft);

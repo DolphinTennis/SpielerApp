@@ -22,7 +22,7 @@ export async function listEntries(orgId) {
     .from('training_focus_entries')
     .select('id, datum, trainingsziel, filed, updated_at')
     .eq('org_id', orgId)
-    .order('datum', { ascending: false, nullsFirst: false })
+    .order('created_at', { ascending: false })
   if (error) throw error
   return data
 }
