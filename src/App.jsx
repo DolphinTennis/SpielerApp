@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { isSupabaseConfigured } from './lib/supabaseClient'
 import { AuthProvider, useAuth } from './lib/AuthContext'
 import { OrgProvider } from './lib/OrgContext'
@@ -21,15 +21,21 @@ function RootRoute() {
 
 function PublicOnlyRoute({ children }) {
   const { session, loading } = useAuth()
+  const location = useLocation()
   if (loading) return null
-  if (session) return <Navigate to="/app" replace />
+  // Send the user back to whatever protected page they were headed for
+  // before ProtectedRoute detoured them here (e.g. the "Intern" footer
+  // link) — without this, login always dumped everyone on /app regardless
+  // of where they actually meant to go.
+  if (session) return <Navigate to={location.state?.from?.pathname || '/app'} replace />
   return children
 }
 
 function ProtectedRoute({ children }) {
   const { session, loading } = useAuth()
+  const location = useLocation()
   if (loading) return null
-  if (!session) return <Navigate to="/login" replace />
+  if (!session) return <Navigate to="/login" state={{ from: location }} replace />
   return children
 }
 
