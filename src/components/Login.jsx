@@ -8,6 +8,12 @@ export default function Login() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+  const [showForgot, setShowForgot] = useState(false)
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [forgotSubmitting, setForgotSubmitting] = useState(false)
+  const [forgotSent, setForgotSent] = useState(false)
+  const [forgotError, setForgotError] = useState('')
+
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
@@ -24,6 +30,27 @@ export default function Login() {
           : signInError.message
       )
     }
+  }
+
+  async function handleForgotSubmit(e) {
+    e.preventDefault()
+    setForgotError('')
+    setForgotSubmitting(true)
+    // Always the real public app URL, never window.location.origin — same
+    // reasoning as inviteMember in teamApi.js.
+    const appUrl = import.meta.env.VITE_APP_URL || window.location.origin
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: `${appUrl}/reset-password`,
+    })
+    setForgotSubmitting(false)
+    if (resetError) {
+      setForgotError(resetError.message)
+      return
+    }
+    // Supabase returns success regardless of whether the address is
+    // registered — deliberately not revealing which is intentional
+    // security behavior, not something to work around here.
+    setForgotSent(true)
   }
 
   return (
@@ -76,12 +103,70 @@ export default function Login() {
         <p style={{ fontSize: 13, color: 'var(--text-soft)', marginTop: 14, textAlign: 'center' }}>
           Noch kein Team? <Link to="/register">Jetzt registrieren</Link>
         </p>
+
+        {!showForgot && (
+          <p style={{ fontSize: 13, color: 'var(--text-soft)', marginTop: 8, textAlign: 'center' }}>
+            <button
+              type="button"
+              onClick={() => {
+                setShowForgot(true)
+                setForgotEmail(email)
+              }}
+              style={styles.linkButton}
+            >
+              Passwort vergessen?
+            </button>
+          </p>
+        )}
+
+        {showForgot && !forgotSent && (
+          <div style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid var(--line)' }}>
+            <p style={{ fontSize: 13, color: 'var(--text-soft)', margin: '0 0 12px' }}>
+              Trag deine E-Mail-Adresse ein, wir schicken dir einen Link zum Vergeben eines neuen Passworts.
+            </p>
+            <div className="field" style={{ marginBottom: 12 }}>
+              <label htmlFor="forgot-email">E-Mail</label>
+              <input
+                id="forgot-email"
+                type="email"
+                required
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                placeholder="name@example.com"
+              />
+            </div>
+            {forgotError && <div style={styles.error}>{forgotError}</div>}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button type="button" className="btn btn-primary" style={{ flex: 1, justifyContent: 'center' }} onClick={handleForgotSubmit} disabled={forgotSubmitting}>
+                {forgotSubmitting ? 'Sendet …' : 'Link senden'}
+              </button>
+              <button type="button" className="btn btn-ghost" onClick={() => setShowForgot(false)}>
+                Abbrechen
+              </button>
+            </div>
+          </div>
+        )}
+
+        {forgotSent && (
+          <div style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid var(--line)', fontSize: 13, color: 'var(--text-soft)', textAlign: 'center' }}>
+            Falls „{forgotEmail}" bei uns registriert ist, wurde gerade ein Link zum Zurücksetzen verschickt.
+          </div>
+        )}
       </form>
     </div>
   )
 }
 
 const styles = {
+  linkButton: {
+    background: 'none',
+    border: 'none',
+    padding: 0,
+    font: 'inherit',
+    color: 'var(--court)',
+    cursor: 'pointer',
+    textDecoration: 'underline',
+  },
   page: {
     minHeight: '100vh',
     display: 'flex',

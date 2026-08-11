@@ -6,6 +6,7 @@ import ConfigWarning from './components/ConfigWarning'
 import Login from './components/Login'
 import Register from './components/Register'
 import AcceptInvite from './pages/AcceptInvite'
+import ResetPassword from './pages/ResetPassword'
 import AppShell from './components/AppShell'
 
 // Landing.jsx (marketing text + pricing) is intentionally not routed right
@@ -24,9 +25,9 @@ function PublicOnlyRoute({ children }) {
   const location = useLocation()
   if (loading) return null
   // Send the user back to whatever protected page they were headed for
-  // before ProtectedRoute detoured them here (e.g. the "Intern" footer
-  // link) — without this, login always dumped everyone on /app regardless
-  // of where they actually meant to go.
+  // before ProtectedRoute detoured them here — without this, login always
+  // dumped everyone on /app regardless of where they actually meant to go
+  // (e.g. a bookmarked deep link into /app/...).
   if (session) return <Navigate to={location.state?.from?.pathname || '/app'} replace />
   return children
 }
@@ -60,6 +61,7 @@ function AppRoutes() {
         }
       />
       <Route path="/accept-invite" element={<AcceptInvite />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route
         path="/app/*"
         element={
