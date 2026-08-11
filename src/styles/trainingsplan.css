@@ -11,6 +11,9 @@
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 14px 16px;
+  /* Grid items default to min-width:auto, which lets long unbroken goal
+     text push the column wider than the grid track instead of wrapping. */
+  min-width: 0;
 }
 .training-goals-group h3 {
   font-family: 'Big Shoulders Display', sans-serif;
@@ -38,14 +41,33 @@
   font-size: 13.5px;
   color: var(--text);
   cursor: pointer;
+  /* Same reasoning as .training-goals-group — a flex item's default
+     min-width:auto stops it from shrinking below its text's unbroken
+     width, which is exactly what pushed long goal text outside the card. */
+  min-width: 0;
 }
 .training-goals-list li input[type='checkbox'] {
   margin-top: 3px;
   flex-shrink: 0;
 }
+.training-goals-list li span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
 @media (max-width: 640px) {
   .training-goals-panel {
     grid-template-columns: 1fr;
+  }
+  .training-goals-group {
+    padding: 12px 14px;
+  }
+  .training-goals-group h3 {
+    font-size: 14.5px;
+  }
+  .training-goals-list li label {
+    font-size: 13px;
   }
 }
 
