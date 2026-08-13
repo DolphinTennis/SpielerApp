@@ -88,6 +88,21 @@ select {
   width: 100%;
 }
 
+/* iOS Safari renders type="date" with its own internal layout that ignores
+   most of the base input rule above — the value comes out centered and
+   noticeably larger than sibling text/number inputs, unlike every other
+   browser. -webkit-appearance:none only strips that default chrome (the
+   tap-to-open date wheel is driven by the input's type, not its appearance,
+   so it keeps working); the rest re-applies the same box/text styling as
+   other inputs so it actually matches them. */
+input[type='date'] {
+  -webkit-appearance: none;
+  appearance: none;
+  font-size: 14px;
+  line-height: 1.3;
+  text-align: left;
+}
+
 input:focus,
 textarea:focus,
 select:focus {
