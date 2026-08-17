@@ -225,10 +225,11 @@ ein paar Tage getragen hat.
 
 ## Was der Umzug nicht mitnimmt
 
-- **Realtime-Publikationen.** Der Liveticker hängt an Postgres Changes. Ob die
-  Publikation `supabase_realtime` die betroffenen Tabellen im neuen Projekt
-  einschließt, ist nach Schritt A2 zu prüfen (Dashboard → Database →
-  Replication) — keine der Migrationen setzt das.
+- ~~**Realtime-Publikationen.**~~ Fehlalarm, geprüft und ausgeräumt: die App
+  benutzt Realtime nirgends (kein `channel(`, kein `postgres_changes` in
+  `src/`), und in **beiden** Projekten enthält die Publikation
+  `supabase_realtime` keine Tabellen. Der Liveticker arbeitet mit gewöhnlichen
+  Abfragen. Hier ist nichts einzustellen.
 - **Vault-Geheimnisse.** `email_inbound_cron_secret` aus Migration 010 liegt in
   Supabase Vault, nicht im Repo. Da der Cron-Job durch Migration 011 ohnehin
   entfällt, wird es voraussichtlich nicht mehr gebraucht.

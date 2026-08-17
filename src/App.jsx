@@ -9,10 +9,10 @@ import AcceptInvite from './pages/AcceptInvite'
 import ResetPassword from './pages/ResetPassword'
 import AppShell from './components/AppShell'
 
-// Landing.jsx (marketing text + pricing) is intentionally not routed right
-// now — pricing/self-service registration isn't ready yet, see
-// OrgContext.jsx's approval gate. Kept in the codebase to re-enable later
-// by pointing this back at <Landing />.
+// No public landing page in this app — everything about marketing, pricing
+// and self-service purchase lives in a separate project now (see
+// docs/vermarktung-ausgliederung.md). `/` therefore only decides whether the
+// visitor is already signed in.
 function RootRoute() {
   const { session, loading } = useAuth()
   if (loading) return null

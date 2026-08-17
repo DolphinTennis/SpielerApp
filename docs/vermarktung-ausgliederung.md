@@ -6,20 +6,30 @@ anderes Projekt einfließt. Dieses Dokument ist die Anleitung dafür.
 
 ## Wo der Code liegt
 
+**Nicht in diesem Repo.** Dieses Projekt ist die ausgegliederte Spielerapp;
+Tag und Branch der Vermarktungsarbeit sind hier absichtlich nicht vorhanden.
+Sie liegen im Ursprungsrepo:
+
 | | |
 |---|---|
+| Repo | `sdwieland-ops/dolphin`, Arbeitskopie `/Volumes/Software/dolphin` |
 | Git-Tag | `archiv/landing-booking-2026-08-17` |
-| Branch | `feature/landing-booking` (11 Commits über `main`) |
+| Branch | `feature/landing-booking` (11 Commits über dessen `main`) |
 | Ursprünglicher Plan | `~/.claude/plans/staged-wibbling-stearns.md` |
 
 Der Tag ist der verlässliche Anker. Der Branch darf verschoben oder gelöscht
 werden, ohne dass der Stand verloren geht.
 
-Zum Ansehen ohne Wechsel des Arbeitsstands:
+Zum Ansehen, im **alten** Ordner:
 
 ```bash
 git diff main...archiv/landing-booking-2026-08-17
 ```
+
+Auch die alte, nie geroutete `src/pages/Landing.jsx` samt ihrer
+`.pricing-*`-Stile in `src/styles/layout.css` ist hier entfernt — sie war
+toter Code mit einer fest eingebauten Preistabelle und gehörte demselben
+Thema. Im alten Repo ist beides erhalten.
 
 ## Was zum Paket gehört
 

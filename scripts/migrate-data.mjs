@@ -5,8 +5,9 @@
 // trigger and the storage bucket. Only rows need carrying over.
 //
 // Usage (see docs/datenbank-umzug.md for the full runbook):
-//   node --env-file=.env.migrate scripts/migrate-data.mjs            # Probelauf
-//   node --env-file=.env.migrate scripts/migrate-data.mjs --execute  # schreibt
+//   node --env-file=.env.migrate scripts/migrate-data.mjs                    # Probelauf
+//   node --env-file=.env.migrate scripts/migrate-data.mjs --execute          # schreibt
+//   node --env-file=.env.migrate scripts/migrate-data.mjs --reset --execute  # leert erst
 //
 // Deliberately dry-run by default: this writes into auth.users of a live
 // project, and a mistyped connection string should cost nothing.
@@ -17,6 +18,11 @@ const TARGET_URL = process.env.TARGET_DB_URL
 
 const execute = process.argv.includes('--execute')
 const force = process.argv.includes('--force')
+// Empties the target before copying. Needed for the final sync before a
+// cutover: a plain re-run inserts with `on conflict do nothing`, so rows that
+// CHANGED in the source since the first copy would silently keep their old
+// values. Only ever touches the target.
+const reset = process.argv.includes('--reset')
 
 // Order matters — foreign keys. auth.users first (everything hangs off it),
 // then organizations/memberships, then the org-scoped tables. Within
@@ -157,6 +163,21 @@ async function main() {
 
   const results = []
   try {
+    if (reset) {
+      // One statement with CASCADE rather than table-by-table deletes: it
+      // settles the foreign-key order by itself, and reaches the auth-internal
+      // tables hanging off auth.users (sessions, refresh tokens) that a
+      // targeted truncate would leave pointing at users about to reappear.
+      const list = TABLES.join(', ')
+      if (!execute) {
+        console.log(`  --reset würde leeren: ${list}\n`)
+      } else {
+        console.log(`  --reset: leere ${TABLES.length} Tabellen im Ziel …`)
+        await target.query(`truncate table ${list} cascade`)
+        console.log('  geleert.\n')
+      }
+    }
+
     for (const table of TABLES) {
       results.push(await copyTable(source, target, table))
     }

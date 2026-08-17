@@ -2,7 +2,7 @@
 # https://supabase.com/docs/guides/local-development/cli/config
 # A string used to distinguish different Supabase projects on the same host. Defaults to the
 # working directory name when running `supabase init`.
-project_id = "dolphin"
+project_id = "dolphin-spielerapp"
 
 [api]
 enabled = true
@@ -160,10 +160,15 @@ site_url = "https://dolphintennis.com"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
+# tes.dolphintennis.com is where this app is verified before it takes over the
+# main domain (see docs/datenbank-umzug.md). The old Netlify URL that used to
+# be listed here is gone: hosting moved to all-inkl long ago, and every entry
+# in this list is a URL auth is willing to redirect a token to.
 additional_redirect_urls = [
   "https://dolphintennis.com/**",
-  "https://dolphintennis.netlify.app/**",
+  "https://tes.dolphintennis.com/**",
   "http://localhost:5173/**",
+  "http://localhost:5175/**",
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
