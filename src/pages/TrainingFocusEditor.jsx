@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { blankEntry, createEntry, getEntry, updateEntry } from '../lib/trainingFocusApi'
+import { blankEntry, createEntry, getEntry, updateEntry, validateEntry } from '../lib/trainingFocusApi'
 import { printInPage } from '../lib/trainingFocusExport'
 import { useToast } from '../lib/ToastContext'
 import { useAuth } from '../lib/AuthContext'
 import { useOrg } from '../lib/OrgContext'
+import AutoTextarea from "../components/AutoTextarea"
 
 export default function TrainingFocusEditor({ entryId, onBack }) {
   const { t } = useTranslation()
@@ -39,6 +40,15 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
   }
 
   async function persist(rec, silent, msg) {
+    // Catch what the database would reject anyway, but say which field and why
+    // — a bare "Speichern fehlgeschlagen" left no way to tell an empty date
+    // from an out-of-range energy value.
+    const problem = validateEntry(rec)
+    if (problem) {
+      toast(problem.values ? t(problem.key, { ...problem.values, label: t(problem.values.labelKey) }) : t(problem.key))
+      throw new Error(problem.key)
+    }
+
     setSaving(true)
     try {
       let saved
@@ -54,7 +64,9 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
       return saved
     } catch (err) {
       console.error(err)
-      toast(t('trainingsfokus.saveFailed'))
+      // Pass the database's own wording through. Without it every failure looks
+      // identical and there is nothing to act on or report.
+      toast(err?.message ? t('trainingsfokus.saveFailedDetail', { detail: err.message }) : t('trainingsfokus.saveFailed'))
       throw err
     } finally {
       setSaving(false)
@@ -152,19 +164,19 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
         <div className="form-card">
           <div className="qgroup">
             <label className="qlabel">{t('trainingsfokus.myGoal')}</label>
-            <textarea value={record.trainingsziel || ''} onChange={(e) => updateField('trainingsziel', e.target.value)} />
+            <AutoTextarea value={record.trainingsziel || ''} onChange={(e) => updateField('trainingsziel', e.target.value)} />
           </div>
           <div className="qgroup">
             <label className="qlabel">{t('trainingsfokus.whatWePracticed')}</label>
-            <textarea value={record.geuebt || ''} onChange={(e) => updateField('geuebt', e.target.value)} />
+            <AutoTextarea value={record.geuebt || ''} onChange={(e) => updateField('geuebt', e.target.value)} />
           </div>
           <div className="qgroup">
             <label className="qlabel">{t('trainingsfokus.whatWasGood')}</label>
-            <textarea value={record.gut || ''} onChange={(e) => updateField('gut', e.target.value)} />
+            <AutoTextarea value={record.gut || ''} onChange={(e) => updateField('gut', e.target.value)} />
           </div>
           <div className="qgroup">
             <label className="qlabel">{t('trainingsfokus.whatToImprove')}</label>
-            <textarea value={record.verbessern || ''} onChange={(e) => updateField('verbessern', e.target.value)} />
+            <AutoTextarea value={record.verbessern || ''} onChange={(e) => updateField('verbessern', e.target.value)} />
           </div>
         </div>
       </div>

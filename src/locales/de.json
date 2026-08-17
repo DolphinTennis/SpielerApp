@@ -67,9 +67,17 @@
       "translatedBanner": "Übersetzt — Original ist nicht bearbeitbar in dieser Ansicht."
     },
     "form1": {
-      "card1": { "title": "Ich — Allgemein" },
-      "card2": { "title": "Ich im Match", "taktikTitle": "Taktik", "feelingTitle": "Feeling" },
-      "card3": { "title": "Mein Gegner" },
+      "card1": {
+        "title": "Ich — Allgemein"
+      },
+      "card2": {
+        "title": "Ich im Match",
+        "taktikTitle": "Taktik",
+        "feelingTitle": "Feeling"
+      },
+      "card3": {
+        "title": "Mein Gegner"
+      },
       "fields": {
         "allg1": "Was hat gut funktioniert, das bereits trainiert wird?",
         "allg2": "Was hat nicht funktioniert, obwohl es trainiert wird?",
@@ -232,7 +240,9 @@
     "undo": "↩ Rückgängig",
     "endMatch": "■ Match beenden",
     "noPointsYet": "Noch keine Punkte erfasst.",
-    "noGamesYet": "Noch keine Spielstände in diesem Satz erfasst."
+    "noGamesYet": "Noch keine Spielstände in diesem Satz erfasst.",
+    "saveFailedDetail": "Punkt nicht gespeichert: {{detail}} — der Stand wurde zurückgesetzt.",
+    "confirmEndUnfinished": "Satz {{satz}} läuft noch, Stand {{stand}}. Match jetzt wirklich beenden? Der laufende Satz wird als Zwischenstand festgehalten."
   },
   "fileTypes": {
     "Bild": "Bild",
@@ -344,7 +354,10 @@
     "printPdf": "🖨️ Als PDF drucken",
     "file": "🗂️ Ablegen",
     "newEntryBtn": "➕ Neuer Eintrag",
-    "backToList": "← Zurück zur Liste"
+    "backToList": "← Zurück zur Liste",
+    "validationDateMissing": "Bitte ein Datum angeben — ohne Datum lässt sich der Eintrag nicht speichern.",
+    "validationRange": "{{label}}: Der Wert muss zwischen {{min}} und {{max}} liegen.",
+    "saveFailedDetail": "Speichern fehlgeschlagen: {{detail}}"
   },
   "trainingGoals": {
     "trainingTitle": "Ziele fürs nächste Training",
@@ -448,9 +461,38 @@
       "ferien": "Ferien",
       "sonstiges": "Sonstiges"
     },
-    "weekdaysShort": { "mo": "Mo", "di": "Di", "mi": "Mi", "do": "Do", "fr": "Fr", "sa": "Sa", "so": "So" },
-    "weekdaysFull": ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],
-    "months": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+    "weekdaysShort": {
+      "mo": "Mo",
+      "di": "Di",
+      "mi": "Mi",
+      "do": "Do",
+      "fr": "Fr",
+      "sa": "Sa",
+      "so": "So"
+    },
+    "weekdaysFull": [
+      "Sonntag",
+      "Montag",
+      "Dienstag",
+      "Mittwoch",
+      "Donnerstag",
+      "Freitag",
+      "Samstag"
+    ],
+    "months": [
+      "Januar",
+      "Februar",
+      "März",
+      "April",
+      "Mai",
+      "Juni",
+      "Juli",
+      "August",
+      "September",
+      "Oktober",
+      "November",
+      "Dezember"
+    ],
     "oneTime": "Einmalig",
     "timeRange": "{{start}}–{{end}} Uhr"
   },
@@ -479,13 +521,34 @@
     "badgeNeu": "neu",
     "badgeReady": "bereit",
     "items": {
-      "turnierplanung": { "title": "Jahresplanung", "desc": "Übersichtsplanung mit Input von außen." },
-      "trainingsplan": { "title": "Terminplanung", "desc": "Trainings- und Spieltermine an einem Ort." },
-      "trainingsfokus": { "title": "Trainingsfokus", "desc": "Vorbereitung und Nacharbeit zum Training." },
-      "videos": { "title": "Beispiele", "desc": "Geteilte Medien als Vorbilder, Hilfestellung, etc. …" },
-      "dateien": { "title": "Meine Dateien", "desc": "Alles was mir wichtig ist." },
-      "liveticker": { "title": "Matchticker", "desc": "Aktuelles Spiel im Blick." },
-      "matchanalyse": { "title": "Matchanalyse", "desc": "Spiele auswerten & reflektieren." }
+      "turnierplanung": {
+        "title": "Jahresplanung",
+        "desc": "Übersichtsplanung mit Input von außen."
+      },
+      "trainingsplan": {
+        "title": "Terminplanung",
+        "desc": "Trainings- und Spieltermine an einem Ort."
+      },
+      "trainingsfokus": {
+        "title": "Trainingsfokus",
+        "desc": "Vorbereitung und Nacharbeit zum Training."
+      },
+      "videos": {
+        "title": "Beispiele",
+        "desc": "Geteilte Medien als Vorbilder, Hilfestellung, etc. …"
+      },
+      "dateien": {
+        "title": "Meine Dateien",
+        "desc": "Alles was mir wichtig ist."
+      },
+      "liveticker": {
+        "title": "Matchticker",
+        "desc": "Aktuelles Spiel im Blick."
+      },
+      "matchanalyse": {
+        "title": "Matchanalyse",
+        "desc": "Spiele auswerten & reflektieren."
+      }
     }
   }
 }

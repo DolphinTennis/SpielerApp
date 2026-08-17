@@ -67,9 +67,17 @@
       "translatedBanner": "Translated — not editable in this view."
     },
     "form1": {
-      "card1": { "title": "Me — General" },
-      "card2": { "title": "Me in the match", "taktikTitle": "Tactics", "feelingTitle": "Feeling" },
-      "card3": { "title": "My opponent" },
+      "card1": {
+        "title": "Me — General"
+      },
+      "card2": {
+        "title": "Me in the match",
+        "taktikTitle": "Tactics",
+        "feelingTitle": "Feeling"
+      },
+      "card3": {
+        "title": "My opponent"
+      },
       "fields": {
         "allg1": "What worked well that's already being trained?",
         "allg2": "What didn't work even though it's being trained?",
@@ -232,7 +240,9 @@
     "undo": "↩ Undo",
     "endMatch": "■ End match",
     "noPointsYet": "No points recorded yet.",
-    "noGamesYet": "No games recorded in this set yet."
+    "noGamesYet": "No games recorded in this set yet.",
+    "saveFailedDetail": "Point not saved: {{detail}} — the score was rolled back.",
+    "confirmEndUnfinished": "Set {{satz}} is still in progress at {{stand}}. Really end the match now? The running set is recorded as an interim score."
   },
   "fileTypes": {
     "Bild": "Image",
@@ -344,7 +354,10 @@
     "printPdf": "🖨️ Save as PDF",
     "file": "🗂️ File",
     "newEntryBtn": "➕ New entry",
-    "backToList": "← Back to list"
+    "backToList": "← Back to list",
+    "validationDateMissing": "Please pick a date — the entry cannot be saved without one.",
+    "validationRange": "{{label}}: the value must be between {{min}} and {{max}}.",
+    "saveFailedDetail": "Save failed: {{detail}}"
   },
   "trainingGoals": {
     "trainingTitle": "Goals for the next training",
@@ -448,9 +461,38 @@
       "ferien": "Holidays",
       "sonstiges": "Other"
     },
-    "weekdaysShort": { "mo": "Mon", "di": "Tue", "mi": "Wed", "do": "Thu", "fr": "Fri", "sa": "Sat", "so": "Sun" },
-    "weekdaysFull": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "weekdaysShort": {
+      "mo": "Mon",
+      "di": "Tue",
+      "mi": "Wed",
+      "do": "Thu",
+      "fr": "Fri",
+      "sa": "Sat",
+      "so": "Sun"
+    },
+    "weekdaysFull": [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
     "oneTime": "One-time",
     "timeRange": "{{start}}–{{end}}"
   },
@@ -479,13 +521,34 @@
     "badgeNeu": "new",
     "badgeReady": "ready",
     "items": {
-      "turnierplanung": { "title": "Season planning", "desc": "Overview planning with input from outside." },
-      "trainingsplan": { "title": "Scheduling", "desc": "Training and match dates in one place." },
-      "trainingsfokus": { "title": "Training focus", "desc": "Preparation and follow-up for training." },
-      "videos": { "title": "Examples", "desc": "Shared media as role models, guidance, etc. …" },
-      "dateien": { "title": "My files", "desc": "Everything that matters to me." },
-      "liveticker": { "title": "Match ticker", "desc": "Keep track of the current match." },
-      "matchanalyse": { "title": "Match analysis", "desc": "Evaluate & reflect on matches." }
+      "turnierplanung": {
+        "title": "Season planning",
+        "desc": "Overview planning with input from outside."
+      },
+      "trainingsplan": {
+        "title": "Scheduling",
+        "desc": "Training and match dates in one place."
+      },
+      "trainingsfokus": {
+        "title": "Training focus",
+        "desc": "Preparation and follow-up for training."
+      },
+      "videos": {
+        "title": "Examples",
+        "desc": "Shared media as role models, guidance, etc. …"
+      },
+      "dateien": {
+        "title": "My files",
+        "desc": "Everything that matters to me."
+      },
+      "liveticker": {
+        "title": "Match ticker",
+        "desc": "Keep track of the current match."
+      },
+      "matchanalyse": {
+        "title": "Match analysis",
+        "desc": "Evaluate & reflect on matches."
+      }
     }
   }
 }

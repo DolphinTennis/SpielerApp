@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CATEGORIES } from '../config/yearPlanCategories'
 import { formatDate } from '../lib/format'
+import AutoTextarea from "./AutoTextarea"
 
 export default function YearPlanDayPopover({ date, entry, activeCategory, canConfirm, onClose, onSave, onConfirm, onDelete }) {
   const { t } = useTranslation()
@@ -41,7 +42,7 @@ export default function YearPlanDayPopover({ date, entry, activeCategory, canCon
         </div>
         <div className="field">
           <label htmlFor="yp-note">{t('yearPlanPopover.note')}</label>
-          <textarea
+          <AutoTextarea
             id="yp-note"
             value={note}
             onChange={(e) => setNote(e.target.value)}

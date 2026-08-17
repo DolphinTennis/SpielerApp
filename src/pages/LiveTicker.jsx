@@ -44,13 +44,24 @@ export default function LiveTicker({ onMatchCreated }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId])
 
+  // Shows the new score straight away — courtside that responsiveness matters —
+  // but a failed save must not leave the two out of step. Previously the point
+  // stayed on screen while the database never got it, so the next reload
+  // quietly rolled the match back: exactly the "I couldn't click any further"
+  // symptom, with points vanishing rather than any button being disabled.
+  // On failure we go back to the last state known to be stored and say so,
+  // including what the database actually complained about.
   async function persist(next) {
+    const previous = liveMatch
     setLiveMatch(next)
     try {
       await saveLiveMatch(userId, orgId, next)
+      return true
     } catch (err) {
       console.error(err)
-      toast(t('liveTicker.saveFailed'))
+      setLiveMatch(previous)
+      toast(err?.message ? t('liveTicker.saveFailedDetail', { detail: err.message }) : t('liveTicker.saveFailed'))
+      return false
     }
   }
 
@@ -72,8 +83,10 @@ export default function LiveTicker({ onMatchCreated }) {
   async function handlePoint(side) {
     if (!liveMatch || liveMatch.decided) return
     const { next, message } = addLivePoint(liveMatch, side)
-    await persist(next)
-    if (message) toast(message)
+    const ok = await persist(next)
+    // Only announce "set over"/"tiebreak starts" once it is actually stored —
+    // otherwise the message claims something the rolled-back state contradicts.
+    if (ok && message) toast(message)
   }
 
   async function handleUndo() {
@@ -84,6 +97,22 @@ export default function LiveTicker({ onMatchCreated }) {
 
   async function handleEnd() {
     if (!liveMatch) return
+
+    // "Beenden" sits next to "Rückgängig" and is irreversible: it writes the
+    // match record and clears the live state. When the match is genuinely
+    // decided that is what you want, so don't nag. While a set is still
+    // running, name the score being frozen — a mis-tap there costs the rest of
+    // the match.
+    if (!liveMatch.decided) {
+      const stand = liveMatch.matchTiebreak
+        ? `${liveMatch.matchTiebreak.pointsA}:${liveMatch.matchTiebreak.pointsB}`
+        : liveMatch.tiebreak
+          ? `${liveMatch.tiebreak.pointsA}:${liveMatch.tiebreak.pointsB}`
+          : `${liveMatch.gamesA}:${liveMatch.gamesB}`
+      const satz = liveMatch.sets.length + 1
+      if (!window.confirm(t('liveTicker.confirmEndUnfinished', { satz, stand }))) return
+    }
+
     setBusy(true)
     try {
       const { ergebnis, verlauf } = buildEndedResult(liveMatch)

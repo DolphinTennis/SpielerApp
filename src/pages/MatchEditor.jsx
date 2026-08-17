@@ -10,6 +10,7 @@ import { useToast } from '../lib/ToastContext'
 import { useAuth } from '../lib/AuthContext'
 import { useOrg } from '../lib/OrgContext'
 import { useLanguage } from '../lib/useLanguage'
+import AutoTextarea from "../components/AutoTextarea"
 
 export default function MatchEditor({ matchId, onBack }) {
   const { t } = useTranslation()
@@ -190,7 +191,7 @@ export default function MatchEditor({ matchId, onBack }) {
       <div className="editor-header">
         <div className="field">
           <label htmlFor="e-verlauf">{t('matchanalyse.editor.matchProgress')}</label>
-          <textarea
+          <AutoTextarea
             id="e-verlauf"
             placeholder={t('matchanalyse.editor.matchProgressPlaceholder')}
             style={{ minHeight: 52 }}
@@ -280,7 +281,7 @@ export default function MatchEditor({ matchId, onBack }) {
               {showTranslation ? (
                 <div className="qvalue">{displayForm2.gut || '–'}</div>
               ) : (
-                <textarea style={{ minHeight: 110 }} value={record.form2.gut} onChange={(e) => updateForm2('gut', e.target.value)} />
+                <AutoTextarea style={{ minHeight: 110 }} value={record.form2.gut} onChange={(e) => updateForm2('gut', e.target.value)} />
               )}
             </div>
             <div className="qgroup">
@@ -288,7 +289,7 @@ export default function MatchEditor({ matchId, onBack }) {
               {showTranslation ? (
                 <div className="qvalue">{displayForm2.nicht || '–'}</div>
               ) : (
-                <textarea style={{ minHeight: 110 }} value={record.form2.nicht} onChange={(e) => updateForm2('nicht', e.target.value)} />
+                <AutoTextarea style={{ minHeight: 110 }} value={record.form2.nicht} onChange={(e) => updateForm2('nicht', e.target.value)} />
               )}
             </div>
           </div>
@@ -297,7 +298,7 @@ export default function MatchEditor({ matchId, onBack }) {
             {showTranslation ? (
               <div className="qvalue">{displayForm2.warum || '–'}</div>
             ) : (
-              <textarea value={record.form2.warum} onChange={(e) => updateForm2('warum', e.target.value)} />
+              <AutoTextarea value={record.form2.warum} onChange={(e) => updateForm2('warum', e.target.value)} />
             )}
           </div>
           <div className="qgroup">
@@ -305,7 +306,7 @@ export default function MatchEditor({ matchId, onBack }) {
             {showTranslation ? (
               <div className="qvalue">{displayForm2.zieleMatch || '–'}</div>
             ) : (
-              <textarea value={record.form2.zieleMatch} onChange={(e) => updateForm2('zieleMatch', e.target.value)} />
+              <AutoTextarea value={record.form2.zieleMatch} onChange={(e) => updateForm2('zieleMatch', e.target.value)} />
             )}
           </div>
           <div className="qgroup">
@@ -313,7 +314,7 @@ export default function MatchEditor({ matchId, onBack }) {
             {showTranslation ? (
               <div className="qvalue">{displayForm2.zieleTraining || '–'}</div>
             ) : (
-              <textarea value={record.form2.zieleTraining} onChange={(e) => updateForm2('zieleTraining', e.target.value)} />
+              <AutoTextarea value={record.form2.zieleTraining} onChange={(e) => updateForm2('zieleTraining', e.target.value)} />
             )}
           </div>
         </div>

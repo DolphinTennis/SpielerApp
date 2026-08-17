@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CATEGORIES, WEEKDAYS } from '../config/trainingPlanCategories'
 import { formatOccurrenceDateLong } from '../lib/trainingPlanOccurrences'
+import AutoTextarea from "./AutoTextarea"
 
 export default function TrainingSessionEditor({
   mode,
@@ -160,7 +161,7 @@ export default function TrainingSessionEditor({
 
         <div className="field">
           <label htmlFor="ts-note">{t('trainingSessionEditor.note')}</label>
-          <textarea
+          <AutoTextarea
             id="ts-note"
             value={note}
             onChange={(e) => setNote(e.target.value)}

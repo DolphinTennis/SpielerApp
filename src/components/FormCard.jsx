@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import AutoTextarea from "./AutoTextarea"
 
 function QGroup({ field, value, onChange, minHeight, readOnly }) {
   const { t } = useTranslation()
@@ -8,7 +9,7 @@ function QGroup({ field, value, onChange, minHeight, readOnly }) {
       {readOnly ? (
         <div className="qvalue">{value || '–'}</div>
       ) : (
-        <textarea
+        <AutoTextarea
           value={value || ''}
           onChange={(e) => onChange(field.key, e.target.value)}
           style={minHeight ? { minHeight } : undefined}

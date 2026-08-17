@@ -103,6 +103,13 @@ input[type='date'] {
   text-align: left;
 }
 
+/* Floor for the auto-growing fields (see components/AutoTextarea.jsx): roughly
+   three lines, so a field starts usefully tall and never collapses when its
+   height cannot be measured yet — e.g. while its form panel is still hidden. */
+textarea {
+  min-height: 74px;
+}
+
 input:focus,
 textarea:focus,
 select:focus {
