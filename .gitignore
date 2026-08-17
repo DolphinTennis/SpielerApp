@@ -6,4 +6,5 @@ dist-ssr
 .env.local
 .env.*.local
 .env.deploy
+.env.migrate
 .DS_Store
