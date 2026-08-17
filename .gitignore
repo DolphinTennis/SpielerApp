@@ -8,3 +8,4 @@ dist-ssr
 .env.deploy
 .env.migrate
 .DS_Store
+.env.functions
