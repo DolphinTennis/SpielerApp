@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 
 export default function Login() {
@@ -100,8 +99,11 @@ export default function Login() {
           {submitting ? 'Anmelden …' : 'Anmelden'}
         </button>
 
+        {/* No self-service registration link any more — a new team is set up
+            after getting in touch, not by signing oneself up. */}
         <p style={{ fontSize: 13, color: 'var(--text-soft)', marginTop: 14, textAlign: 'center' }}>
-          Noch kein Team? <Link to="/register">Jetzt registrieren</Link>
+          Noch kein Team? –{' '}
+          <a href="mailto:info@dolphintennis.com?subject=Anfrage%20Team-Zugang">jetzt Kontakt aufnehmen</a>
         </p>
 
         {!showForgot && (
