@@ -235,10 +235,13 @@ web3 = 30
 # secret = ""
 
 [auth.email]
-# Allow/disallow new user signups via email to your project.
-# Off for the same reason as [auth].enable_signup above — email is the only
-# provider this app uses, so both switches have to be closed.
-enable_signup = false
+# MUST stay true. This is not "may people register with email" — GoTrue treats
+# it as whether the email provider exists at all. Setting it false was tried
+# and it broke signing in: /token?grant_type=password answered 422
+# email_provider_disabled, "Email logins are disabled". Registration is closed
+# by [auth].enable_signup above, which is the correct switch for that and
+# leaves password login working.
+enable_signup = true
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
