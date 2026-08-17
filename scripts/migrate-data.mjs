@@ -85,13 +85,21 @@ async function copyTable(source, target, qualified) {
   const { rows: [{ count: sourceCount }] } = await source.query(`select count(*)::int as count from ${qualified}`)
   const { rows: [{ count: targetCount }] } = await target.query(`select count(*)::int as count from ${qualified}`)
 
+  // Run without --execute again after a copy and this line becomes the
+  // check: every table should read gleich. That's what makes the dry run
+  // double as verification instead of needing a separate script.
+  const mark = targetCount === sourceCount ? '=' : targetCount === 0 ? ' ' : '≠'
   const note = onlySource.length ? `  (übersprungen, fehlen im Ziel: ${onlySource.join(', ')})` : ''
-  console.log(`  ${qualified.padEnd(34)} Quelle ${String(sourceCount).padStart(6)}   Ziel ${String(targetCount).padStart(6)}${note}`)
+  console.log(
+    `  ${mark} ${qualified.padEnd(34)} Quelle ${String(sourceCount).padStart(6)}   Ziel ${String(targetCount).padStart(6)}${note}`
+  )
 
-  if (targetCount > 0 && !force) {
+  // Only a guard when actually writing — a dry run against an already
+  // copied target is the verification pass and must not abort on it.
+  if (execute && targetCount > 0 && !force) {
     fail(`${qualified} ist im Ziel nicht leer (${targetCount} Zeilen). Erst leeren, oder --force setzen.`)
   }
-  if (!execute || sourceCount === 0) return { table: qualified, copied: 0 }
+  if (!execute || sourceCount === 0) return { table: qualified, copied: 0, sourceCount, targetCount }
 
   const columnList = shared.map((c) => `"${c}"`).join(', ')
   const batch = batchSize(shared.length)
@@ -123,7 +131,7 @@ async function copyTable(source, target, qualified) {
     copied += rows.length
   }
 
-  return { table: qualified, copied }
+  return { table: qualified, copied, sourceCount, targetCount }
 }
 
 async function main() {
@@ -160,9 +168,23 @@ async function main() {
   if (execute) {
     const total = results.reduce((sum, r) => sum + r.copied, 0)
     console.log(`\n  ✓ ${total} Zeilen kopiert.`)
-    console.log('  Nächster Schritt: node --env-file=.env.migrate scripts/migrate-storage.mjs --execute\n')
+    console.log('  Prüfen: denselben Aufruf ohne --execute wiederholen — jede Zeile muss "=" zeigen.')
+    console.log('  Dann: node --env-file=.env.migrate scripts/migrate-storage.mjs --execute\n')
+    return
+  }
+
+  const empty = results.filter((r) => r.targetCount === 0 && r.sourceCount > 0)
+  const mismatched = results.filter((r) => r.targetCount > 0 && r.targetCount !== r.sourceCount)
+
+  if (empty.length === results.filter((r) => r.sourceCount > 0).length) {
+    console.log('\n  Ziel ist leer — bereit zum Kopieren mit --execute.\n')
+  } else if (mismatched.length === 0 && empty.length === 0) {
+    console.log('\n  ✓ Alle Tabellen stimmen überein.\n')
   } else {
-    console.log('\n  Probelauf beendet. Nichts geschrieben.\n')
+    if (empty.length) console.log(`\n  ✗ Leer geblieben: ${empty.map((r) => r.table).join(', ')}`)
+    if (mismatched.length) console.log(`  ✗ Abweichend: ${mismatched.map((r) => r.table).join(', ')}`)
+    console.log()
+    process.exitCode = 1
   }
 }
 

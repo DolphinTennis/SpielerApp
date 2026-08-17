@@ -3,6 +3,14 @@
 **Vorbereitet am 17.08.2026.** Noch nichts ausgeführt — dieses Dokument und die
 beiden Skripte in `scripts/` sind der vorbereitete Ablauf.
 
+| | |
+|---|---|
+| Quelle | `lguvrhdvlqipbjkesuon` („Dolphin", Organisation `gnahmpcaiagqkpfzmmij`, eu-central-1) |
+| Ziel | `ayfiezwtgazcvkepefwv` — drittes, eigenes Konto |
+| Zuerst | **Übungskopie**, kein echter Umzug |
+
+Das Akademie-Projekt (`seplxondmkfyijlrcubt`) bleibt unbeteiligt.
+
 ## Der Grundgedanke
 
 Ein Supabase-Projekt lässt sich nicht als Ganzes zwischen Konten verschieben.
@@ -14,7 +22,7 @@ Es wird neu aufgebaut und befüllt. Das teilt sich sauber:
 | Daten aus 12 Tabellen **und** `auth.users` | `scripts/migrate-data.mjs` |
 | Dateien im Bucket `files` | `scripts/migrate-storage.mjs` |
 | Edge Functions | `supabase functions deploy` |
-| Secrets der Functions | `supabase secrets set` — Werte hat nur du |
+| Secrets der Functions | `supabase secrets set` |
 | Anmelde-Einstellungen, SMTP, E-Mail-Vorlagen | `supabase config push` |
 
 Das Schema muss also **nicht** abgezogen werden. Es steht vollständig im Repo,
@@ -39,8 +47,8 @@ Auf diesem Rechner fehlen **Docker, psql und pg_dump** (und Homebrew, um sie
 zu installieren). Der Ablauf unten ist genau deshalb so gebaut, dass keins
 davon gebraucht wird:
 
-- `supabase db push`, `functions deploy`, `secrets set` und `config push`
-  sprechen direkt mit dem Projekt — kein Docker.
+- `supabase db push --db-url …` spricht direkt mit dem Projekt. Geprüft: es
+  scheitert an der Verbindung, nicht an Docker.
 - Die beiden Skripte laufen auf Node mit `pg` und `@supabase/supabase-js`,
   beides bereits installiert.
 
@@ -50,35 +58,59 @@ startet pg_dump in einem Docker-Container und bricht mit
 willst (etwa als Sicherung), führt daran nur eine Docker-Desktop-Installation
 vorbei.
 
-## Ablauf
+**Kein `supabase link`, keine Neuanmeldung.** Über `--db-url` bleibt die CLI
+unangetastet. Das ist hier wichtig: die Anmeldung der CLI ist global und hängt
+am Akademie-Konto, und ein `link` würde außerdem die Verknüpfung in
+`supabase/.temp/` auf das neue Projekt umschreiben.
 
-### 1. Neues Projekt anlegen *(dein Schritt)*
+---
 
-Im neuen Konto ein Projekt anlegen. Region möglichst wie bisher
-(`eu-central-1`), Datenbank-Passwort sicher notieren. Projekt-Ref merken — die
-Zeichenfolge aus der Projekt-URL.
+# Teil A — Übungskopie
 
-### 2. Zugangsdaten eintragen *(dein Schritt)*
+Ziel: den ganzen Ablauf einmal gefahrlos durchspielen. Das alte Projekt wird
+dabei **nur gelesen**, die App bleibt unverändert am alten Projekt. Die
+Edge Functions und die E-Mail-Einstellungen bleiben außen vor — sie sind für
+die Übung nicht nötig und brauchen Werte, die derzeit fehlen (siehe Teil B).
 
-`.env.migrate.example` nach `.env.migrate` kopieren und ausfüllen. Die Datei
-ist gitignored. Trag die Werte selbst ein — schick sie mir nicht im Chat.
+### A1. Zugangsdaten *(dein Schritt)*
 
-### 3. Schema aufbauen
+`.env.migrate.example` nach `.env.migrate` kopieren und ausfüllen — die Datei
+ist gitignored. Trag die Werte selbst ein, schick sie mir nicht im Chat.
+
+Gebraucht werden vier Dinge:
+
+| Wert | Woher |
+|---|---|
+| Datenbank-Passwort **alt** | Dashboard des alten Projekts → Settings → Database → *Reset database password*. Das Passwort ist nirgends einsehbar, nur neu setzbar. Ein Zurücksetzen stört den laufenden Betrieb nicht — die App verbindet sich über den anon-Schlüssel, nicht über Postgres. |
+| service_role-Schlüssel **alt** | Dashboard des alten Projekts → Settings → API. Der ist im Klartext einsehbar. |
+| Datenbank-Passwort **neu** | beim Anlegen des Projekts vergeben |
+| service_role-Schlüssel **neu** | Dashboard des neuen Projekts → Settings → API |
+
+Beide Verbindungszeichenfolgen über den **Session-Pooler** (Port 5432), nicht
+den Transaction-Pooler (6543). Sonderzeichen im Passwort prozentkodieren
+(`@` → `%40`).
+
+> Das setzt voraus, dass du dich beim **alten** Konto noch anmelden kannst.
+> Ohne Zugriff auf dessen Dashboard gibt es keinen Weg an die Daten — dann
+> wäre vor allem anderen die Kontowiederherstellung zu klären.
+
+### A2. Schema aufbauen
 
 ```bash
-npx supabase link --project-ref NEUE_PROJEKT_REF
-npx supabase db push
+npx supabase db push --db-url "$TARGET_DB_URL" --dry-run
 ```
 
-Danach stehen alle 12 Tabellen, die Zugriffsregeln, `is_org_member()`,
-`role_has_permission()`, die Trigger und der Bucket `files`.
+Zeigt, welche Migrationen laufen würden. Sieht es richtig aus, ohne
+`--dry-run` wiederholen. Danach stehen im neuen Projekt alle 12 Tabellen, die
+Zugriffsregeln, `is_org_member()`, `role_has_permission()`, die Trigger und
+der Bucket `files`.
 
 **Zu erwarten:** Migration 010 legt einen pg_cron-Job an, dessen URL noch auf
 das alte Projekt zeigt. Migration 011 entfernt denselben Job unmittelbar
 danach wieder — unterm Strich bleibt kein Job übrig, die veraltete URL ist
-also folgenlos. Ein Aufräumen der beiden Migrationen wäre Kosmetik.
+also folgenlos.
 
-### 4. Daten kopieren
+### A3. Daten kopieren
 
 Erst der Probelauf. Er schreibt nichts, sondern zeigt beide Verbindungen und
 je Tabelle die Zeilenzahl in Quelle und Ziel:
@@ -87,19 +119,19 @@ je Tabelle die Zeilenzahl in Quelle und Ziel:
 node --env-file=.env.migrate scripts/migrate-data.mjs
 ```
 
-Sehen die Zahlen plausibel aus und sind alle Zieltabellen leer:
+Sieht das plausibel aus:
 
 ```bash
 node --env-file=.env.migrate scripts/migrate-data.mjs --execute
 ```
 
-Das Skript bricht ab, wenn eine Zieltabelle nicht leer ist — das ist Absicht
-und lässt sich mit `--force` übergehen. Es kopiert nur Spalten, die es auf
-**beiden** Seiten gibt, damit ein Versionsunterschied bei `auth.users` nicht
-mitten im Lauf zum Fehler wird. Ein abgebrochener Lauf kann wiederholt
-werden (`on conflict do nothing`).
+### A4. Kontrolle
 
-### 5. Dateien kopieren
+Denselben Aufruf **ohne** `--execute` wiederholen. Jede Zeile muss mit `=`
+beginnen, am Ende steht „Alle Tabellen stimmen überein." Weicht etwas ab,
+endet das Skript mit Fehlercode und nennt die betroffenen Tabellen.
+
+### A5. Dateien kopieren
 
 ```bash
 node --env-file=.env.migrate scripts/migrate-storage.mjs
@@ -108,70 +140,94 @@ node --env-file=.env.migrate scripts/migrate-storage.mjs --execute
 
 Der Probelauf nennt Anzahl und Gesamtgröße und listet die ersten 20 Pfade.
 
-### 6. Edge Functions ausrollen
+### A6. Anmeldung prüfen — die eigentliche Probe
+
+Das ist der Punkt, an dem sich zeigt, ob der Umzug taugt. In einer Kopie von
+`.env.local` (**nicht** die echte überschreiben) `VITE_SUPABASE_URL` und
+`VITE_SUPABASE_ANON_KEY` auf das neue Projekt setzen, dann:
 
 ```bash
-npx supabase functions deploy activate-membership approve-registration email-inbound invite-member link-preview notify-registration resend-invite translate-match
+npm run dev
 ```
 
-Die `verify_jwt`-Einstellungen kommen aus `supabase/config.toml` mit.
+Mit einem **bestehenden** Konto und dessen **altem** Passwort anmelden. Klappt
+das, sind Nutzer und Passwörter heil übergekommen. Anschließend prüfen: Team
+sichtbar, Matches da, eine Datei aus „Meine Dateien" lässt sich öffnen.
 
-### 7. Secrets setzen *(deine Werte)*
+Danach `.env.local` zurücksetzen.
 
-Die Functions brauchen sieben Werte. `SUPABASE_URL`, `SUPABASE_ANON_KEY` und
-`SUPABASE_SERVICE_ROLE_KEY` setzt die Plattform selbst — die übrigen nicht:
+### A7. Aufräumen
 
-| Secret | wofür |
-|---|---|
-| `AZURE_TRANSLATOR_KEY` | `translate-match` |
-| `AZURE_TRANSLATOR_REGION` | `translate-match` |
-| `MAILBOX_HOST` | `email-inbound` |
-| `MAILBOX_USER` | `email-inbound` |
-| `MAILBOX_PASSWORD` | `email-inbound` |
-| `MAILBOX_IMAP_PORT` | `email-inbound` |
-| `MAILBOX_SMTP_PORT` | `email-inbound` |
+Nach der Übung `.env.migrate` löschen — dort steht ein service_role-Schlüssel
+im Klartext. Das Übungsprojekt kann stehen bleiben oder zurückgesetzt werden
+(Dashboard → Settings → General → *Reset project*), bevor der echte Umzug
+läuft.
+
+---
+
+# Teil B — Was der echte Umzug zusätzlich braucht
+
+Erst relevant, wenn die Übung sitzt.
+
+### B1. Ein Zeitfenster ohne Nutzung
+
+Alles, was nach dem Kopieren noch im alten Projekt passiert, geht verloren.
+Der echte Umzug braucht deshalb eine Zeit, in der niemand die App benutzt.
+
+### B2. Secrets der Edge Functions — hier fehlt etwas
+
+Die Werte des alten Projekts sind **nicht mehr vorhanden** und im Dashboard
+auch nicht mehr im Klartext einsehbar. Sie müssen neu beschafft werden:
+
+| Secret | wofür | Beschaffung |
+|---|---|---|
+| `AZURE_TRANSLATOR_KEY` | `translate-match` | im Azure-Portal neu erzeugen (Key rotieren) |
+| `AZURE_TRANSLATOR_REGION` | `translate-match` | steht im Azure-Portal, kein Geheimnis |
+| `MAILBOX_HOST` | `email-inbound` | all-inkl, kein Geheimnis |
+| `MAILBOX_USER` | `email-inbound` | all-inkl, kein Geheimnis |
+| `MAILBOX_PASSWORD` | `email-inbound` | im all-inkl-KAS neu setzen |
+| `MAILBOX_IMAP_PORT` | `email-inbound` | kein Geheimnis |
+| `MAILBOX_SMTP_PORT` | `email-inbound` | kein Geheimnis |
+
+Dazu `SMTP_PASSWORD` für `config push` — dasselbe all-inkl-Postfach.
+
+Ohne diese Werte laufen die Übersetzung von Matches und der Mail-Eingang für
+„Beispiele" im neuen Projekt nicht. Alles andere funktioniert.
+
+### B3. Functions ausrollen und Einstellungen übertragen
 
 ```bash
+npx supabase functions deploy activate-membership approve-registration \
+  email-inbound invite-member link-preview notify-registration \
+  resend-invite translate-match
+
 npx supabase secrets set --env-file .env.functions
-```
-
-Die alten Werte stehen im Dashboard des bisherigen Projekts unter Edge
-Functions → Secrets. Sie sind dort **nicht mehr im Klartext einsehbar** —
-falls du sie nicht anderweitig hast, müssen der Azure-Schlüssel und das
-Postfach-Passwort neu erzeugt werden.
-
-### 8. Anmeldung und E-Mail einstellen
-
-```bash
 npx supabase config push
 ```
 
-Überträgt `site_url`, die Weiterleitungsadressen, die SMTP-Verbindung zu
-all-inkl und die fünf E-Mail-Vorlagen aus `supabase/templates/`. Braucht
-`SMTP_PASSWORD` in der Umgebung (`config.toml` verweist mit `env(SMTP_PASSWORD)`
-darauf).
+Diese drei brauchen — anders als `db push` — eine CLI-Anmeldung im neuen Konto
+und ein `link` darauf. Danach zeigt `supabase/.temp/` auf das neue Projekt;
+das ist ab diesem Zeitpunkt richtig so.
 
-**Achtung:** `config push` beendet alle laufenden Sitzungen. Danach ist eine
-Neuanmeldung nötig, und Edge Functions antworten kurzzeitig mit „Nicht
-authentifiziert.", während einfache Abfragen weiterlaufen.
+`config push` überträgt `site_url`, die Weiterleitungsadressen, die
+SMTP-Verbindung zu all-inkl und die fünf E-Mail-Vorlagen aus
+`supabase/templates/`. **Achtung:** es beendet alle laufenden Sitzungen; danach
+antworten Edge Functions kurzzeitig mit „Nicht authentifiziert.", während
+einfache Abfragen weiterlaufen.
 
-### 9. App umstellen
+### B4. App umstellen
 
-In `.env.local` `VITE_SUPABASE_URL` und `VITE_SUPABASE_ANON_KEY` auf das neue
-Projekt setzen, dann `npm run dev` und anmelden — mit einem **bestehenden**
-Konto und dessen altem Passwort. Klappt das, ist der Umzug der Nutzer
-gelungen. Danach `npm run deploy:allinkl`.
+`.env.local` dauerhaft auf das neue Projekt setzen, dann
+`npm run deploy:allinkl`. Das alte Projekt stehen lassen, bis der neue Stand
+ein paar Tage getragen hat.
 
-### 10. Erst dann aufräumen
-
-Das alte Projekt stehen lassen, bis der neue Stand ein paar Tage getragen hat.
-`.env.migrate` löschen — dort steht ein service_role-Schlüssel im Klartext.
+---
 
 ## Was der Umzug nicht mitnimmt
 
 - **Realtime-Publikationen.** Der Liveticker hängt an Postgres Changes. Ob die
   Publikation `supabase_realtime` die betroffenen Tabellen im neuen Projekt
-  einschließt, ist nach Schritt 3 zu prüfen (Dashboard → Database →
+  einschließt, ist nach Schritt A2 zu prüfen (Dashboard → Database →
   Replication) — keine der Migrationen setzt das.
 - **Vault-Geheimnisse.** `email_inbound_cron_secret` aus Migration 010 liegt in
   Supabase Vault, nicht im Repo. Da der Cron-Job durch Migration 011 ohnehin
@@ -180,14 +236,3 @@ Das alte Projekt stehen lassen, bis der neue Stand ein paar Tage getragen hat.
   Migrationshistorie des alten Projekts bleiben zurück.
 - **Benutzerdefinierte Domains, Netzwerksperren, Sicherungspläne**, falls im
   alten Projekt eingerichtet.
-
-## Offen, bevor es losgeht
-
-1. **Wohin?** Das Akademie-Projekt liegt bereits in einem zweiten Konto
-   (`seplxondmkfyijlrcubt`). Soll die Spielerapp **dorthin** als zweites
-   Projekt, oder in ein drittes, eigenes Konto?
-2. **Umzug oder Kopie?** Ein reiner Probelauf zum Üben ist harmlos. Ein echter
-   Umzug braucht ein Zeitfenster, in dem niemand die App benutzt — sonst gehen
-   Änderungen verloren, die nach dem Kopieren im alten Projekt entstehen.
-3. **Sind die Function-Secrets noch vorhanden?** Siehe Schritt 7. Wenn nicht,
-   vor dem Umzug neu beschaffen.
