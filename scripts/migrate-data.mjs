@@ -13,6 +13,17 @@
 // project, and a mistyped connection string should cost nothing.
 import pg from 'pg'
 
+// Hand date/time values through as the exact strings Postgres printed, instead
+// of letting node-postgres turn them into JavaScript Dates. A Date only holds
+// milliseconds, so a timestamptz of 13:38:14.311235+00 came back out as
+// 13:38:14.311+00 — every timestamp in every table silently lost its last
+// three digits. Harmless for the app, but it is data loss, and it made a
+// content comparison between source and target impossible.
+// OIDs: 1082 date, 1083 time, 1114 timestamp, 1184 timestamptz, 1266 timetz.
+for (const oid of [1082, 1083, 1114, 1184, 1266]) {
+  pg.types.setTypeParser(oid, (value) => value)
+}
+
 const SOURCE_URL = process.env.SOURCE_DB_URL
 const TARGET_URL = process.env.TARGET_DB_URL
 
@@ -80,6 +91,18 @@ async function sharedColumns(source, target, schema, table) {
   const shared = a.rows.map((r) => r.column_name).filter((c) => inTarget.has(c))
   const onlySource = a.rows.map((r) => r.column_name).filter((c) => !inTarget.has(c))
   return { shared, onlySource }
+}
+
+// Only the public tables: auth.users is owned by supabase_auth_admin, so
+// ALTER TABLE on it would be refused — and its one trigger fires on UPDATE,
+// not INSERT, so it never interferes with a copy anyway.
+const TRIGGER_TABLES = TABLES.filter((t) => t.startsWith('public.'))
+
+async function setUserTriggers(target, enabled) {
+  for (const table of TRIGGER_TABLES) {
+    await target.query(`alter table ${table} ${enabled ? 'enable' : 'disable'} trigger user`)
+  }
+  console.log(`  Trigger im Ziel ${enabled ? 'wieder eingeschaltet' : 'für den Kopiervorgang abgeschaltet'}.`)
 }
 
 async function copyTable(source, target, qualified) {
@@ -178,8 +201,20 @@ async function main() {
       }
     }
 
-    for (const table of TABLES) {
-      results.push(await copyTable(source, target, table))
+    // The target's own BEFORE INSERT triggers rewrite what we insert:
+    // set_training_session_status recomputes `status` and takes `created_by`
+    // from auth.uid() — which is NULL here — so confirmed sessions arrived as
+    // `proposed` with no creator, and set_updated_at stamped today's date.
+    // A copy has to reproduce rows, not re-run the app's business rules over
+    // them, so user triggers go off for the duration. Re-enabled in the
+    // finally below even if a copy fails halfway.
+    if (execute) await setUserTriggers(target, false)
+    try {
+      for (const table of TABLES) {
+        results.push(await copyTable(source, target, table))
+      }
+    } finally {
+      if (execute) await setUserTriggers(target, true)
     }
   } finally {
     await source.end()

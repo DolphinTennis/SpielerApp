@@ -35,10 +35,15 @@ function derivePermissions(role, rolePermissions) {
   return rolePermissions?.[role] || {}
 }
 
-// After Register.jsx signs a new user up, no session exists yet (email
-// confirmation pending), so the team can't be created then — RLS requires
-// auth.uid(). Instead the team/player name is stashed in the auth user's
-// metadata, and this runs it once a session finally exists (first login).
+// Unreachable since self-registration was closed: the only writer of
+// pending_team_name was the removed Register.jsx, so the guard below now
+// always returns null. Kept because it is the whole recipe for provisioning a
+// team from the client under RLS, and re-opening signup would need it back.
+//
+// How it worked: right after signup no session exists yet (email confirmation
+// pending), so the team can't be created then — RLS requires auth.uid().
+// The team/player name was stashed in the auth user's metadata, and this ran
+// once a session finally existed (first login).
 async function provisionPendingTeam(session) {
   const meta = session.user.user_metadata || {}
   if (!meta.pending_team_name) return null

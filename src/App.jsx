@@ -4,7 +4,6 @@ import { AuthProvider, useAuth } from './lib/AuthContext'
 import { OrgProvider } from './lib/OrgContext'
 import ConfigWarning from './components/ConfigWarning'
 import Login from './components/Login'
-import Register from './components/Register'
 import AcceptInvite from './pages/AcceptInvite'
 import ResetPassword from './pages/ResetPassword'
 import AppShell from './components/AppShell'
@@ -52,14 +51,11 @@ function AppRoutes() {
           </PublicOnlyRoute>
         }
       />
-      <Route
-        path="/register"
-        element={
-          <PublicOnlyRoute>
-            <Register />
-          </PublicOnlyRoute>
-        }
-      />
+      {/* No /register route: self-registration is closed. Anyone typing the
+          URL lands on /login via the catch-all below. The database side is
+          what actually shuts it — see enable_signup in supabase/config.toml.
+          Members still arrive by invitation, which goes through
+          /accept-invite and the admin API, not through signup. */}
       <Route path="/accept-invite" element={<AcceptInvite />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route
