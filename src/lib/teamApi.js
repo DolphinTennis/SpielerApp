@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient'
+import { callFunction } from './callFunction'
 
 export async function listMembers(orgId) {
   const { data, error } = await supabase
@@ -42,29 +43,6 @@ export async function updatePlayerName(orgId, playerName) {
 export async function updateTheme(orgId, theme) {
   const { error } = await supabase.from('organizations').update({ theme }).eq('id', orgId)
   if (error) throw error
-}
-
-// Calling Edge Functions via plain fetch (rather than functions.invoke())
-// so the Authorization header is exactly what we set — invoke() was
-// silently not forwarding the caller's session token as expected.
-async function callFunction(name, body) {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) throw new Error('Nicht angemeldet.')
-
-  const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${name}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${session.access_token}`,
-    },
-    body: JSON.stringify(body),
-  })
-  const data = await response.json().catch(() => ({}))
-  if (!response.ok) throw new Error(data.error || 'Anfrage fehlgeschlagen.')
-  return data
 }
 
 // Always the real public app URL, never window.location.origin — inviting

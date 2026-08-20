@@ -18,7 +18,8 @@ import {
   upsertTrainingSessionException,
 } from '../lib/trainingPlanApi'
 import { expandOccurrences, parseOccurrenceId, formatOccurrenceDateShort, formatTimeRange, todayIso, addDaysIso } from '../lib/trainingPlanOccurrences'
-import { buildIcs, downloadIcs } from '../lib/icalExport'
+import { downloadIcs } from '../lib/icalExport'
+import { ensureFeedToken, renewFeedToken, feedUrl, webcalUrl, sendCalendarLinkToTeam } from '../lib/calendarFeedApi'
 import { CATEGORY_BY_KEY, UPCOMING_COUNT_OPTIONS } from '../config/trainingPlanCategories'
 import { listGoals, deleteGoal } from '../lib/trainingGoalsApi'
 import TrainingSessionEditor from '../components/TrainingSessionEditor'
@@ -54,6 +55,10 @@ export default function Trainingsplan() {
   const toast = useToast()
   const canConfirm = !!permissions?.confirm_termine
   const canCreate = canConfirm || !!permissions?.calendar_entries
+  const canSubscribe = !!permissions?.calendar_subscribe
+
+  const [feedToken, setFeedToken] = useState(null)
+  const [feedBusy, setFeedBusy] = useState(false)
 
   const [sessions, setSessions] = useState([])
   const [exceptions, setExceptions] = useState([])
@@ -312,11 +317,67 @@ export default function Trainingsplan() {
     }
   }
 
-  function handleExportIcs() {
-    const start = todayIso()
-    const end = addDaysIso(start, 365)
-    const events = expandOccurrences(sessions, exceptions, start, end)
-    downloadIcs('terminplanung.ics', buildIcs(events))
+  // Lädt genau das, was auch das Abonnement liefert, statt die Datei ein
+  // zweites Mal im Browser zu bauen — so können Export und Abo nicht
+  // auseinanderlaufen.
+  async function handleExportIcs() {
+    setFeedBusy(true)
+    try {
+      const token = feedToken || (await ensureFeedToken(session.user.id, orgId))
+      if (!feedToken) setFeedToken(token)
+      const response = await fetch(feedUrl(token))
+      if (!response.ok) throw new Error('HTTP ' + response.status)
+      downloadIcs('terminplanung.ics', await response.text())
+    } catch (err) {
+      console.error(err)
+      toast(t('trainingsplan.feedFailed'))
+    } finally {
+      setFeedBusy(false)
+    }
+  }
+
+  async function handleCopyLink() {
+    try {
+      const token = feedToken || (await ensureFeedToken(session.user.id, orgId))
+      setFeedToken(token)
+      await navigator.clipboard.writeText(feedUrl(token))
+      toast(t('trainingsplan.feedCopied'))
+    } catch (err) {
+      console.error(err)
+      toast(t('trainingsplan.feedFailed'))
+    }
+  }
+
+  // Bewusst mit Rückfrage: bestehende Abonnements hören danach auf zu
+  // aktualisieren, und zwar wortlos — die Kalender-App meldet keinen Fehler,
+  // die Termine hören einfach auf, sich zu ändern.
+  async function handleRenewLink() {
+    if (!window.confirm(t('trainingsplan.feedRenewConfirm'))) return
+    setFeedBusy(true)
+    try {
+      const token = await renewFeedToken(session.user.id, orgId)
+      setFeedToken(token)
+      toast(t('trainingsplan.feedRenewed'))
+    } catch (err) {
+      console.error(err)
+      toast(t('trainingsplan.feedFailed'))
+    } finally {
+      setFeedBusy(false)
+    }
+  }
+
+  async function handleSendLinks() {
+    if (!window.confirm(t('trainingsplan.feedSendConfirm'))) return
+    setFeedBusy(true)
+    try {
+      const result = await sendCalendarLinkToTeam(orgId)
+      toast(t('trainingsplan.feedSent', { anzahl: result.versendet }))
+    } catch (err) {
+      console.error(err)
+      toast(err?.message || t('trainingsplan.feedFailed'))
+    } finally {
+      setFeedBusy(false)
+    }
   }
 
   return (
@@ -325,10 +386,50 @@ export default function Trainingsplan() {
       <p className="section-sub">{t('trainingsplan.subtitle')}</p>
 
       <div style={{ marginBottom: 16 }}>
-        <button type="button" className="btn btn-outline btn-sm" onClick={handleExportIcs}>
+        <button type="button" className="btn btn-outline btn-sm" onClick={handleExportIcs} disabled={feedBusy}>
           {t('trainingsplan.exportIcs')}
         </button>
       </div>
+
+      {canSubscribe && (
+        <div className="calendar-feed-box">
+          <div className="calendar-feed-title">{t('trainingsplan.feedTitle')}</div>
+          <p className="calendar-feed-hint">{t('trainingsplan.feedIntro')}</p>
+          <div className="calendar-feed-actions">
+            <a
+              className="btn btn-primary btn-sm"
+              href={feedToken ? webcalUrl(feedToken) : undefined}
+              onClick={async (e) => {
+                if (feedToken) return
+                // Der Link entsteht erst beim ersten Bedarf — sonst legt jeder
+                // Seitenaufruf ein Token an, das nie jemand benutzt.
+                e.preventDefault()
+                try {
+                  const token = await ensureFeedToken(session.user.id, orgId)
+                  setFeedToken(token)
+                  window.location.href = webcalUrl(token)
+                } catch (err) {
+                  console.error(err)
+                  toast(t('trainingsplan.feedFailed'))
+                }
+              }}
+            >
+              {t('trainingsplan.feedSubscribe')}
+            </a>
+            <button type="button" className="btn btn-outline btn-sm" onClick={handleCopyLink} disabled={feedBusy}>
+              {t('trainingsplan.feedCopy')}
+            </button>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={handleRenewLink} disabled={feedBusy}>
+              {t('trainingsplan.feedRenew')}
+            </button>
+            <button type="button" className="btn btn-clay btn-sm" onClick={handleSendLinks} disabled={feedBusy}>
+              {t('trainingsplan.feedSend')}
+            </button>
+          </div>
+          <p className="calendar-feed-note">{t('trainingsplan.feedRefreshNote')}</p>
+          <p className="calendar-feed-note">{t('trainingsplan.feedPrivacyNote')}</p>
+        </div>
+      )}
 
       <div className="trainingplan-upcoming">
         <div className="trainingplan-upcoming-header">

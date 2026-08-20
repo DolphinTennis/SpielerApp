@@ -11,12 +11,22 @@ export default function RolePermissionsEditor({ role, value, onChange }) {
     { key: 'year_plan_entries', label: t('rolePermissions.rightYearPlanEntries'), confirmKey: 'year_plan_auto_confirm' },
     { key: 'calendar_entries', label: t('rolePermissions.rightCalendarEntries'), confirmKey: 'calendar_auto_confirm' },
     { key: 'confirm_termine', label: t('rolePermissions.rightConfirmTermine') },
+    // Unterschalter nach demselben Muster wie oben: das Hauptrecht gibt den
+    // Abo-Link überhaupt frei, der Unterschalter entscheidet, ob die
+    // Jahresplanung im Abonnement mitkommt.
+    {
+      key: 'calendar_subscribe',
+      label: t('rolePermissions.rightCalendarSubscribe'),
+      confirmKey: 'calendar_feed_yearplan',
+      confirmLabel: t('rolePermissions.calendarYearPlanSub'),
+    },
   ]
 
   function toggle(key) {
     const next = { ...value, [key]: !value[key] }
     if (key === 'year_plan_entries' && !next.year_plan_entries) next.year_plan_auto_confirm = false
     if (key === 'calendar_entries' && !next.calendar_entries) next.calendar_auto_confirm = false
+    if (key === 'calendar_subscribe' && !next.calendar_subscribe) next.calendar_feed_yearplan = false
     onChange(next)
   }
 
@@ -40,7 +50,7 @@ export default function RolePermissionsEditor({ role, value, onChange }) {
           {r.confirmKey && value[r.key] && (
             <label className="perm-checkbox perm-checkbox-sub">
               <input type="checkbox" checked={!!value[r.confirmKey]} onChange={() => toggle(r.confirmKey)} />
-              {t('rolePermissions.autoConfirmSub')}
+              {r.confirmLabel || t('rolePermissions.autoConfirmSub')}
             </label>
           )}
         </div>

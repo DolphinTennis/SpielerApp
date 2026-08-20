@@ -380,3 +380,39 @@
   flex-wrap: wrap;
   margin-top: 16px;
 }
+
+/* Kalenderabonnement (siehe lib/calendarFeedApi.js). Abgesetzt vom Rest der
+   Seite, weil hier ein Link entsteht, den man weitergibt — das soll man sehen
+   und nicht mit den Bearbeitungsknöpfen darüber verwechseln. */
+.calendar-feed-box {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  padding: 16px 18px;
+  margin-bottom: 18px;
+}
+.calendar-feed-title {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 800;
+  font-size: 19px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.calendar-feed-hint {
+  font-size: 13.5px;
+  color: var(--text);
+  margin: 0 0 12px;
+  line-height: 1.45;
+}
+.calendar-feed-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.calendar-feed-note {
+  font-size: 12.5px;
+  color: var(--text-soft);
+  margin: 4px 0 0;
+  line-height: 1.45;
+}

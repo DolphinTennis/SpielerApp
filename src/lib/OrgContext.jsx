@@ -25,6 +25,8 @@ const FULL_PERMISSIONS = {
   calendar_entries: true,
   calendar_auto_confirm: true,
   confirm_termine: true,
+  calendar_subscribe: true,
+  calendar_feed_yearplan: true,
   visible_tiles: null,
 }
 

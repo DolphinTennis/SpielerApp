@@ -413,7 +413,21 @@
     "cancelFailed": "Absagen fehlgeschlagen.",
     "seriesDeleted": "Serie gelöscht.",
     "eventDeleted": "Termin gelöscht.",
-    "deleteFailed": "Löschen fehlgeschlagen."
+    "deleteFailed": "Löschen fehlgeschlagen.",
+    "feedTitle": "Kalender abonnieren",
+    "feedIntro": "Dein persönlicher Link. Abonnierte Termine aktualisieren sich von selbst — neue und verschobene Trainings erscheinen ohne Zutun.",
+    "feedSubscribe": "Im Kalender öffnen",
+    "feedCopy": "Link kopieren",
+    "feedRenew": "Link löschen und neu erzeugen",
+    "feedSend": "An alle im Team senden",
+    "feedCopied": "Link kopiert.",
+    "feedRenewed": "Neuer Link erzeugt. Der alte funktioniert nicht mehr.",
+    "feedRenewConfirm": "Wirklich einen neuen Link erzeugen? Bereits eingerichtete Abonnements hören danach auf zu aktualisieren — ohne Fehlermeldung, die Termine bleiben einfach stehen.",
+    "feedSendConfirm": "Jedem aktiven Teammitglied seinen persönlichen Abo-Link per E-Mail schicken?",
+    "feedSent": "An {{anzahl}} Teammitglieder verschickt.",
+    "feedFailed": "Der Kalenderlink konnte nicht erzeugt werden.",
+    "feedRefreshNote": "Wie schnell Änderungen ankommen, entscheidet deine Kalender-App: Apple Kalender lässt sich auf stündlich stellen, Google aktualisiert oft nur alle 12 bis 24 Stunden.",
+    "feedPrivacyNote": "Der Link ist persönlich — wer ihn hat, sieht deine Termine. Nicht in offene Gruppen stellen. Ist er abhandengekommen, hilft „Link löschen und neu erzeugen“."
   },
   "yearPlanPopover": {
     "proposedBy": "Vorschlag von {{name}}",
@@ -511,7 +525,9 @@
     "rightCalendarEntries": "Termine eintragen in Terminplanung",
     "rightConfirmTermine": "Termine bestätigen (Vormerkungen freigeben)",
     "autoConfirmSub": "→ direkt bestätigt (statt Vormerkung)",
-    "visibleTiles": "Sichtbare Kacheln"
+    "visibleTiles": "Sichtbare Kacheln",
+    "rightCalendarSubscribe": "Kalender abonnieren",
+    "calendarYearPlanSub": "auch die Jahresplanung"
   },
   "overview": {
     "title": "Übersicht",

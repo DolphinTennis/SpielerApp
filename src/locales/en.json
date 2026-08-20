@@ -413,7 +413,21 @@
     "cancelFailed": "Cancel failed.",
     "seriesDeleted": "Series deleted.",
     "eventDeleted": "Event deleted.",
-    "deleteFailed": "Delete failed."
+    "deleteFailed": "Delete failed.",
+    "feedTitle": "Subscribe to calendar",
+    "feedIntro": "Your personal link. A subscribed calendar updates itself — new and rescheduled sessions appear on their own.",
+    "feedSubscribe": "Open in calendar",
+    "feedCopy": "Copy link",
+    "feedRenew": "Delete link and create a new one",
+    "feedSend": "Send to everyone in the team",
+    "feedCopied": "Link copied.",
+    "feedRenewed": "New link created. The old one no longer works.",
+    "feedRenewConfirm": "Really create a new link? Existing subscriptions will stop updating afterwards — with no error, the entries simply stop changing.",
+    "feedSendConfirm": "Email every active team member their personal subscription link?",
+    "feedSent": "Sent to {{anzahl}} team members.",
+    "feedFailed": "The calendar link could not be created.",
+    "feedRefreshNote": "How quickly changes arrive is up to your calendar app: Apple Calendar can be set to hourly, Google often refreshes only every 12 to 24 hours.",
+    "feedPrivacyNote": "The link is personal — anyone holding it can see your schedule. Do not post it in open groups. If it gets out, use “Delete link and create a new one”."
   },
   "yearPlanPopover": {
     "proposedBy": "Suggested by {{name}}",
@@ -511,7 +525,9 @@
     "rightCalendarEntries": "Create entries in scheduling",
     "rightConfirmTermine": "Confirm entries (approve pending ones)",
     "autoConfirmSub": "→ confirmed directly (no approval needed)",
-    "visibleTiles": "Visible tiles"
+    "visibleTiles": "Visible tiles",
+    "rightCalendarSubscribe": "Subscribe to calendar",
+    "calendarYearPlanSub": "including the year plan"
   },
   "overview": {
     "title": "Overview",
