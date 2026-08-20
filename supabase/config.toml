@@ -457,6 +457,17 @@ verify_jwt = false
 # not called from the logged-in app. The token in the URL is the auth.
 verify_jwt = false
 
+[functions.calendar-feed]
+# Kein JWT: Kalender-Apps rufen die Adresse ohne Anmeldung ab. Die Berechtigung
+# steckt im Token im Query-String, das die Funktion selbst nachschlägt und
+# gegen role_has_permission() prüft. Gleiche Lage wie approve-registration.
+verify_jwt = false
+
+[functions.send-calendar-link]
+# Gleiches Gateway-Problem wie bei den übrigen Funktionen — die Anmeldung wird
+# in der Funktion selbst per getUser(jwt) geprüft.
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.
