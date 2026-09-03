@@ -72,6 +72,7 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!
     const asCaller = createClient(supabaseUrl, anonKey, {
+      db: { schema: 'spielerapp' },
       global: { headers: { Authorization: authHeader } },
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     })

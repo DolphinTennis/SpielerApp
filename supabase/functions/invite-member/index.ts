@@ -42,6 +42,7 @@ Deno.serve(async (req) => {
     // session that can never exist here and fails with "Auth session missing!"
     // even when a valid jwt is passed in directly.
     const asCaller = createClient(supabaseUrl, anonKey, {
+      db: { schema: 'spielerapp' },
       global: { headers: { Authorization: authHeader } },
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     })
@@ -72,7 +73,7 @@ Deno.serve(async (req) => {
       return json({ error: 'Keine Berechtigung, Mitglieder für dieses Team einzuladen.' }, 403)
     }
 
-    const admin = createClient(supabaseUrl, serviceRoleKey)
+    const admin = createClient(supabaseUrl, serviceRoleKey, { db: { schema: 'spielerapp' } })
 
     const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
       redirectTo: redirectTo || undefined,

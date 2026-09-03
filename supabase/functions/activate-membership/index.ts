@@ -32,6 +32,7 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
     const asCaller = createClient(supabaseUrl, anonKey, {
+      db: { schema: 'spielerapp' },
       global: { headers: { Authorization: authHeader } },
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     })
@@ -39,7 +40,7 @@ Deno.serve(async (req) => {
     const { data: userData } = await asCaller.auth.getUser(jwt)
     if (!userData.user) return json({ error: 'Nicht authentifiziert.' }, 401)
 
-    const admin = createClient(supabaseUrl, serviceRoleKey)
+    const admin = createClient(supabaseUrl, serviceRoleKey, { db: { schema: 'spielerapp' } })
     const { data, error } = await admin
       .from('memberships')
       .update({ status: 'active' })

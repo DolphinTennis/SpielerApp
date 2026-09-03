@@ -57,6 +57,7 @@ Deno.serve(async (req) => {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!
   const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!
   const asCaller = createClient(supabaseUrl, anonKey, {
+    db: { schema: 'spielerapp' },
     global: { headers: { Authorization: authHeader } },
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   })
@@ -64,7 +65,7 @@ Deno.serve(async (req) => {
   const { data: userData } = await asCaller.auth.getUser(jwt)
   if (!userData.user) return json({ error: 'Nicht authentifiziert.' }, 401)
 
-  const admin = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
+  const admin = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { db: { schema: 'spielerapp' } })
   const client = new ImapFlow({
     host: Deno.env.get('MAILBOX_HOST')!,
     port: Number(Deno.env.get('MAILBOX_IMAP_PORT')!),

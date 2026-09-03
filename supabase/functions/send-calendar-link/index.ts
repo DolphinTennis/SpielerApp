@@ -31,6 +31,7 @@ Deno.serve(async (req) => {
     // Gegen die Sitzung des Aufrufers, damit die Zugriffsregeln die Wahrheit
     // über seine Mitgliedschaft sagen — gleiches Muster wie invite-member.
     const asCaller = createClient(supabaseUrl, anonKey, {
+      db: { schema: 'spielerapp' },
       global: { headers: { Authorization: authHeader } },
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     })
@@ -47,7 +48,7 @@ Deno.serve(async (req) => {
       .maybeSingle()
     if (!caller) return json({ error: 'Keine Berechtigung für dieses Team.' }, 403)
 
-    const admin = createClient(supabaseUrl, serviceRoleKey)
+    const admin = createClient(supabaseUrl, serviceRoleKey, { db: { schema: 'spielerapp' } })
 
     const { data: maysend } = await admin.rpc('role_has_permission', {
       target_org_id: orgId,

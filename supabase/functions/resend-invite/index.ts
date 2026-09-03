@@ -41,6 +41,7 @@ Deno.serve(async (req) => {
     // Scoped to the caller's JWT so RLS decides what they may see/do, rather
     // than trusting the client. (Same rationale as invite-member.)
     const asCaller = createClient(supabaseUrl, anonKey, {
+      db: { schema: 'spielerapp' },
       global: { headers: { Authorization: authHeader } },
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     })
@@ -71,7 +72,7 @@ Deno.serve(async (req) => {
       return json({ error: 'Keine Berechtigung, Einladungen für dieses Team zu verwalten.' }, 403)
     }
 
-    const admin = createClient(supabaseUrl, serviceRoleKey)
+    const admin = createClient(supabaseUrl, serviceRoleKey, { db: { schema: 'spielerapp' } })
 
     // Load the target membership with the service role, then re-check that it
     // belongs to the caller's org — never trust the orgId/membershipId pairing
