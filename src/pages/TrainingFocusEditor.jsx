@@ -131,8 +131,9 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
               type="number"
               min="1"
               max="10"
+              step="1"
               value={record.energie_mental ?? ''}
-              onChange={(e) => updateField('energie_mental', e.target.value === '' ? null : Number(e.target.value))}
+              onChange={(e) => updateField('energie_mental', e.target.value === '' ? null : Math.round(Number(e.target.value)))}
             />
           </div>
           <div className="field">
@@ -142,8 +143,9 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
               type="number"
               min="1"
               max="10"
+              step="1"
               value={record.energie_physisch ?? ''}
-              onChange={(e) => updateField('energie_physisch', e.target.value === '' ? null : Number(e.target.value))}
+              onChange={(e) => updateField('energie_physisch', e.target.value === '' ? null : Math.round(Number(e.target.value)))}
             />
           </div>
           <div className="field">
@@ -153,8 +155,9 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
               type="number"
               min="0"
               max="100"
+              step="1"
               value={record.einsatz_prozent ?? ''}
-              onChange={(e) => updateField('einsatz_prozent', e.target.value === '' ? null : Number(e.target.value))}
+              onChange={(e) => updateField('einsatz_prozent', e.target.value === '' ? null : Math.round(Number(e.target.value)))}
             />
           </div>
         </div>

@@ -42,7 +42,18 @@ export function validateEntry(record) {
   for (const [field, min, max, labelKey] of ranges) {
     const value = record[field]
     if (value === null || value === undefined || value === '') continue
-    if (!Number.isFinite(value) || value < min || value > max) {
+    if (!Number.isFinite(value)) {
+      return { key: 'trainingsfokus.validationRange', values: { labelKey, min, max } }
+    }
+    // Distinct from the range check on purpose: 80.1 lies well inside 0..100,
+    // so "must be between 0 and 100" would read as wrong. The columns are
+    // smallint (migration 014) — no fractional part at all, regardless of
+    // range. The number inputs round on change, but this is the fallback for
+    // anything that reaches here already fractional (paste, programmatic set).
+    if (!Number.isInteger(value)) {
+      return { key: 'trainingsfokus.validationInteger', values: { labelKey } }
+    }
+    if (value < min || value > max) {
       return { key: 'trainingsfokus.validationRange', values: { labelKey, min, max } }
     }
   }

@@ -357,7 +357,8 @@
     "backToList": "← Back to list",
     "validationDateMissing": "Please pick a date — the entry cannot be saved without one.",
     "validationRange": "{{label}}: the value must be between {{min}} and {{max}}.",
-    "saveFailedDetail": "Save failed: {{detail}}"
+    "saveFailedDetail": "Save failed: {{detail}}",
+    "validationInteger": "{{label}}: whole numbers only, no decimals."
   },
   "trainingGoals": {
     "trainingTitle": "Goals for the next training",

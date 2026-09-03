@@ -357,7 +357,8 @@
     "backToList": "← Zurück zur Liste",
     "validationDateMissing": "Bitte ein Datum angeben — ohne Datum lässt sich der Eintrag nicht speichern.",
     "validationRange": "{{label}}: Der Wert muss zwischen {{min}} und {{max}} liegen.",
-    "saveFailedDetail": "Speichern fehlgeschlagen: {{detail}}"
+    "saveFailedDetail": "Speichern fehlgeschlagen: {{detail}}",
+    "validationInteger": "{{label}}: Nur ganze Zahlen ohne Nachkommastellen."
   },
   "trainingGoals": {
     "trainingTitle": "Ziele fürs nächste Training",
