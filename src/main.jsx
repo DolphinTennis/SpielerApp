@@ -11,6 +11,7 @@ import './styles/yearplan.css'
 import './styles/trainingsplan.css'
 import './styles/beispiele.css'
 import './styles/team.css'
+import './styles/punktprotokoll.css'
 import './i18n'
 import App from './App.jsx'
 

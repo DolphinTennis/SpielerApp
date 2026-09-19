@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import FormCard from '../components/FormCard'
 import { FORM1_CARDS, FORM2_FIELDS } from '../config/matchFormFields'
@@ -11,6 +12,9 @@ import { useAuth } from '../lib/AuthContext'
 import { useOrg } from '../lib/OrgContext'
 import { useLanguage } from '../lib/useLanguage'
 import AutoTextarea from "../components/AutoTextarea"
+import { StatsView, ProtocolTable, playerNames } from '../components/PointProtocolViews'
+import { getProtocolForMatch, listUnlinkedProtocols, updateProtocol } from '../lib/pointProtocolApi'
+import { pct, resultText, stats, verlaufText } from '../lib/pointProtocolLogic'
 
 export default function MatchEditor({ matchId, onBack }) {
   const { t } = useTranslation()
@@ -18,6 +22,10 @@ export default function MatchEditor({ matchId, onBack }) {
   const { session } = useAuth()
   const { orgId, playerName } = useOrg()
   const toast = useToast()
+  const navigate = useNavigate()
+  const [protocol, setProtocol] = useState(null)
+  const [unlinked, setUnlinked] = useState([])
+  const [linkChoice, setLinkChoice] = useState('')
   const [record, setRecord] = useState(null)
   const [tab, setTab] = useState(1)
   const [saving, setSaving] = useState(false)
@@ -54,6 +62,64 @@ export default function MatchEditor({ matchId, onBack }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchId, orgId, playerName])
+
+  // Verknüpftes Punktprotokoll (falls vorhanden) und, solange keines verknüpft
+  // ist, die noch freien Protokolle zur Auswahl.
+  useEffect(() => {
+    let cancelled = false
+    setProtocol(null)
+    setUnlinked([])
+    setLinkChoice('')
+    if (!matchId) return undefined
+    getProtocolForMatch(matchId)
+      .then(async (p) => {
+        if (cancelled) return
+        setProtocol(p)
+        if (!p) {
+          const free = await listUnlinkedProtocols(orgId)
+          if (!cancelled) setUnlinked(free)
+        }
+      })
+      .catch((err) => console.error(err))
+    return () => {
+      cancelled = true
+    }
+  }, [matchId, orgId])
+
+  async function handleLink() {
+    if (!linkChoice || !record?.id) return
+    try {
+      const p = await updateProtocol(linkChoice, { match_id: record.id })
+      setProtocol(p)
+      setUnlinked([])
+      toast(t('matchanalyse.editor.pp.linked'))
+    } catch (err) {
+      console.error(err)
+      toast(t('matchanalyse.editor.pp.linkFailed'))
+    }
+  }
+
+  async function handleUnlink() {
+    if (!protocol || !window.confirm(t('matchanalyse.editor.pp.unlinkConfirm'))) return
+    try {
+      await updateProtocol(protocol.id, { match_id: null })
+      setProtocol(null)
+      setUnlinked(await listUnlinkedProtocols(orgId))
+      toast(t('matchanalyse.editor.pp.unlinked'))
+    } catch (err) {
+      console.error(err)
+      toast(t('matchanalyse.editor.pp.linkFailed'))
+    }
+  }
+
+  // Schreibt Ergebnis und Spielverlauf aus dem Protokoll in die Felder oben —
+  // im selben Textformat wie beim Matchticker. Gespeichert wird erst mit "Speichern".
+  function handleGenerateVerlauf() {
+    const m = { firstServer: protocol.first_server, mode: protocol.mode, games: protocol.state?.games || [] }
+    if ((record.verlauf || '').trim() && !window.confirm(t('matchanalyse.editor.pp.overwriteConfirm'))) return
+    setRecord((r) => ({ ...r, verlauf: verlaufText(m), ergebnis: r.ergebnis || resultText(m) }))
+    toast(t('matchanalyse.editor.pp.generated'))
+  }
 
   function updateField(key, value) {
     setRecord((r) => ({ ...r, [key]: value }))
@@ -175,6 +241,10 @@ export default function MatchEditor({ matchId, onBack }) {
 
   if (!record) return null
 
+  const ppMatch = protocol ? { firstServer: protocol.first_server, mode: protocol.mode, games: protocol.state?.games || [] } : null
+  const ppNames = playerNames(playerName, record.gegner, t)
+  const ppStats = ppMatch ? stats(ppMatch) : null
+
   const displayForm1 = showTranslation && translation ? translation.form1 : record.form1
   const displayForm2 = showTranslation && translation ? translation.form2 : record.form2
 
@@ -244,6 +314,9 @@ export default function MatchEditor({ matchId, onBack }) {
         <div className={`tab${tab === 2 ? ' active' : ''}`} onClick={() => setTab(2)}>
           {t('matchanalyse.editor.tab2')}
         </div>
+        <div className={`tab${tab === 3 ? ' active' : ''}`} onClick={() => setTab(3)}>
+          {t('matchanalyse.editor.tab3')}
+        </div>
       </div>
 
       <div className={`form-panel${tab === 1 ? ' active' : ''}`}>
@@ -271,6 +344,19 @@ export default function MatchEditor({ matchId, onBack }) {
       </div>
 
       <div className={`form-panel${tab === 2 ? ' active' : ''}`}>
+        {ppStats && ppStats.total > 0 && (
+          <div className="aaa-note pp-form-hint">
+            <strong>{t('matchanalyse.editor.pp.hintTitle')}</strong>{' '}
+            {t('matchanalyse.editor.pp.hintText', {
+              won: pct(ppStats.won, ppStats.total),
+              deuce: pct(ppStats.dzw, ppStats.dz),
+              df: ppStats.err.dfK,
+              rf: ppStats.err.rfG,
+              f1: ppStats.err.f1K,
+              winners: ppStats.err.wK,
+            })}
+          </div>
+        )}
         <div className="form-card">
           <h4>{t('matchanalyse.editor.tripleATitle')}</h4>
           <p className="hint">{t('matchanalyse.editor.tripleAHint')}</p>
@@ -317,6 +403,62 @@ export default function MatchEditor({ matchId, onBack }) {
               <AutoTextarea value={record.form2.zieleTraining} onChange={(e) => updateForm2('zieleTraining', e.target.value)} />
             )}
           </div>
+        </div>
+      </div>
+
+      <div className={`form-panel${tab === 3 ? ' active' : ''}`}>
+        <div className="form-card pp pp-analysis">
+          <h4>{t('matchanalyse.editor.pp.title')}</h4>
+          {!record.id && <p className="hint">{t('matchanalyse.editor.pp.saveFirst')}</p>}
+          {record.id && !protocol && (
+            <>
+              <p className="hint">{t('matchanalyse.editor.pp.none')}</p>
+              {unlinked.length > 0 ? (
+                <div className="pp-link-row">
+                  <select value={linkChoice} onChange={(e) => setLinkChoice(e.target.value)}>
+                    <option value="">{t('matchanalyse.editor.pp.choose')}</option>
+                    {unlinked.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {(p.opponent || t('punktprotokoll.opponent')) + (p.match_date ? ` · ${formatDate(p.match_date)}` : '')}
+                      </option>
+                    ))}
+                  </select>
+                  <button type="button" className="btn btn-primary btn-sm" disabled={!linkChoice} onClick={handleLink}>
+                    {t('matchanalyse.editor.pp.link')}
+                  </button>
+                </div>
+              ) : (
+                <p className="hint">{t('matchanalyse.editor.pp.noneFree')}</p>
+              )}
+              <button type="button" className="btn btn-outline btn-sm" onClick={() => navigate('/app/punktprotokoll')}>
+                {t('matchanalyse.editor.pp.toProtocols')}
+              </button>
+            </>
+          )}
+          {protocol && (
+            <>
+              <p className="hint">
+                {t('matchanalyse.editor.pp.linkedTo', {
+                  name: protocol.opponent || t('punktprotokoll.opponent'),
+                  date: protocol.match_date ? formatDate(protocol.match_date) : '–',
+                })}
+              </p>
+              <div className="pp-link-row">
+                <button type="button" className="btn btn-outline btn-sm" onClick={() => navigate(`/app/punktprotokoll/${protocol.id}`)}>
+                  {t('matchanalyse.editor.pp.open')}
+                </button>
+                <button type="button" className="btn btn-outline btn-sm" onClick={handleGenerateVerlauf}>
+                  {t('matchanalyse.editor.pp.generate')}
+                </button>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={handleUnlink}>
+                  {t('matchanalyse.editor.pp.unlink')}
+                </button>
+              </div>
+              <StatsView match={ppMatch} own={ppNames.own} other={ppNames.other} />
+              <h4 style={{ marginTop: 18 }}>{t('matchanalyse.editor.pp.protocolTitle')}</h4>
+              <ProtocolTable match={ppMatch} own={ppNames.own} other={ppNames.other} />
+            </>
+          )}
         </div>
       </div>
 

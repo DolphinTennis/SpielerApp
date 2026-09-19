@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { formatDate } from '../lib/format'
 
-export default function MatchRow({ match, onClick, onDelete }) {
+export default function MatchRow({ match, hasProtocol, onClick, onDelete }) {
   const { t } = useTranslation()
   return (
     <div className="match-row" onClick={onClick}>
@@ -13,6 +13,7 @@ export default function MatchRow({ match, onClick, onDelete }) {
           <span>🏆 {match.turnier || '–'}</span>
         </div>
       </div>
+      {hasProtocol && <span className="filed-tag pp-analysis-tag">{t('matchanalyse.list.pointAnalysis')}</span>}
       {match.filed && <span className="filed-tag">{t('matchanalyse.list.filed')}</span>}
       <button
         type="button"
