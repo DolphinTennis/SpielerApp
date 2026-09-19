@@ -428,7 +428,8 @@
     "feedSent": "Sent to {{anzahl}} team members.",
     "feedFailed": "The calendar link could not be created.",
     "feedRefreshNote": "How quickly changes arrive is up to your calendar app: Apple Calendar can be set to hourly, Google often refreshes only every 12 to 24 hours.",
-    "feedPrivacyNote": "The link is personal — anyone holding it can see your schedule. Do not post it in open groups. If it gets out, use “Delete link and create a new one”."
+    "feedPrivacyNote": "The link is personal — anyone holding it can see your schedule. Do not post it in open groups. If it gets out, use “Delete link and create a new one”.",
+    "feedBoxTitle": "Subscribe to & export calendar"
   },
   "yearPlanPopover": {
     "proposedBy": "Suggested by {{name}}",

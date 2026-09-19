@@ -384,6 +384,10 @@
 /* Kalenderabonnement (siehe lib/calendarFeedApi.js). Abgesetzt vom Rest der
    Seite, weil hier ein Link entsteht, den man weitergibt — das soll man sehen
    und nicht mit den Bearbeitungsknöpfen darüber verwechseln. */
+.calendar-feed-box.calendar-feed-box--bottom {
+  margin-top: 20px;
+  margin-bottom: 0;
+}
 .calendar-feed-box {
   border: 1px solid var(--line);
   border-radius: var(--radius);

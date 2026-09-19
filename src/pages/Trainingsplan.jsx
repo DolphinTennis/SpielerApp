@@ -385,52 +385,6 @@ export default function Trainingsplan() {
       <h1 className="section-title">{t('trainingsplan.title')}</h1>
       <p className="section-sub">{t('trainingsplan.subtitle')}</p>
 
-      <div style={{ marginBottom: 16 }}>
-        <button type="button" className="btn btn-outline btn-sm" onClick={handleExportIcs} disabled={feedBusy}>
-          {t('trainingsplan.exportIcs')}
-        </button>
-      </div>
-
-      {canSubscribe && (
-        <div className="calendar-feed-box">
-          <div className="calendar-feed-title">{t('trainingsplan.feedTitle')}</div>
-          <p className="calendar-feed-hint">{t('trainingsplan.feedIntro')}</p>
-          <div className="calendar-feed-actions">
-            <a
-              className="btn btn-primary btn-sm"
-              href={feedToken ? webcalUrl(feedToken) : undefined}
-              onClick={async (e) => {
-                if (feedToken) return
-                // Der Link entsteht erst beim ersten Bedarf — sonst legt jeder
-                // Seitenaufruf ein Token an, das nie jemand benutzt.
-                e.preventDefault()
-                try {
-                  const token = await ensureFeedToken(session.user.id, orgId)
-                  setFeedToken(token)
-                  window.location.href = webcalUrl(token)
-                } catch (err) {
-                  console.error(err)
-                  toast(t('trainingsplan.feedFailed'))
-                }
-              }}
-            >
-              {t('trainingsplan.feedSubscribe')}
-            </a>
-            <button type="button" className="btn btn-outline btn-sm" onClick={handleCopyLink} disabled={feedBusy}>
-              {t('trainingsplan.feedCopy')}
-            </button>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={handleRenewLink} disabled={feedBusy}>
-              {t('trainingsplan.feedRenew')}
-            </button>
-            <button type="button" className="btn btn-clay btn-sm" onClick={handleSendLinks} disabled={feedBusy}>
-              {t('trainingsplan.feedSend')}
-            </button>
-          </div>
-          <p className="calendar-feed-note">{t('trainingsplan.feedRefreshNote')}</p>
-          <p className="calendar-feed-note">{t('trainingsplan.feedPrivacyNote')}</p>
-        </div>
-      )}
-
       <div className="trainingplan-upcoming">
         <div className="trainingplan-upcoming-header">
           <h2>{t('trainingsplan.upcoming')}</h2>
@@ -491,6 +445,55 @@ export default function Trainingsplan() {
           eventDrop={handleEventDropOrResize}
           eventResize={handleEventDropOrResize}
         />
+      </div>
+
+      <div className="calendar-feed-box calendar-feed-box--bottom">
+        <div className="calendar-feed-title">{t('trainingsplan.feedBoxTitle')}</div>
+        {canSubscribe && <p className="calendar-feed-hint">{t('trainingsplan.feedIntro')}</p>}
+        <div className="calendar-feed-actions">
+          {canSubscribe && (
+            <>
+              <a
+                className="btn btn-primary btn-sm"
+                href={feedToken ? webcalUrl(feedToken) : undefined}
+                onClick={async (e) => {
+                  if (feedToken) return
+                  // Der Link entsteht erst beim ersten Bedarf — sonst legt jeder
+                  // Seitenaufruf ein Token an, das nie jemand benutzt.
+                  e.preventDefault()
+                  try {
+                    const token = await ensureFeedToken(session.user.id, orgId)
+                    setFeedToken(token)
+                    window.location.href = webcalUrl(token)
+                  } catch (err) {
+                    console.error(err)
+                    toast(t('trainingsplan.feedFailed'))
+                  }
+                }}
+              >
+                {t('trainingsplan.feedSubscribe')}
+              </a>
+              <button type="button" className="btn btn-outline btn-sm" onClick={handleCopyLink} disabled={feedBusy}>
+                {t('trainingsplan.feedCopy')}
+              </button>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={handleRenewLink} disabled={feedBusy}>
+                {t('trainingsplan.feedRenew')}
+              </button>
+              <button type="button" className="btn btn-clay btn-sm" onClick={handleSendLinks} disabled={feedBusy}>
+                {t('trainingsplan.feedSend')}
+              </button>
+            </>
+          )}
+          <button type="button" className="btn btn-outline btn-sm" onClick={handleExportIcs} disabled={feedBusy}>
+            {t('trainingsplan.exportIcs')}
+          </button>
+        </div>
+        {canSubscribe && (
+          <>
+            <p className="calendar-feed-note">{t('trainingsplan.feedRefreshNote')}</p>
+            <p className="calendar-feed-note">{t('trainingsplan.feedPrivacyNote')}</p>
+          </>
+        )}
       </div>
 
       {editingTarget && (

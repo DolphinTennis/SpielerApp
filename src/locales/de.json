@@ -428,7 +428,8 @@
     "feedSent": "An {{anzahl}} Teammitglieder verschickt.",
     "feedFailed": "Der Kalenderlink konnte nicht erzeugt werden.",
     "feedRefreshNote": "Wie schnell Änderungen ankommen, entscheidet deine Kalender-App: Apple Kalender lässt sich auf stündlich stellen, Google aktualisiert oft nur alle 12 bis 24 Stunden.",
-    "feedPrivacyNote": "Der Link ist persönlich — wer ihn hat, sieht deine Termine. Nicht in offene Gruppen stellen. Ist er abhandengekommen, hilft „Link löschen und neu erzeugen“."
+    "feedPrivacyNote": "Der Link ist persönlich — wer ihn hat, sieht deine Termine. Nicht in offene Gruppen stellen. Ist er abhandengekommen, hilft „Link löschen und neu erzeugen“.",
+    "feedBoxTitle": "Kalender abonnieren & exportieren"
   },
   "yearPlanPopover": {
     "proposedBy": "Vorschlag von {{name}}",
