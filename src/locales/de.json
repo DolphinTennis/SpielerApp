@@ -391,7 +391,25 @@
     "cancelOccurrence": "Nur diesen Termin absagen",
     "deleteSeries": "Ganze Serie löschen",
     "delete": "Löschen",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "headingEditOccurrence": "Einzelnen Termin bearbeiten",
+    "seriesFrom": "Serie ab {{date}}",
+    "seriesSpanSummary": "jeder Termin geht über {{count}} Tage weiter",
+    "deviatesFromSeries": "Weicht von der Serie ab",
+    "movedFrom": "Verschoben von {{date}}",
+    "occurrenceHint": "Gilt nur für diesen einen Termin. Die übrigen Termine der Serie bleiben unverändert.",
+    "seriesHint": "Gilt für alle Termine der Serie. Einzelne Termine kannst du über den Kalender gezielt ändern.",
+    "beginDate": "Beginn (Datum)",
+    "beginTime": "Beginn (Uhrzeit)",
+    "endDate": "Ende (Datum)",
+    "endTimeOfDay": "Ende (Uhrzeit)",
+    "duration": "Dauer ab Beginn",
+    "sameDay": "am selben Tag",
+    "daysLater": "{{count}} Tage später (mehrtägig)",
+    "errEndBeforeStart": "Das Ende muss nach dem Beginn liegen.",
+    "errTooLong": "Ein Termin kann höchstens {{count}} Tage dauern.",
+    "saveOccurrence": "Nur diesen Termin speichern",
+    "resetToSeries": "Zurück auf Serie"
   },
   "trainingsplan": {
     "title": "Terminplanung",
@@ -429,7 +447,9 @@
     "feedFailed": "Der Kalenderlink konnte nicht erzeugt werden.",
     "feedRefreshNote": "Wie schnell Änderungen ankommen, entscheidet deine Kalender-App: Apple Kalender lässt sich auf stündlich stellen, Google aktualisiert oft nur alle 12 bis 24 Stunden.",
     "feedPrivacyNote": "Der Link ist persönlich — wer ihn hat, sieht deine Termine. Nicht in offene Gruppen stellen. Ist er abhandengekommen, hilft „Link löschen und neu erzeugen“.",
-    "feedBoxTitle": "Kalender abonnieren & exportieren"
+    "feedBoxTitle": "Kalender abonnieren & exportieren",
+    "orphanConfirm": "{{count}} einzeln geänderte oder abgesagte Termine passen nach dieser Änderung nicht mehr zur Serie und werden gelöscht. Fortfahren?",
+    "resetDone": "Termin folgt wieder der Serie."
   },
   "yearPlanPopover": {
     "proposedBy": "Vorschlag von {{name}}",
@@ -568,5 +588,12 @@
         "desc": "Spiele auswerten & reflektieren."
       }
     }
+  },
+  "seriesChoice": {
+    "title": "Serientermin",
+    "text": "Was möchtest du öffnen?",
+    "occurrence": "Nur diesen Termin",
+    "series": "Ganze Serie",
+    "cancel": "Abbrechen"
   }
 }

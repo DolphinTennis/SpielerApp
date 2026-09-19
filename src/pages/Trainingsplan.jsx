@@ -16,13 +16,15 @@ import {
   updateTrainingSession,
   deleteTrainingSession,
   upsertTrainingSessionException,
+  deleteTrainingSessionException,
 } from '../lib/trainingPlanApi'
-import { expandOccurrences, parseOccurrenceId, formatOccurrenceDateShort, formatTimeRange, todayIso, addDaysIso } from '../lib/trainingPlanOccurrences'
+import { expandOccurrences, parseOccurrenceId, formatOccurrenceDateShort, formatEventRange, formatWeekdays, daysBetweenIso, todayIso, addDaysIso } from '../lib/trainingPlanOccurrences'
 import { downloadIcs } from '../lib/icalExport'
 import { ensureFeedToken, renewFeedToken, feedUrl, webcalUrl, sendCalendarLinkToTeam } from '../lib/calendarFeedApi'
 import { CATEGORY_BY_KEY, UPCOMING_COUNT_OPTIONS } from '../config/trainingPlanCategories'
 import { listGoals, deleteGoal } from '../lib/trainingGoalsApi'
 import TrainingSessionEditor from '../components/TrainingSessionEditor'
+import SeriesChoiceDialog from '../components/SeriesChoiceDialog'
 import TrainingGoalsPanel from '../components/TrainingGoalsPanel'
 
 function renderEventContent(arg) {
@@ -48,6 +50,23 @@ function addMinutesToTime(hhmm, minutes) {
   return `${String(nh).padStart(2, '0')}:${String(nm).padStart(2, '0')}`
 }
 
+const OVERRIDE_KEYS = ['override_date', 'override_span_days', 'override_start_time', 'override_end_time', 'override_location', 'override_with_whom', 'override_note']
+
+// Weicht diese Ausnahme wirklich von der Serie ab (statt nur den Status zu tragen)?
+function deviatesFromSeries(exception) {
+  return !!exception && OVERRIDE_KEYS.some((k) => exception[k] !== null && exception[k] !== undefined)
+}
+
+// Passt ein Datum noch zur Regel (Wochentag, Beginn, Ende) der Serie?
+function matchesSeriesRule(weekdays, startDate, endDate, iso) {
+  if (iso < startDate) return false
+  if (endDate && iso > endDate) return false
+  const [y, m, d] = iso.split('-').map(Number)
+  return weekdays.includes(new Date(y, m - 1, d).getDay())
+}
+
+const sameText = (a, b) => (a || '') === (b || '')
+
 export default function Trainingsplan() {
   const { t, i18n } = useTranslation()
   const { session } = useAuth()
@@ -66,6 +85,7 @@ export default function Trainingsplan() {
   const [loading, setLoading] = useState(true)
   const [visibleRange, setVisibleRange] = useState(null)
   const [editingTarget, setEditingTarget] = useState(null)
+  const [choiceTarget, setChoiceTarget] = useState(null)
   const [upcomingCount, setUpcomingCount] = useState(UPCOMING_COUNT_OPTIONS[0])
 
   useEffect(() => {
@@ -131,18 +151,22 @@ export default function Trainingsplan() {
         weekdays: [],
         startDate: dateIso,
         endDate: null,
+        spanDays: 0,
       },
     })
   }
 
-  function openEditEditor(fcEvent) {
+  function openEditEditor(fcEvent, scope) {
     const { sessionId, occurrenceDate } = parseOccurrenceId(fcEvent.id)
     const baseSession = sessionById[sessionId]
     if (!baseSession) return
     const exception = exceptionByKey[`${sessionId}::${occurrenceDate}`] || null
     const isRecurring = baseSession.weekdays.length > 0
+    const forOccurrence = scope === 'occurrence'
+    const ex = forOccurrence ? exception : null
     setEditingTarget({
       mode: 'edit',
+      scope: scope || 'series',
       session: baseSession,
       occurrenceDate,
       exception,
@@ -150,14 +174,15 @@ export default function Trainingsplan() {
       status: exception ? exception.status : baseSession.status,
       initial: {
         category: baseSession.category,
-        location: exception?.override_location ?? baseSession.location ?? '',
-        withWhom: exception?.override_with_whom ?? baseSession.with_whom ?? '',
-        note: exception?.override_note ?? baseSession.note ?? '',
-        startTime: (exception?.override_start_time || baseSession.start_time || '').slice(0, 5),
-        endTime: (exception?.override_end_time || baseSession.end_time || '').slice(0, 5),
+        location: ex?.override_location ?? baseSession.location ?? '',
+        withWhom: ex?.override_with_whom ?? baseSession.with_whom ?? '',
+        note: ex?.override_note ?? baseSession.note ?? '',
+        startTime: (ex?.override_start_time || baseSession.start_time || '').slice(0, 5),
+        endTime: (ex?.override_end_time || baseSession.end_time || '').slice(0, 5),
         weekdays: baseSession.weekdays,
-        startDate: baseSession.start_date,
+        startDate: forOccurrence ? ex?.override_date || occurrenceDate : baseSession.start_date,
         endDate: baseSession.end_date,
+        spanDays: (forOccurrence ? ex?.override_span_days : null) ?? baseSession.span_days ?? 0,
       },
     })
   }
@@ -171,8 +196,12 @@ export default function Trainingsplan() {
     openCreateEditor(dateIso, startTime, endTime)
   }
 
+  // Bei einer Serie zuerst fragen, ob nur dieser Termin oder die ganze Serie
+  // gemeint ist; Einmaltermine öffnen direkt.
   function handleEventClick(info) {
-    openEditEditor(info.event)
+    const { isRecurring } = info.event.extendedProps
+    if (!isRecurring) return openEditEditor(info.event, 'series')
+    setChoiceTarget(info.event)
   }
 
   async function handleEventDropOrResize(info) {
@@ -181,13 +210,17 @@ export default function Trainingsplan() {
     if (!baseSession) return
     const newStartIso = info.event.startStr.slice(0, 10)
     const newStartTime = info.event.startStr.slice(11, 16)
-    const newEndTime = info.event.endStr.slice(11, 16)
+    const endStr = info.event.endStr || info.event.startStr
+    const newEndIso = endStr.slice(0, 10)
+    const newEndTime = endStr.slice(11, 16)
+    const newSpan = Math.max(0, daysBetweenIso(newStartIso, newEndIso))
     try {
       if (baseSession.weekdays.length === 0) {
         const updated = await updateTrainingSession(baseSession.id, {
           start_date: newStartIso,
           start_time: newStartTime,
           end_time: newEndTime,
+          span_days: newSpan,
         })
         setSessions((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
       } else {
@@ -197,6 +230,7 @@ export default function Trainingsplan() {
           override_date: newStartIso !== occurrenceDate ? newStartIso : null,
           override_start_time: newStartTime,
           override_end_time: newEndTime,
+          override_span_days: newSpan !== (baseSession.span_days || 0) ? newSpan : null,
         })
         setExceptions((prev) => [...prev.filter((e) => e.id !== saved.id), saved])
       }
@@ -222,11 +256,20 @@ export default function Trainingsplan() {
           weekdays: values.weekdays,
           start_date: values.startDate,
           end_date: values.endDate,
+          span_days: values.spanDays,
           created_by_label: session.user.email,
         })
         setSessions((prev) => [...prev, created])
         toast(t('trainingsplan.eventCreated'))
       } else {
+        // Einzelne Anpassungen/Absagen, die nach der Änderung zu keinem Termin
+        // der Serie mehr passen, würden sonst wortlos verwaist liegen bleiben.
+        const orphans = exceptions.filter(
+          (e) =>
+            e.session_id === editingTarget.session.id &&
+            (values.weekdays.length === 0 || !matchesSeriesRule(values.weekdays, values.startDate, values.endDate, e.occurrence_date))
+        )
+        if (orphans.length > 0 && !window.confirm(t('trainingsplan.orphanConfirm', { count: orphans.length }))) return
         const updated = await updateTrainingSession(editingTarget.session.id, {
           category: values.category,
           location: values.location || null,
@@ -237,11 +280,56 @@ export default function Trainingsplan() {
           weekdays: values.weekdays,
           start_date: values.startDate,
           end_date: values.endDate,
+          span_days: values.spanDays,
           created_by_label: session.user.email,
         })
+        await Promise.all(orphans.map((e) => deleteTrainingSessionException(e.id)))
+        const orphanIds = new Set(orphans.map((e) => e.id))
+        setExceptions((prev) => prev.filter((e) => !orphanIds.has(e.id)))
         setSessions((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
         toast(t('trainingsplan.saved'))
       }
+      setEditingTarget(null)
+    } catch (err) {
+      console.error(err)
+      toast(t('trainingsplan.saveFailed'))
+    }
+  }
+
+  // Speichert einen einzelnen Termin einer Serie als Ausnahme. Nur was von der
+  // Serie abweicht, wird gespeichert — alles andere folgt weiter späteren
+  // Änderungen an der Serie.
+  async function handleEditorSaveOccurrence(values) {
+    const { session: base, occurrenceDate } = editingTarget
+    const diff = (value, baseValue) => (sameText(value, baseValue) ? null : value || '')
+    try {
+      const saved = await upsertTrainingSessionException({
+        session_id: base.id,
+        occurrence_date: occurrenceDate,
+        cancelled: false,
+        override_date: values.startDate !== occurrenceDate ? values.startDate : null,
+        override_span_days: values.spanDays !== (base.span_days || 0) ? values.spanDays : null,
+        override_start_time: values.startTime !== (base.start_time || '').slice(0, 5) ? values.startTime : null,
+        override_end_time: values.endTime !== (base.end_time || '').slice(0, 5) ? values.endTime : null,
+        override_location: diff(values.location, base.location),
+        override_with_whom: diff(values.withWhom, base.with_whom),
+        override_note: diff(values.note, base.note),
+      })
+      setExceptions((prev) => [...prev.filter((e) => e.id !== saved.id), saved])
+      toast(t('trainingsplan.saved'))
+      setEditingTarget(null)
+    } catch (err) {
+      console.error(err)
+      toast(t('trainingsplan.saveFailed'))
+    }
+  }
+
+  async function handleEditorResetOccurrence() {
+    try {
+      const ex = editingTarget.exception
+      await deleteTrainingSessionException(ex.id)
+      setExceptions((prev) => prev.filter((e) => e.id !== ex.id))
+      toast(t('trainingsplan.resetDone'))
       setEditingTarget(null)
     } catch (err) {
       console.error(err)
@@ -257,6 +345,7 @@ export default function Trainingsplan() {
           session_id: editingTarget.session.id,
           occurrence_date: editingTarget.occurrenceDate,
           override_date: ex.override_date,
+          override_span_days: ex.override_span_days,
           override_start_time: ex.override_start_time,
           override_end_time: ex.override_end_time,
           override_location: ex.override_location,
@@ -276,6 +365,7 @@ export default function Trainingsplan() {
           weekdays: s.weekdays,
           start_date: s.start_date,
           end_date: s.end_date,
+          span_days: s.span_days,
         })
         setSessions((prev) => prev.map((sess) => (sess.id === updated.id ? updated : sess)))
       }
@@ -402,8 +492,12 @@ export default function Trainingsplan() {
           <ul className="trainingplan-upcoming-list">
             {upcomingEvents.map((ev) => (
               <li key={ev.id} className={ev.extendedProps.status === 'proposed' ? 'proposed' : ''}>
-                <span className="trainingplan-upcoming-date">{formatOccurrenceDateShort(ev.extendedProps.occurrenceDate)}</span>
-                <span className="trainingplan-upcoming-time">{formatTimeRange(ev.extendedProps.startTime, ev.extendedProps.endTime)}</span>
+                <span className="trainingplan-upcoming-date">{formatOccurrenceDateShort(ev.extendedProps.startDate)}</span>
+                <span className="trainingplan-upcoming-time">
+                  {ev.extendedProps.spanDays > 0
+                    ? `${ev.extendedProps.startTime} – ${formatOccurrenceDateShort(ev.extendedProps.endDate)} ${ev.extendedProps.endTime}`
+                    : `${ev.extendedProps.startTime}–${ev.extendedProps.endTime}`}
+                </span>
                 <span className="trainingplan-upcoming-category" style={{ '--cat-color': CATEGORY_BY_KEY[ev.extendedProps.category].color }}>
                   {t(CATEGORY_BY_KEY[ev.extendedProps.category].labelKey)}
                 </span>
@@ -496,16 +590,42 @@ export default function Trainingsplan() {
         )}
       </div>
 
+      {choiceTarget && (
+        <SeriesChoiceDialog
+          dateLabel={formatEventRange(
+            choiceTarget.extendedProps.startDate,
+            choiceTarget.extendedProps.startTime,
+            choiceTarget.extendedProps.endDate,
+            choiceTarget.extendedProps.endTime
+          )}
+          weekdaysLabel={formatWeekdays(sessionById[choiceTarget.extendedProps.sessionId]?.weekdays)}
+          onOccurrence={() => {
+            openEditEditor(choiceTarget, 'occurrence')
+            setChoiceTarget(null)
+          }}
+          onSeries={() => {
+            openEditEditor(choiceTarget, 'series')
+            setChoiceTarget(null)
+          }}
+          onClose={() => setChoiceTarget(null)}
+        />
+      )}
+
       {editingTarget && (
         <TrainingSessionEditor
+          key={`${editingTarget.session?.id || 'new'}-${editingTarget.scope || 'series'}-${editingTarget.occurrenceDate || ''}`}
           mode={editingTarget.mode}
+          scope={editingTarget.scope}
           initial={editingTarget.initial}
-          occurrenceDate={editingTarget.occurrenceDate}
           status={editingTarget.mode === 'edit' ? editingTarget.status : null}
           isRecurring={editingTarget.mode === 'edit' ? editingTarget.isRecurring : false}
+          hasException={deviatesFromSeries(editingTarget.exception)}
+          movedFromDate={editingTarget.exception?.override_date ? editingTarget.occurrenceDate : null}
           canConfirm={canConfirm}
           onClose={() => setEditingTarget(null)}
           onSave={handleEditorSave}
+          onSaveOccurrence={handleEditorSaveOccurrence}
+          onResetOccurrence={handleEditorResetOccurrence}
           onConfirm={handleEditorConfirm}
           onCancelOccurrence={handleEditorCancelOccurrence}
           onDeleteSeries={handleEditorDeleteSeries}

@@ -391,7 +391,25 @@
     "cancelOccurrence": "Cancel just this event",
     "deleteSeries": "Delete entire series",
     "delete": "Delete",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "headingEditOccurrence": "Edit single occurrence",
+    "seriesFrom": "Series from {{date}}",
+    "seriesSpanSummary": "each occurrence runs for {{count}} more days",
+    "deviatesFromSeries": "Differs from the series",
+    "movedFrom": "Moved from {{date}}",
+    "occurrenceHint": "Applies to this one occurrence only. All other occurrences of the series stay unchanged.",
+    "seriesHint": "Applies to every occurrence of the series. Use the calendar to change single occurrences.",
+    "beginDate": "Start (date)",
+    "beginTime": "Start (time)",
+    "endDate": "End (date)",
+    "endTimeOfDay": "End (time)",
+    "duration": "Duration from start",
+    "sameDay": "same day",
+    "daysLater": "{{count}} days later (multi-day)",
+    "errEndBeforeStart": "The end must be after the start.",
+    "errTooLong": "An event can last at most {{count}} days.",
+    "saveOccurrence": "Save this occurrence only",
+    "resetToSeries": "Reset to series"
   },
   "trainingsplan": {
     "title": "Scheduling",
@@ -429,7 +447,9 @@
     "feedFailed": "The calendar link could not be created.",
     "feedRefreshNote": "How quickly changes arrive is up to your calendar app: Apple Calendar can be set to hourly, Google often refreshes only every 12 to 24 hours.",
     "feedPrivacyNote": "The link is personal — anyone holding it can see your schedule. Do not post it in open groups. If it gets out, use “Delete link and create a new one”.",
-    "feedBoxTitle": "Subscribe to & export calendar"
+    "feedBoxTitle": "Subscribe to & export calendar",
+    "orphanConfirm": "{{count}} individually changed or cancelled occurrences no longer fit the series after this change and will be deleted. Continue?",
+    "resetDone": "Occurrence follows the series again."
   },
   "yearPlanPopover": {
     "proposedBy": "Suggested by {{name}}",
@@ -568,5 +588,12 @@
         "desc": "Evaluate & reflect on matches."
       }
     }
+  },
+  "seriesChoice": {
+    "title": "Recurring event",
+    "text": "What would you like to open?",
+    "occurrence": "This occurrence only",
+    "series": "Whole series",
+    "cancel": "Cancel"
   }
 }
