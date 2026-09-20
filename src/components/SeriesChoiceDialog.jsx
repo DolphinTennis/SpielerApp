@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 // Beim Klick auf einen Termin einer Serie: nur diesen einen oder die ganze
 // Serie bearbeiten?
-export default function SeriesChoiceDialog({ dateLabel, weekdaysLabel, onOccurrence, onSeries, onClose }) {
+export default function SeriesChoiceDialog({ dateLabel, weekdaysLabel, onOccurrence, onFollowing, onSeries, onClose }) {
   const { t } = useTranslation()
   return (
     <div className="trainingplan-popover-backdrop" onClick={onClose}>
@@ -13,6 +13,10 @@ export default function SeriesChoiceDialog({ dateLabel, weekdaysLabel, onOccurre
           <button type="button" className="btn btn-primary" onClick={onOccurrence}>
             <span>{t('seriesChoice.occurrence')}</span>
             <small>{dateLabel}</small>
+          </button>
+          <button type="button" className="btn btn-outline" onClick={onFollowing}>
+            <span>{t('seriesChoice.following')}</span>
+            <small>{t('seriesChoice.followingHint')}</small>
           </button>
           <button type="button" className="btn btn-outline" onClick={onSeries}>
             <span>{t('seriesChoice.series')}</span>

@@ -28,6 +28,7 @@ export default function TrainingSessionEditor({
 }) {
   const { t } = useTranslation()
   const isOccurrence = scope === 'occurrence'
+  const isFollowing = scope === 'following'
 
   const [category, setCategory] = useState(initial.category)
   const [location, setLocation] = useState(initial.location || '')
@@ -98,7 +99,9 @@ export default function TrainingSessionEditor({
       ? t('trainingSessionEditor.headingCreate')
       : isOccurrence
         ? t('trainingSessionEditor.headingEditOccurrence')
-        : isRecurring
+        : isFollowing
+          ? t('trainingSessionEditor.headingEditFollowing')
+          : isRecurring
           ? t('trainingSessionEditor.headingEditSeries')
           : t('trainingSessionEditor.headingEdit')
 
@@ -126,7 +129,8 @@ export default function TrainingSessionEditor({
           </span>
         )}
         {isOccurrence && <p className="trainingplan-popover-note">{t('trainingSessionEditor.occurrenceHint')}</p>}
-        {!isOccurrence && mode === 'edit' && isRecurring && <p className="trainingplan-popover-note">{t('trainingSessionEditor.seriesHint')}</p>}
+        {isFollowing && <p className="trainingplan-popover-note">{t('trainingSessionEditor.followingHint')}</p>}
+        {!isOccurrence && !isFollowing && mode === 'edit' && isRecurring && <p className="trainingplan-popover-note">{t('trainingSessionEditor.seriesHint')}</p>}
 
         <div className="field" style={{ marginBottom: 12 }}>
           <label htmlFor="ts-category">{t('trainingSessionEditor.topic')}</label>
@@ -162,7 +166,7 @@ export default function TrainingSessionEditor({
           </div>
         </div>
 
-        {!isOccurrence && (
+        {!isOccurrence && !isFollowing && (
           <label className="trainingplan-oneoff-toggle">
             <input type="checkbox" checked={oneOff} onChange={(e) => setOneOff(e.target.checked)} />
             <span>
@@ -285,7 +289,7 @@ export default function TrainingSessionEditor({
           )}
           {mode === 'edit' && !isOccurrence && (
             <button type="button" className="btn btn-clay" disabled={busy} onClick={() => run(onDeleteSeries)}>
-              {isRecurring ? t('trainingSessionEditor.deleteSeries') : t('trainingSessionEditor.delete')}
+              {isFollowing ? t('trainingSessionEditor.deleteFollowing') : isRecurring ? t('trainingSessionEditor.deleteSeries') : t('trainingSessionEditor.delete')}
             </button>
           )}
           <button type="button" className="btn btn-ghost" disabled={busy} onClick={onClose}>

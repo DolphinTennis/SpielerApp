@@ -17,6 +17,7 @@ import {
   deleteTrainingSession,
   upsertTrainingSessionException,
   deleteTrainingSessionException,
+  moveExceptionsToSession,
 } from '../lib/trainingPlanApi'
 import { expandOccurrences, parseOccurrenceId, formatOccurrenceDateShort, formatEventRange, formatWeekdays, daysBetweenIso, todayIso, addDaysIso } from '../lib/trainingPlanOccurrences'
 import { downloadIcs } from '../lib/icalExport'
@@ -63,6 +64,13 @@ function matchesSeriesRule(weekdays, startDate, endDate, iso) {
   if (endDate && iso > endDate) return false
   const [y, m, d] = iso.split('-').map(Number)
   return weekdays.includes(new Date(y, m - 1, d).getDay())
+}
+
+// Neues Serienende, wenn ab splitIso nichts mehr gelten soll: der Vortag —
+// oder das bisherige Ende, falls das ohnehin früher liegt.
+function endBefore(currentEnd, splitIso) {
+  const dayBefore = addDaysIso(splitIso, -1)
+  return currentEnd && currentEnd < dayBefore ? currentEnd : dayBefore
 }
 
 const sameText = (a, b) => (a || '') === (b || '')
@@ -180,7 +188,7 @@ export default function Trainingsplan() {
         startTime: (ex?.override_start_time || baseSession.start_time || '').slice(0, 5),
         endTime: (ex?.override_end_time || baseSession.end_time || '').slice(0, 5),
         weekdays: baseSession.weekdays,
-        startDate: forOccurrence ? ex?.override_date || occurrenceDate : baseSession.start_date,
+        startDate: forOccurrence ? ex?.override_date || occurrenceDate : scope === 'following' ? occurrenceDate : baseSession.start_date,
         endDate: baseSession.end_date,
         spanDays: (forOccurrence ? ex?.override_span_days : null) ?? baseSession.span_days ?? 0,
       },
@@ -242,8 +250,49 @@ export default function Trainingsplan() {
     }
   }
 
+  // "Dieser und alle folgenden": die Serie wird am gewählten Tag in zwei
+  // geteilt. Der bisherige Teil endet am Vortag, ab dem gewählten Tag gilt
+  // eine neue Serie mit den geänderten Werten; Ausnahmen ab dem Teilungstag
+  // wandern mit.
+  async function saveFollowing(values) {
+    const base = editingTarget.session
+    const split = values.startDate
+    const moving = exceptions.filter((e) => e.session_id === base.id && e.occurrence_date >= split)
+    const orphans = moving.filter((e) => !matchesSeriesRule(values.weekdays, split, values.endDate, e.occurrence_date))
+    if (orphans.length > 0 && !window.confirm(t('trainingsplan.orphanConfirm', { count: orphans.length }))) return false
+    const created = await createTrainingSession({
+      org_id: orgId,
+      category: values.category,
+      location: values.location || null,
+      with_whom: values.withWhom || null,
+      note: values.note || null,
+      start_time: values.startTime,
+      end_time: values.endTime,
+      weekdays: values.weekdays,
+      start_date: split,
+      end_date: values.endDate,
+      span_days: values.spanDays,
+      created_by_label: session.user.email,
+    })
+    const orphanIds = new Set(orphans.map((e) => e.id))
+    const kept = moving.filter((e) => !orphanIds.has(e.id))
+    await moveExceptionsToSession(kept.map((e) => e.id), created.id)
+    await Promise.all(orphans.map((e) => deleteTrainingSessionException(e.id)))
+    const updated = await updateTrainingSession(base.id, { end_date: endBefore(base.end_date, split) })
+    const keptIds = new Set(kept.map((e) => e.id))
+    setExceptions((prev) => prev.filter((e) => !orphanIds.has(e.id)).map((e) => (keptIds.has(e.id) ? { ...e, session_id: created.id } : e)))
+    setSessions((prev) => [...prev.map((s) => (s.id === updated.id ? updated : s)), created])
+    return true
+  }
+
   async function handleEditorSave(values) {
     try {
+      if (editingTarget.mode === 'edit' && editingTarget.scope === 'following' && values.startDate > editingTarget.session.start_date) {
+        if (!(await saveFollowing(values))) return
+        toast(t('trainingsplan.saved'))
+        setEditingTarget(null)
+        return
+      }
       if (editingTarget.mode === 'create') {
         const created = await createTrainingSession({
           org_id: orgId,
@@ -390,6 +439,27 @@ export default function Trainingsplan() {
     } catch (err) {
       console.error(err)
       toast(t('trainingsplan.cancelFailed'))
+    }
+  }
+
+  // Löscht diesen und alle folgenden Termine: die Serie endet am Vortag.
+  async function handleEditorDeleteFollowing() {
+    const base = editingTarget.session
+    const split = editingTarget.occurrenceDate
+    if (split <= base.start_date) return handleEditorDeleteSeries()
+    if (!window.confirm(t('trainingsplan.deleteFollowingConfirm'))) return
+    try {
+      const doomed = exceptions.filter((e) => e.session_id === base.id && e.occurrence_date >= split)
+      const updated = await updateTrainingSession(base.id, { end_date: endBefore(base.end_date, split) })
+      await Promise.all(doomed.map((e) => deleteTrainingSessionException(e.id)))
+      const doomedIds = new Set(doomed.map((e) => e.id))
+      setExceptions((prev) => prev.filter((e) => !doomedIds.has(e.id)))
+      setSessions((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
+      toast(t('trainingsplan.followingDeleted'))
+      setEditingTarget(null)
+    } catch (err) {
+      console.error(err)
+      toast(t('trainingsplan.deleteFailed'))
     }
   }
 
@@ -603,6 +673,10 @@ export default function Trainingsplan() {
             openEditEditor(choiceTarget, 'occurrence')
             setChoiceTarget(null)
           }}
+          onFollowing={() => {
+            openEditEditor(choiceTarget, 'following')
+            setChoiceTarget(null)
+          }}
           onSeries={() => {
             openEditEditor(choiceTarget, 'series')
             setChoiceTarget(null)
@@ -628,7 +702,7 @@ export default function Trainingsplan() {
           onResetOccurrence={handleEditorResetOccurrence}
           onConfirm={handleEditorConfirm}
           onCancelOccurrence={handleEditorCancelOccurrence}
-          onDeleteSeries={handleEditorDeleteSeries}
+          onDeleteSeries={editingTarget.scope === 'following' ? handleEditorDeleteFollowing : handleEditorDeleteSeries}
         />
       )}
     </div>

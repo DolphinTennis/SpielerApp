@@ -434,7 +434,10 @@
     "errEndBeforeStart": "Das Ende muss nach dem Beginn liegen.",
     "errTooLong": "Ein Termin kann höchstens {{count}} Tage dauern.",
     "saveOccurrence": "Nur diesen Termin speichern",
-    "resetToSeries": "Zurück auf Serie"
+    "resetToSeries": "Zurück auf Serie",
+    "headingEditFollowing": "Dieser und folgende Termine bearbeiten",
+    "followingHint": "Gilt ab dem Start-Datum unten für alle folgenden Termine. Frühere Termine der Serie bleiben unverändert.",
+    "deleteFollowing": "Diesen und alle folgenden löschen"
   },
   "trainingsplan": {
     "title": "Terminplanung",
@@ -474,7 +477,9 @@
     "feedPrivacyNote": "Der Link ist persönlich — wer ihn hat, sieht deine Termine. Nicht in offene Gruppen stellen. Ist er abhandengekommen, hilft „Link löschen und neu erzeugen“.",
     "feedBoxTitle": "Kalender abonnieren & exportieren",
     "orphanConfirm": "{{count}} einzeln geänderte oder abgesagte Termine passen nach dieser Änderung nicht mehr zur Serie und werden gelöscht. Fortfahren?",
-    "resetDone": "Termin folgt wieder der Serie."
+    "resetDone": "Termin folgt wieder der Serie.",
+    "deleteFollowingConfirm": "Diesen und alle folgenden Termine löschen? Frühere Termine der Serie bleiben.",
+    "followingDeleted": "Diese und folgende Termine gelöscht."
   },
   "yearPlanPopover": {
     "proposedBy": "Vorschlag von {{name}}",
@@ -623,7 +628,9 @@
     "text": "Was möchtest du öffnen?",
     "occurrence": "Nur diesen Termin",
     "series": "Ganze Serie",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "following": "Dieser und alle folgenden",
+    "followingHint": "Ab diesem Termin ändern, frühere bleiben"
   },
   "punktprotokoll": {
     "player": "Spieler",

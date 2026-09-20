@@ -434,7 +434,10 @@
     "errEndBeforeStart": "The end must be after the start.",
     "errTooLong": "An event can last at most {{count}} days.",
     "saveOccurrence": "Save this occurrence only",
-    "resetToSeries": "Reset to series"
+    "resetToSeries": "Reset to series",
+    "headingEditFollowing": "Edit this and following occurrences",
+    "followingHint": "Applies from the start date below to all following occurrences. Earlier occurrences of the series stay unchanged.",
+    "deleteFollowing": "Delete this and all following"
   },
   "trainingsplan": {
     "title": "Scheduling",
@@ -474,7 +477,9 @@
     "feedPrivacyNote": "The link is personal — anyone holding it can see your schedule. Do not post it in open groups. If it gets out, use “Delete link and create a new one”.",
     "feedBoxTitle": "Subscribe to & export calendar",
     "orphanConfirm": "{{count}} individually changed or cancelled occurrences no longer fit the series after this change and will be deleted. Continue?",
-    "resetDone": "Occurrence follows the series again."
+    "resetDone": "Occurrence follows the series again.",
+    "deleteFollowingConfirm": "Delete this and all following occurrences? Earlier occurrences of the series stay.",
+    "followingDeleted": "This and following occurrences deleted."
   },
   "yearPlanPopover": {
     "proposedBy": "Suggested by {{name}}",
@@ -623,7 +628,9 @@
     "text": "What would you like to open?",
     "occurrence": "This occurrence only",
     "series": "Whole series",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "following": "This and all following",
+    "followingHint": "Change from here on, earlier ones stay"
   },
   "punktprotokoll": {
     "player": "Player",

@@ -47,6 +47,14 @@ export async function upsertTrainingSessionException(payload) {
   return data
 }
 
+// Beim Aufteilen einer Serie ("dieser und alle folgenden"): die Ausnahmen der
+// hinteren Hälfte wandern zur neuen Serie.
+export async function moveExceptionsToSession(ids, sessionId) {
+  if (ids.length === 0) return
+  const { error } = await supabase.from('training_session_exceptions').update({ session_id: sessionId }).in('id', ids)
+  if (error) throw error
+}
+
 export async function deleteTrainingSessionException(id) {
   const { error } = await supabase.from('training_session_exceptions').delete().eq('id', id)
   if (error) throw error
