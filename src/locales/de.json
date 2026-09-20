@@ -87,8 +87,10 @@
         "unlinked": "Verknüpfung gelöst.",
         "linkFailed": "Das hat nicht geklappt.",
         "hintTitle": "Aus dem Punktprotokoll:",
-        "hintText": "{{won}} der Punkte gewonnen, {{deuce}} bei Einstand/Vorteil. Eigene Fehler: {{df}} Doppelfehler, {{f1}} 1.-Aufschlag-Fehler; Returnfehler des Gegners: {{rf}}; eigene Winner: {{winners}}."
-      }
+        "hintText": "{{won}} der Punkte gewonnen, {{deuce}} bei Einstand/Vorteil. Eigene Fehler: {{df}} Doppelfehler, {{f1}} 1.-Aufschlag-Fehler; Returnfehler des Gegners: {{rf}}; eigene Winner: {{winners}}.",
+        "printNeedsProtocol": "Zum Drucken zuerst ein Punktprotokoll verknüpfen (Tab „Punktanalyse“)."
+      },
+      "printForm3": "🖨️ Punktanalyse als PDF"
     },
     "form1": {
       "card1": {

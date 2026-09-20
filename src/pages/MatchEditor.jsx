@@ -177,7 +177,7 @@ export default function MatchEditor({ matchId, onBack }) {
   async function handlePrint(formNumber) {
     try {
       const saved = await persist(record, true)
-      printInPage(saved, formNumber)
+      printInPage(saved, formNumber, formNumber === 3 && ppMatch ? { match: ppMatch, ...ppNames } : undefined)
       toast(t('matchanalyse.editor.printDialog'))
     } catch (err) {
       if (err?.message) toast(err.message)
@@ -447,6 +447,9 @@ export default function MatchEditor({ matchId, onBack }) {
                 <button type="button" className="btn btn-outline btn-sm" onClick={() => navigate(`/app/punktprotokoll/${protocol.id}`)}>
                   {t('matchanalyse.editor.pp.open')}
                 </button>
+                <button type="button" className="btn btn-outline btn-sm" onClick={() => handlePrint(3)} disabled={saving}>
+                  {t('matchanalyse.editor.printForm3')}
+                </button>
                 <button type="button" className="btn btn-outline btn-sm" onClick={handleGenerateVerlauf}>
                   {t('matchanalyse.editor.pp.generate')}
                 </button>
@@ -472,6 +475,9 @@ export default function MatchEditor({ matchId, onBack }) {
           </button>
           <button className="btn btn-outline" onClick={() => handlePrint(2)} disabled={saving}>
             {t('matchanalyse.editor.printForm2')}
+          </button>
+          <button className="btn btn-outline" onClick={() => handlePrint(3)} disabled={saving || !ppMatch} title={ppMatch ? undefined : t('matchanalyse.editor.pp.printNeedsProtocol')}>
+            {t('matchanalyse.editor.printForm3')}
           </button>
           <button className="btn btn-outline" onClick={handleMail} disabled={saving}>
             {t('matchanalyse.editor.sendMail')}

@@ -1,4 +1,5 @@
 import { formatDate } from './format'
+import { buildForm3Html } from './pointProtocolExport'
 
 function escapeHtml(s) {
   return String(s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
@@ -11,7 +12,7 @@ function buildRow(label, val) {
 
 // Shared header (logo/timestamp bar, title, match meta, Spielverlauf) so both
 // per-form PDFs carry the same "Stammdaten" even when printed separately.
-function buildHeaderHtml(rec, fileName) {
+export function buildHeaderHtml(rec, fileName) {
   const esc = escapeHtml
   const now = new Date()
   const timestamp = now.toLocaleDateString('de-DE') + ', ' + now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
@@ -71,13 +72,16 @@ export function buildForm2Html(rec) {
 // instead of window.open(): no pop-up involved at all, so there's nothing
 // for a pop-up blocker to block, and the user never leaves the app — closing
 // or canceling the print dialog just returns to the exact screen they were on.
-// formNumber: 1 | 2 — which form to render as its own printable document.
-export function printInPage(rec, formNumber) {
+// formNumber: 1 | 2 | 3 — which form to render as its own printable document.
+// formNumber 3 is the point analysis; `pointProtocol` ({ match, own, other })
+// is what it prints besides the match record itself.
+export function printInPage(rec, formNumber, pointProtocol) {
   const printArea = document.getElementById('print-area')
   if (!printArea) {
     throw new Error('Druckbereich konnte nicht gefunden werden.')
   }
-  printArea.innerHTML = formNumber === 2 ? buildForm2Html(rec) : buildForm1Html(rec)
+  if (formNumber === 3) printArea.innerHTML = buildForm3Html(rec, pointProtocol)
+  else printArea.innerHTML = formNumber === 2 ? buildForm2Html(rec) : buildForm1Html(rec)
   window.print()
 }
 

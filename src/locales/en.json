@@ -87,8 +87,10 @@
         "unlinked": "Unlinked.",
         "linkFailed": "That did not work.",
         "hintTitle": "From the point protocol:",
-        "hintText": "{{won}} of points won, {{deuce}} at deuce/advantage. Own errors: {{df}} double faults, {{f1}} 1st-serve faults; opponent's return errors: {{rf}}; own winners: {{winners}}."
-      }
+        "hintText": "{{won}} of points won, {{deuce}} at deuce/advantage. Own errors: {{df}} double faults, {{f1}} 1st-serve faults; opponent's return errors: {{rf}}; own winners: {{winners}}.",
+        "printNeedsProtocol": "To print, first link a point protocol (tab “Point analysis”)."
+      },
+      "printForm3": "🖨️ Point analysis as PDF"
     },
     "form1": {
       "card1": {
