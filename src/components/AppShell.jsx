@@ -7,6 +7,8 @@ import Overview from '../pages/Overview'
 import MatchList from '../pages/MatchList'
 import MatchEditor from '../pages/MatchEditor'
 import LiveTicker from '../pages/LiveTicker'
+import Punktprotokoll from '../pages/Punktprotokoll'
+import PunktprotokollMatch from '../pages/PunktprotokollMatch'
 import Files from '../pages/Files'
 import TeamManage from '../pages/TeamManage'
 import YearPlanning from '../pages/YearPlanning'
@@ -23,6 +25,12 @@ function MatchEditorRoute() {
   const { matchId } = useParams()
   const navigate = useNavigate()
   return <MatchEditor matchId={matchId === 'neu' ? null : matchId} onBack={() => navigate('/app/matchanalyse')} />
+}
+
+function PunktprotokollMatchRoute() {
+  const { protocolId } = useParams()
+  const navigate = useNavigate()
+  return <PunktprotokollMatch key={protocolId} protocolId={protocolId} onBack={() => navigate('/app/punktprotokoll')} onOpenMatch={(id) => navigate(`/app/matchanalyse/${id}`)} />
 }
 
 function TrainingFocusEditorRoute() {
@@ -47,6 +55,9 @@ function AppShellInner() {
     crumbs = [{ label: t('appShell.breadcrumbOverview'), onClick: () => navigate('/app') }]
     if (location.pathname.startsWith('/app/matchanalyse/')) {
       crumbs.push({ label: t('appShell.breadcrumbMatchanalyse'), onClick: () => navigate('/app/matchanalyse') })
+    }
+    if (location.pathname.startsWith('/app/punktprotokoll/')) {
+      crumbs.push({ label: t('appShell.breadcrumbPunktprotokoll'), onClick: () => navigate('/app/punktprotokoll') })
     }
     if (location.pathname.startsWith('/app/trainingsfokus/')) {
       crumbs.push({ label: t('appShell.breadcrumbTrainingsfokus'), onClick: () => navigate('/app/trainingsfokus') })
@@ -73,6 +84,8 @@ function AppShellInner() {
         />
         <Route path="matchanalyse/:matchId" element={<MatchEditorRoute />} />
         <Route path="liveticker" element={<LiveTicker onMatchCreated={(id) => navigate(`/app/matchanalyse/${id}`)} />} />
+        <Route path="punktprotokoll" element={<Punktprotokoll onOpen={(id) => navigate(`/app/punktprotokoll/${id}`)} />} />
+        <Route path="punktprotokoll/:protocolId" element={<PunktprotokollMatchRoute />} />
         <Route path="dateien" element={<Files />} />
         <Route path="team" element={<TeamManage />} />
         <Route path="turnierplanung" element={<YearPlanning />} />

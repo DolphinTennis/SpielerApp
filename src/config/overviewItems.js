@@ -12,5 +12,6 @@ export const OVERVIEW_ITEMS = [
   { key: 'videos', icon: '🎬', titleKey: 'overview.items.videos.title', descKey: 'overview.items.videos.desc', implemented: true, badge: 'ready' },
   { key: 'dateien', icon: '📁', titleKey: 'overview.items.dateien.title', descKey: 'overview.items.dateien.desc', implemented: true, badge: 'ready' },
   { key: 'liveticker', icon: '📡', titleKey: 'overview.items.liveticker.title', descKey: 'overview.items.liveticker.desc', implemented: true, badge: 'live' },
+  { key: 'punktprotokoll', icon: '📝', titleKey: 'overview.items.punktprotokoll.title', descKey: 'overview.items.punktprotokoll.desc', implemented: true, badge: 'neu' },
   { key: 'matchanalyse', icon: '🎾', titleKey: 'overview.items.matchanalyse.title', descKey: 'overview.items.matchanalyse.desc', implemented: true, badge: 'ready' },
 ]

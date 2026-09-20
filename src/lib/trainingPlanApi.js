@@ -1,9 +1,9 @@
 import { supabase } from './supabaseClient'
 
 const SESSION_COLUMNS =
-  'id, org_id, category, location, with_whom, note, start_time, end_time, weekdays, start_date, end_date, status, created_by, created_by_label'
+  'id, org_id, category, location, with_whom, note, start_time, end_time, weekdays, start_date, end_date, span_days, status, created_by, created_by_label'
 const EXCEPTION_COLUMNS =
-  'id, session_id, org_id, occurrence_date, cancelled, override_date, override_start_time, override_end_time, override_location, override_with_whom, override_note, status, created_by'
+  'id, session_id, org_id, occurrence_date, cancelled, override_date, override_span_days, override_start_time, override_end_time, override_location, override_with_whom, override_note, status, created_by'
 
 export async function listTrainingSessions(orgId) {
   const { data, error } = await supabase.from('training_sessions').select(SESSION_COLUMNS).eq('org_id', orgId)
@@ -45,6 +45,14 @@ export async function upsertTrainingSessionException(payload) {
     .single()
   if (error) throw error
   return data
+}
+
+// Beim Aufteilen einer Serie ("dieser und alle folgenden"): die Ausnahmen der
+// hinteren Hälfte wandern zur neuen Serie.
+export async function moveExceptionsToSession(ids, sessionId) {
+  if (ids.length === 0) return
+  const { error } = await supabase.from('training_session_exceptions').update({ session_id: sessionId }).in('id', ids)
+  if (error) throw error
 }
 
 export async function deleteTrainingSessionException(id) {

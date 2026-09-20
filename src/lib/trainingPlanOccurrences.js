@@ -1,6 +1,8 @@
 import i18n from '../i18n'
 import { CATEGORY_BY_KEY, WEEKDAYS } from '../config/trainingPlanCategories'
 
+import { expandRawOccurrences } from '../../supabase/functions/_shared/occurrenceRules.ts'
+
 function isoFromDate(date) {
   const y = date.getFullYear()
   const m = String(date.getMonth() + 1).padStart(2, '0')
@@ -13,21 +15,19 @@ function dateFromIso(iso) {
   return new Date(y, m - 1, d)
 }
 
-function buildEvent(session, occurrenceDateIso, exception) {
+function buildEvent(o) {
+  const { session, exception, occurrenceDate } = o
   const cat = CATEGORY_BY_KEY[session.category]
-  const effectiveDate = exception?.override_date || occurrenceDateIso
-  const startTime = exception?.override_start_time || session.start_time
-  const endTime = exception?.override_end_time || session.end_time
   const status = exception ? exception.status : session.status
   return {
-    id: `${session.id}::${occurrenceDateIso}`,
+    id: `${session.id}::${occurrenceDate}`,
     title: i18n.t(cat.labelKey),
-    start: `${effectiveDate}T${startTime}`,
-    end: `${effectiveDate}T${endTime}`,
+    start: `${o.startDate}T${o.startTime}`,
+    end: `${o.endDate}T${o.endTime}`,
     color: cat.color,
     extendedProps: {
       sessionId: session.id,
-      occurrenceDate: occurrenceDateIso,
+      occurrenceDate,
       isRecurring: session.weekdays.length > 0,
       category: session.category,
       location: exception?.override_location ?? session.location,
@@ -35,8 +35,11 @@ function buildEvent(session, occurrenceDateIso, exception) {
       note: exception?.override_note ?? session.note,
       status,
       hasException: !!exception,
-      startTime,
-      endTime,
+      startTime: o.startTime,
+      endTime: o.endTime,
+      startDate: o.startDate,
+      endDate: o.endDate,
+      spanDays: o.spanDays,
     },
   }
 }
@@ -47,42 +50,11 @@ function buildEvent(session, occurrenceDateIso, exception) {
 // underlying data changes, instead of asking FullCalendar to understand
 // recurrence (its built-in recurring events and the rrule plugin both lack
 // a way to cancel/reschedule a single occurrence while keeping the rest of
-// the series intact).
+// the series intact). The expansion itself lives in
+// supabase/functions/_shared/occurrenceRules.ts, shared with the calendar
+// feed so both always agree.
 export function expandOccurrences(sessions, exceptions, rangeStartIso, rangeEndIso) {
-  const exceptionMap = new Map()
-  for (const ex of exceptions) {
-    exceptionMap.set(`${ex.session_id}::${ex.occurrence_date}`, ex)
-  }
-
-  const events = []
-  for (const session of sessions) {
-    if (!session.weekdays || session.weekdays.length === 0) {
-      if (session.start_date >= rangeStartIso && session.start_date <= rangeEndIso) {
-        events.push(buildEvent(session, session.start_date, null))
-      }
-      continue
-    }
-
-    const loopStartIso = session.start_date > rangeStartIso ? session.start_date : rangeStartIso
-    const loopEndIso = session.end_date && session.end_date < rangeEndIso ? session.end_date : rangeEndIso
-    if (loopStartIso > loopEndIso) continue
-
-    const cursor = dateFromIso(loopStartIso)
-    const endDate = dateFromIso(loopEndIso)
-    while (cursor <= endDate) {
-      if (session.weekdays.includes(cursor.getDay())) {
-        const iso = isoFromDate(cursor)
-        const ex = exceptionMap.get(`${session.id}::${iso}`)
-        if (!(ex && ex.cancelled)) {
-          events.push(buildEvent(session, iso, ex || null))
-        }
-      }
-      cursor.setDate(cursor.getDate() + 1)
-    }
-  }
-
-  events.sort((a, b) => a.start.localeCompare(b.start))
-  return events
+  return expandRawOccurrences(sessions, exceptions, rangeStartIso, rangeEndIso).map(buildEvent)
 }
 
 export function parseOccurrenceId(id) {
@@ -122,4 +94,20 @@ export function addDaysIso(iso, days) {
   const date = dateFromIso(iso)
   date.setDate(date.getDate() + days)
   return isoFromDate(date)
+}
+
+// Ganze Tage von fromIso bis toIso (negativ, wenn toIso davor liegt).
+export function daysBetweenIso(fromIso, toIso) {
+  const [fy, fm, fd] = fromIso.split('-').map(Number)
+  const [ty, tm, td] = toIso.split('-').map(Number)
+  return Math.round((Date.UTC(ty, tm - 1, td) - Date.UTC(fy, fm - 1, fd)) / 86400000)
+}
+
+// Zeitraum eines Termins in einer Zeile: eintägig "Sa, 19.09.26 17:00–18:00",
+// mehrtägig "Sa, 19.09.26 09:00 – So, 20.09.26 17:00".
+export function formatEventRange(startDate, startTime, endDate, endTime) {
+  const st = startTime.slice(0, 5)
+  const et = endTime.slice(0, 5)
+  if (startDate === endDate) return `${formatOccurrenceDateShort(startDate)} ${formatTimeRange(st, et)}`
+  return `${formatOccurrenceDateShort(startDate)} ${st} – ${formatOccurrenceDateShort(endDate)} ${et}`
 }

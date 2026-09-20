@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import MatchRow from '../components/MatchRow'
 import { deleteMatch, listMatches } from '../lib/matchesApi'
+import { listLinkedMatchIds } from '../lib/pointProtocolApi'
 import { useToast } from '../lib/ToastContext'
 import { useOrg } from '../lib/OrgContext'
 
@@ -10,6 +11,7 @@ export default function MatchList({ onOpenMatch, onNewMatch }) {
   const { orgId, playerName } = useOrg()
   const [matches, setMatches] = useState([])
   const [loading, setLoading] = useState(true)
+  const [linkedIds, setLinkedIds] = useState(() => new Set())
   const [filters, setFilters] = useState({ opp: '', date: '', tourn: '' })
   const toast = useToast()
 
@@ -27,6 +29,10 @@ export default function MatchList({ onOpenMatch, onNewMatch }) {
       .finally(() => {
         if (!cancelled) setLoading(false)
       })
+    // Nur ein Kennzeichen — schlägt das fehl, bleibt die Liste trotzdem benutzbar.
+    listLinkedMatchIds(orgId)
+      .then((ids) => !cancelled && setLinkedIds(new Set(ids)))
+      .catch((err) => console.error(err))
     return () => {
       cancelled = true
     }
@@ -118,7 +124,7 @@ export default function MatchList({ onOpenMatch, onNewMatch }) {
 
       <div className="match-list">
         {filtered.map((m) => (
-          <MatchRow key={m.id} match={m} onClick={() => onOpenMatch(m.id)} onDelete={() => handleDelete(m)} />
+          <MatchRow key={m.id} match={m} hasProtocol={linkedIds.has(m.id)} onClick={() => onOpenMatch(m.id)} onDelete={() => handleDelete(m)} />
         ))}
       </div>
     </div>

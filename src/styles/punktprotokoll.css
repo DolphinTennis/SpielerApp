@@ -1,0 +1,134 @@
+/* Punktprotokoll — Erfassen, Protokoll, Auswertung. Farben kommen aus dem Theme. */
+.pp .pp-sub { font-size: 13px; color: var(--text-soft); margin: 2px 0 14px; line-height: 1.5; }
+.pp .pp-muted { color: var(--text-soft); }
+.pp .pp-input { width: 100%; font: 15px Inter, system-ui, sans-serif; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--chalk); color: var(--text); }
+.pp .pp-l { display: block; font: 600 11px Inter, system-ui, sans-serif; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-soft); margin: 12px 0 6px; }
+.pp .pp-l:first-child { margin-top: 0; }
+.pp .pp-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); margin-bottom: 14px; }
+.pp .pp-cardtitle { font: 600 11px Inter, system-ui, sans-serif; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-soft); margin-bottom: 8px; display: flex; justify-content: space-between; gap: 8px; }
+.pp .pp-seg { display: flex; gap: 8px; }
+.pp .pp-seg button { flex: 1; padding: 11px 8px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--chalk); font: 600 13.5px Inter, system-ui, sans-serif; color: var(--text); cursor: pointer; }
+.pp .pp-seg button.on { border-color: var(--court); background: color-mix(in srgb, var(--court) 12%, white); color: var(--court-dark); }
+
+.pp .pp-save { margin-left: 10px; font-size: 11.5px; }
+.pp .pp-save--saved { color: var(--text-soft); }
+.pp .pp-save--saving { color: var(--court); }
+.pp .pp-save--error { color: var(--clay); font-weight: 600; }
+
+.pp .pp-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.pp .pp-tabs button { flex: 1; border: 1px solid var(--line); background: var(--paper); padding: 9px 4px; border-radius: 10px; font: 600 12.5px Inter, system-ui, sans-serif; color: var(--text-soft); display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+.pp .pp-tabs button.on { color: var(--court-dark); border-color: var(--court); background: color-mix(in srgb, var(--court) 10%, white); }
+
+/* Anzeigetafel */
+.pp .pp-sb { background: var(--ink); color: #fff; border-radius: var(--radius); padding: 14px 14px 12px; box-shadow: var(--shadow); }
+.pp .pp-sb-row { display: grid; gap: 6px 10px; align-items: center; }
+.pp .pp-sb-row + .pp-sb-row { margin-top: 8px; }
+.pp .pp-sb-name { font: 700 17px 'Big Shoulders Display', sans-serif; letter-spacing: 0.4px; display: flex; align-items: center; gap: 8px; color: #fff; min-width: 0; overflow-wrap: anywhere; }
+.pp .pp-srv { flex: none; width: 11px; height: 11px; border-radius: 50%; background: var(--ball); box-shadow: 0 0 0 3px rgba(215, 242, 61, 0.28); }
+.pp .pp-srv.off { background: transparent; box-shadow: none; }
+.pp .pp-sb-n { font: 600 20px 'IBM Plex Mono', monospace; min-width: 22px; text-align: center; color: rgba(255, 255, 255, 0.55); }
+.pp .pp-sb-n.g { color: #fff; }
+.pp .pp-sb-n.p { color: var(--ball); min-width: 64px; text-align: right; font-size: 22px; }
+.pp .pp-sb-head { display: grid; gap: 10px; font: 600 9.5px 'IBM Plex Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); margin-bottom: 4px; }
+.pp .pp-sb-head span { min-width: 22px; text-align: center; }
+.pp .pp-sb-head span:last-child { min-width: 64px; text-align: right; }
+.pp .pp-sb-status { margin-top: 10px; padding-top: 9px; border-top: 1px solid rgba(255, 255, 255, 0.14); font-size: 12px; color: rgba(255, 255, 255, 0.75); display: flex; justify-content: space-between; gap: 8px; }
+
+.pp .pp-gamehead { display: flex; justify-content: space-between; align-items: baseline; margin: 18px 2px 8px; }
+.pp .pp-gamehead h3 { font-size: 20px; }
+.pp .pp-gamehead span { font: 11px 'IBM Plex Mono', monospace; color: var(--text-soft); }
+.pp .pp-chips { display: flex; flex-wrap: wrap; gap: 6px; min-height: 34px; }
+.pp .pp-pt { font: 700 15px 'IBM Plex Mono', monospace; min-width: 34px; text-align: center; padding: 7px 4px; border-radius: 9px; }
+.pp .pp-pt.w { background: #e4f5c8; color: #3f6a0a; }
+.pp .pp-pt.l { background: #fbe3df; color: var(--clay); }
+.pp .pp-pt.e { background: color-mix(in srgb, var(--court) 12%, white); color: var(--court-dark); }
+.pp .pp-pt.vp { background: color-mix(in srgb, var(--court) 22%, white); color: var(--court-dark); }
+.pp .pp-pt.vm { background: #f7d9d5; color: var(--clay); }
+.pp .pp-empty { font-size: 13px; color: var(--text-soft); padding: 8px 2px; }
+.pp sup { font: 600 8px 'IBM Plex Mono', monospace; letter-spacing: 0.2px; margin-left: 1px; vertical-align: top; position: relative; top: -3px; opacity: 0.85; }
+
+.pp .pp-btnrow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.pp .pp-pbtn { min-height: 104px; border-radius: 18px; border: 0; font: 800 19px 'Big Shoulders Display', sans-serif; letter-spacing: 0.4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; box-shadow: var(--shadow); user-select: none; touch-action: manipulation; transition: transform 0.06s; cursor: pointer; padding: 6px; text-align: center; overflow-wrap: anywhere; }
+.pp .pp-pbtn:active { transform: scale(0.97); }
+.pp .pp-pbtn .sign { font: 700 32px 'IBM Plex Mono', monospace; line-height: 1; }
+.pp .pp-pbtn small { font: 500 11px Inter, system-ui, sans-serif; letter-spacing: 0; opacity: 0.75; }
+.pp .pp-pbtn.win { background: var(--ball); color: var(--ink); }
+.pp .pp-pbtn.lose { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); }
+.pp .pp-undo { margin-top: 12px; }
+.pp .pp-undo .btn { width: 100%; }
+
+.pp .pp-detail { margin-top: 14px; }
+.pp .pp-f1btn { width: 100%; text-align: left; border: 1.5px solid var(--line); background: var(--chalk); border-radius: 12px; padding: 11px 13px; display: flex; flex-direction: column; gap: 2px; color: var(--text); cursor: pointer; }
+.pp .pp-f1btn b { font: 700 14px Inter, system-ui, sans-serif; }
+.pp .pp-f1btn small { font: 12px Inter, system-ui, sans-serif; color: var(--text-soft); }
+.pp .pp-f1btn.on { background: #fff3cd; border-color: #e0b100; }
+.pp .pp-f1btn.on small { color: #7a5d00; }
+.pp .pp-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.pp .pp-dbtn { border: 1.5px solid var(--ink); background: var(--paper); border-radius: 12px; padding: 12px 10px; text-align: left; display: flex; flex-direction: column; gap: 3px; color: var(--ink); min-height: 64px; touch-action: manipulation; cursor: pointer; overflow-wrap: anywhere; }
+.pp .pp-dbtn:active { transform: scale(0.98); background: var(--chalk); }
+.pp .pp-dbtn b { font: 700 14.5px Inter, system-ui, sans-serif; }
+.pp .pp-dbtn small { font: 11.5px Inter, system-ui, sans-serif; color: var(--text-soft); line-height: 1.3; }
+.pp .pp-dhint { font-size: 11.5px; color: var(--text-soft); margin-top: 9px; }
+
+.pp .pp-chiprow { display: flex; flex-wrap: wrap; gap: 7px; }
+.pp .pp-chip { border: 1.5px solid var(--line); background: var(--chalk); color: var(--text); border-radius: 999px; padding: 8px 12px; font: 500 13px Inter, system-ui, sans-serif; cursor: pointer; }
+.pp .pp-chip.on { background: var(--court); border-color: var(--court); color: #fff; }
+
+/* Protokolltabelle */
+.pp .pp-tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; background: var(--paper); }
+.pp .pp-tbl th { background: var(--court); color: #fff; font: 600 10.5px Inter, system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.5px; padding: 7px 6px; text-align: left; }
+.pp .pp-tbl td { padding: 7px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.pp .pp-tbl tr.click { cursor: pointer; }
+.pp .pp-tbl tr.click:active { background: var(--chalk); }
+.pp .pp-seq { font: 600 12px 'IBM Plex Mono', monospace; letter-spacing: 0.5px; line-height: 1.6; word-break: break-word; }
+.pp .pp-plus { color: #4c7d0f; }
+.pp .pp-minus { color: var(--clay); }
+.pp .pp-e { color: var(--court); font-weight: 700; }
+.pp .pp-srvdot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--ball-dark); }
+.pp .pp-srvdot.o { background: var(--ink); }
+.pp .pp-tag { display: inline-block; font-size: 10.5px; background: color-mix(in srgb, var(--court) 12%, white); color: var(--court-dark); border-radius: 999px; padding: 2px 7px; margin: 0 3px 3px 0; }
+.pp .pp-setcap { font: 800 20px 'Big Shoulders Display', sans-serif; color: var(--ink); margin: 18px 2px 8px; display: flex; justify-content: space-between; align-items: baseline; }
+.pp .pp-setcap span { font: 600 12px 'IBM Plex Mono', monospace; color: var(--court); }
+
+/* Auswertung */
+.pp .pp-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.pp .pp-kpi { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow); }
+.pp .pp-kpi .v { font: 800 30px 'Big Shoulders Display', sans-serif; color: var(--court); line-height: 1; }
+.pp .pp-kpi .t { font-size: 12px; color: var(--text-soft); margin-top: 5px; line-height: 1.35; }
+.pp .pp-kpi .h { font-size: 11px; color: var(--text-soft); margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--line); }
+.pp .pp-bar { height: 10px; border-radius: 6px; background: #f7d9d5; overflow: hidden; margin-top: 6px; }
+.pp .pp-bar i { display: block; height: 100%; background: var(--court); }
+.pp .pp-sethdr { display: flex; justify-content: space-between; font-size: 13px; margin-top: 10px; }
+.pp .pp-errtbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.pp .pp-errtbl th { text-align: right; font: 600 11px Inter, system-ui, sans-serif; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-soft); padding: 4px 6px 6px; }
+.pp .pp-errtbl th:first-child { text-align: left; }
+.pp .pp-errtbl td { padding: 9px 6px; border-top: 1px solid var(--line); text-align: right; vertical-align: top; }
+.pp .pp-errtbl td:first-child { text-align: left; }
+.pp .pp-errtbl td b { font: 800 22px 'Big Shoulders Display', sans-serif; color: var(--court); }
+.pp .pp-errtbl small { display: block; font: 11px Inter, system-ui, sans-serif; color: var(--text-soft); margin-top: 2px; font-weight: 400; }
+
+.pp .pp-finish { background: var(--ball); color: var(--ink); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; font-weight: 600; font-size: 14px; box-shadow: var(--shadow); }
+.pp .pp-head-edit { margin-top: 18px; }
+.pp .pp-head-edit summary { cursor: pointer; font-weight: 600; font-size: 13.5px; color: var(--text-soft); }
+.pp .pp-back { margin-top: 18px; }
+
+/* Beobachtungs-Fenster */
+.pp-scrim { position: fixed; inset: 0; background: rgba(15, 39, 64, 0.45); z-index: 200; display: flex; align-items: flex-end; justify-content: center; }
+.pp-sheet { background: var(--paper); width: 100%; max-width: 480px; border-radius: 22px 22px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); }
+.pp-sheet h3 { font-size: 22px; margin-bottom: 10px; }
+.pp-sheet .pp-input { width: 100%; font: 15px Inter, system-ui, sans-serif; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--chalk); color: var(--text); }
+.pp-sheet-seq { margin-bottom: 10px; font: 600 12px 'IBM Plex Mono', monospace; letter-spacing: 0.5px; line-height: 1.6; }
+.pp-sheet-seq .pp-plus { color: #4c7d0f; } .pp-sheet-seq .pp-minus { color: var(--clay); } .pp-sheet-seq .pp-e { color: var(--court); font-weight: 700; }
+.pp-sheet .pp-chiprow { display: flex; flex-wrap: wrap; gap: 7px; }
+.pp-sheet .pp-chip { border: 1.5px solid var(--line); background: var(--chalk); color: var(--text); border-radius: 999px; padding: 8px 12px; font: 500 13px Inter, system-ui, sans-serif; cursor: pointer; }
+.pp-sheet .pp-chip.on { background: var(--court); border-color: var(--court); color: #fff; }
+
+/* Verknüpfung mit der Matchanalyse */
+.pp .pp-transfer { margin-top: 18px; }
+.pp .pp-transfer p { font-size: 13px; color: var(--text-soft); margin-bottom: 10px; }
+.pp-link-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0 12px; }
+.pp-link-row select { flex: 1 1 200px; min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--chalk); font: 14px Inter, system-ui, sans-serif; }
+.pp-form-hint { margin-bottom: 12px; }
+.pp-analysis .pp-kpis, .pp-analysis .pp-tbl { margin-top: 10px; }
+.filed-tag.pp-analysis-tag { background: color-mix(in srgb, var(--court) 12%, white); color: var(--court-dark); }
+.pp-analysis { --paper: #fff; }

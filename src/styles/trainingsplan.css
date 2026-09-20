@@ -384,6 +384,10 @@
 /* Kalenderabonnement (siehe lib/calendarFeedApi.js). Abgesetzt vom Rest der
    Seite, weil hier ein Link entsteht, den man weitergibt — das soll man sehen
    und nicht mit den Bearbeitungsknöpfen darüber verwechseln. */
+.calendar-feed-box.calendar-feed-box--bottom {
+  margin-top: 20px;
+  margin-bottom: 0;
+}
 .calendar-feed-box {
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -416,3 +420,16 @@
   margin: 4px 0 0;
   line-height: 1.45;
 }
+
+/* Mehrtägige Termine, Serien-Auswahl */
+.trainingplan-range-summary { font-weight: 600; }
+.trainingplan-deviates-badge {
+  display: inline-block; margin: 0 0 8px; padding: 2px 8px; border-radius: 999px;
+  background: #fff3d6; color: #7a5200; font-size: 0.8rem; font-weight: 600;
+}
+.trainingplan-popover-note { margin: 0 0 12px; font-size: 0.88rem; color: var(--muted, #5b6b7a); }
+.trainingplan-form-error { margin: -4px 0 10px; font-size: 0.85rem; color: #b3261e; }
+.trainingplan-choice { max-width: 420px; }
+.trainingplan-choice-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+.trainingplan-choice-buttons .btn { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; padding: 12px 14px; }
+.trainingplan-choice-buttons .btn small { font-weight: 400; opacity: 0.85; }
