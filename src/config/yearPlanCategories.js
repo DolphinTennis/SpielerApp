@@ -3,7 +3,7 @@ export const CATEGORIES = [
   { key: 'turnier_national', labelKey: 'calendar.yearPlanCategories.turnier_national', color: '#1C63B7' },
   { key: 'turnier_international', labelKey: 'calendar.yearPlanCategories.turnier_international', color: '#17A2A2' },
   { key: 'training', labelKey: 'calendar.yearPlanCategories.training', color: '#D9A916' },
-  { key: 'ferien', labelKey: 'calendar.yearPlanCategories.ferien', color: '#F2ECDD' },
+  { key: 'ferien', labelKey: 'calendar.yearPlanCategories.ferien', color: '#FFFFFF' },
   { key: 'sonstiges', labelKey: 'calendar.yearPlanCategories.sonstiges', color: '#C0392B' },
 ]
 

@@ -275,7 +275,7 @@ export default function YearPlanning() {
                     <div className="yearplan-cell-wrap" key={i}>
                       <button
                         type="button"
-                        className={`yearplan-cell${isWeekend ? ' weekend' : ''}${entry ? ' filled' : ''}${entry?.status === 'proposed' ? ' proposed' : ''}${isToday ? ' today' : ''}`}
+                        className={`yearplan-cell${isWeekend ? ' weekend' : ''}${entry ? ' filled' : ''}${cat?.key === 'ferien' ? ' ferien' : ''}${entry?.status === 'proposed' ? ' proposed' : ''}${isToday ? ' today' : ''}`}
                         style={entry ? { background: cat.color } : undefined}
                         title={
                           entry

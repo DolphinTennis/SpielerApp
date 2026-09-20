@@ -192,3 +192,15 @@
   flex-wrap: wrap;
   margin-top: 16px;
 }
+
+/* Ferien sind rein weiß — bewusst heller als die Tabelle (Chalk) und ohne die
+   Verdunkelung am Wochenende; der feine Rand hält sie auf hellem Grund sichtbar. */
+.yearplan-cell.filled.ferien,
+.yearplan-cell.weekend.filled.ferien {
+  background: #ffffff;
+  border-color: color-mix(in srgb, var(--ink) 35%, transparent);
+  filter: none;
+}
+.yearplan-legend button .swatch {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 25%, transparent);
+}
