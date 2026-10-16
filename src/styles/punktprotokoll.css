@@ -132,3 +132,9 @@
 .pp-analysis .pp-kpis, .pp-analysis .pp-tbl { margin-top: 10px; }
 .filed-tag.pp-analysis-tag { background: color-mix(in srgb, var(--court) 12%, white); color: var(--court-dark); }
 .pp-analysis { --paper: #fff; }
+
+/* Nicht mitgeschriebene Punkte ("?") und Lücken-Bereich */
+.pp .pp-pt.q { background: #eceff2; color: var(--text-soft); }
+.pp .pp-q, .pp-sheet-seq .pp-q { color: var(--text-soft); font-weight: 700; }
+.pp .pp-gapcard .pp-gapbtn { width: 100%; }
+.pp .pp-gapcard .pp-row2 { margin-top: 10px; }

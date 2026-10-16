@@ -275,3 +275,10 @@
   font-size: 12.5px;
   border-radius: 8px;
 }
+
+/* Ablage "Mentaler Trainingsfokus" */
+.mental-list { display: flex; flex-direction: column; gap: 12px; }
+.mental-entry { cursor: pointer; margin-bottom: 0; }
+.mental-line { display: flex; gap: 12px; padding: 4px 0; font-size: 14px; }
+.mental-label { flex: 0 0 120px; font: 600 11px 'IBM Plex Mono', monospace; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-soft); padding-top: 3px; }
+.mental-text span:last-child { white-space: pre-wrap; line-height: 1.5; min-width: 0; overflow-wrap: anywhere; }

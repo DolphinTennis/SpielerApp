@@ -11,6 +11,7 @@ export function blankEntry(userId, orgId, spielerName = '') {
     trainingsziel: '',
     geuebt: '',
     gut: '',
+    mental_analyse: '',
     verbessern: '',
     einsatz_prozent: null,
     filed: false,
@@ -68,6 +69,20 @@ export async function listEntries(orgId) {
     .order('created_at', { ascending: false })
   if (error) throw error
   return data
+}
+
+// Ablage "Mentaler Trainingsfokus": Datum, Energie mental und die mentale
+// Analyse jedes Trainingsfokus-Eintrags — direkt aus den Einträgen gelesen,
+// damit jeder neue oder geänderte Eintrag sofort dort erscheint.
+export async function listMentalEntries(orgId) {
+  const { data, error } = await supabase
+    .from('training_focus_entries')
+    .select('id, datum, energie_mental, mental_analyse, created_at')
+    .eq('org_id', orgId)
+    .order('datum', { ascending: false })
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data.filter((e) => e.energie_mental !== null || (e.mental_analyse || '').trim() !== '')
 }
 
 export async function getEntry(id) {

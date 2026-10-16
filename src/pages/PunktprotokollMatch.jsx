@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getProtocol, saveProtocolState, updateProtocol } from '../lib/pointProtocolApi'
-import { addPoint, derive, ensureGame, labels, pointServer, resultText, undoPoint, verlaufText } from '../lib/pointProtocolLogic'
+import { addPoint, derive, ensureGame, finishGame, labels, markGap, pointServer, resultText, undoPoint, verlaufText } from '../lib/pointProtocolLogic'
 import { blankMatch, createMatch } from '../lib/matchesApi'
 import { useAuth } from '../lib/AuthContext'
 import { useOrg } from '../lib/OrgContext'
@@ -221,7 +221,19 @@ export default function PunktprotokollMatch({ protocolId, onBack, onOpenMatch })
                   <button type="button" className="pp-dbtn" onClick={() => point(true, { kind: 'w', ...(f1 ? { f1: true } : {}) })}><b>{t('punktprotokoll.winner')} {names.own}</b><small>{t('punktprotokoll.winnerHint')}</small></button>
                   <button type="button" className="pp-dbtn" onClick={() => point(false, { kind: 'w', ...(f1 ? { f1: true } : {}) })}><b>{t('punktprotokoll.winner')} {names.other}</b><small>{t('punktprotokoll.winnerHint')}</small></button>
                 </div>
+                <div className="pp-row2">
+                  <button type="button" className="pp-dbtn" onClick={() => point(false, { kind: 'ue', ...(f1 ? { f1: true } : {}) })}><b>{t('punktprotokoll.unforcedError')} {names.own}</b><small>→ {t('punktprotokoll.pointOf', { name: names.other })}</small></button>
+                  <button type="button" className="pp-dbtn" onClick={() => point(true, { kind: 'ue', ...(f1 ? { f1: true } : {}) })}><b>{t('punktprotokoll.unforcedError')} {names.other}</b><small>→ {t('punktprotokoll.pointOf', { name: names.own })}</small></button>
+                </div>
                 <p className="pp-dhint">{t('punktprotokoll.detailsHint')}</p>
+              </div>
+              <div className="pp-card pp-gapcard">
+                <div className="pp-cardtitle"><span>{t('punktprotokoll.gapTitle')}</span><span>{t('punktprotokoll.optional')}</span></div>
+                <button type="button" className="pp-dbtn pp-gapbtn" onClick={() => mutate((m) => markGap(m))}><b>? {t('punktprotokoll.gapMark')}</b><small>{t('punktprotokoll.gapMarkHint')}</small></button>
+                <div className="pp-row2">
+                  <button type="button" className="pp-dbtn" onClick={() => mutate((m) => finishGame(m, true))}><b>{t('punktprotokoll.gameFor', { name: names.own })}</b><small>{t('punktprotokoll.gameForHint')}</small></button>
+                  <button type="button" className="pp-dbtn" onClick={() => mutate((m) => finishGame(m, false))}><b>{t('punktprotokoll.gameFor', { name: names.other })}</b><small>{t('punktprotokoll.gameForHint')}</small></button>
+                </div>
               </div>
               <div className="pp-undo"><button type="button" className="btn btn-ghost" onClick={() => { mutate((m) => undoPoint(m)); setF1(false) }}>↶ {t('punktprotokoll.undo')}</button></div>
               <div className="pp-card" style={{ marginTop: 14 }}>

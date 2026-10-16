@@ -88,7 +88,7 @@ function Seq({ game }) {
   const labs = labels(game)
   if (!labs.length) return <span className="pp-muted">–</span>
   return labs.map((l, i) => (
-    <span key={i} className={l.cls === 'w' ? 'pp-plus' : l.cls === 'l' ? 'pp-minus' : 'pp-e'}>
+    <span key={i} className={l.cls === 'w' ? 'pp-plus' : l.cls === 'l' ? 'pp-minus' : l.cls === 'q' ? 'pp-q' : 'pp-e'}>
       {l.txt}
       {l.sup && <sup>{l.sup}</sup>}{' '}
     </span>
@@ -169,6 +169,7 @@ export function ErrorCard({ s, own, other }) {
             <td><b>{e.f1G}</b><small>{t('punktprotokoll.ofN', { n: e.srvG })}</small></td>
           </tr>
           <tr><td>{t('punktprotokoll.winner')}</td><td><b>{e.wK}</b></td><td><b>{e.wG}</b></td></tr>
+          <tr><td>{t('punktprotokoll.unforcedError')}</td><td><b>{e.ueK}</b></td><td><b>{e.ueG}</b></td></tr>
         </tbody>
       </table>
     </div>

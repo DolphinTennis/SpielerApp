@@ -16,6 +16,7 @@ import Trainingsplan from '../pages/Trainingsplan'
 import Beispiele from '../pages/Beispiele'
 import TrainingFocusList from '../pages/TrainingFocusList'
 import TrainingFocusEditor from '../pages/TrainingFocusEditor'
+import TrainingFocusMental from '../pages/TrainingFocusMental'
 import Einstellungen from '../pages/Einstellungen'
 import Placeholder from '../pages/Placeholder'
 
@@ -99,6 +100,10 @@ function AppShellInner() {
               onNewEntry={() => navigate('/app/trainingsfokus/neu')}
             />
           }
+        />
+        <Route
+          path="trainingsfokus/mental"
+          element={<TrainingFocusMental onOpenEntry={(id) => navigate(`/app/trainingsfokus/${id}`)} onBack={() => navigate('/app/trainingsfokus')} />}
         />
         <Route path="trainingsfokus/:entryId" element={<TrainingFocusEditorRoute />} />
         <Route path="einstellungen" element={<Einstellungen />} />

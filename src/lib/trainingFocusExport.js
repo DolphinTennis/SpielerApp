@@ -29,6 +29,7 @@ function buildHtml(rec) {
       ${buildRow('Mein Trainingsziel', rec.trainingsziel)}
       ${buildRow('Was haben wir geübt', rec.geuebt)}
       ${buildRow('Was war gut', rec.gut)}
+      ${buildRow('Mentale Analyse', rec.mental_analyse)}
       ${buildRow('Was kann ich verbessern', rec.verbessern)}
       ${buildRow('Einsatz (in %)', rec.einsatz_prozent != null ? rec.einsatz_prozent + ' %' : '')}
     </div>`

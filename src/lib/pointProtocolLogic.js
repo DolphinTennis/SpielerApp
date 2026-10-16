@@ -6,8 +6,11 @@
 //   { server, tb, pts: [true|false…], meta: [{ kind?, f1? }…], chips: [], note }
 // pts[i] === true heißt: 'k' hat den Punkt gewonnen. tb ist 0 (normales Spiel),
 // 7 (Tiebreak im Satz) oder 10 (Champions-Tiebreak statt 3. Satz).
-// meta[i].kind: 'df' Doppelfehler, 'rf' Returnfehler, 'w' Winner;
+// meta[i].kind: 'df' Doppelfehler, 'rf' Returnfehler, 'w' Winner,
+// 'ue' Unforced Error (der Punkt geht an den Gegner des Fehlerverursachers),
+// 'gap' ersatzweise ergänzter Punkt (nicht mitgeschrieben, siehe finishGame);
 // meta[i].f1: der 1. Aufschlag war ein Fehler.
+// g.gaps: Stellen im Spiel (Index in pts), an denen "?" markiert wurde.
 
 export const opp = (s) => (s === 'k' ? 'g' : 'k')
 
@@ -93,15 +96,49 @@ export function addPoint(m, won, meta) {
   ensureGame(m)
 }
 
+// "?" — hier wurde nicht mitgeschrieben. Ändert den Spielstand nicht.
+export function markGap(m) {
+  const g = m.games[m.games.length - 1]
+  if (!g || derive(m).over) return
+  if (!g.gaps) g.gaps = []
+  g.gaps.push(g.pts.length)
+}
+
+// Beendet das laufende Spiel für eine Seite, ohne dass die Punkte mitgeschrieben
+// wurden: die fehlenden Punkte werden ergänzt (und als 'gap' gekennzeichnet),
+// damit der Spielstand wieder stimmt. Sie zählen nicht in die Auswertung.
+export function finishGame(m, ownWon) {
+  if (derive(m).over) return
+  const g = m.games[m.games.length - 1]
+  if (!g || isOver(g)) return
+  if (!g.meta) g.meta = []
+  g.meta.length = g.pts.length
+  let guard = 0
+  while (!isOver(g) && guard++ < 100) {
+    g.pts.push(ownWon)
+    g.meta[g.pts.length - 1] = { kind: 'gap' }
+  }
+  ensureGame(m)
+}
+
 export function undoPoint(m) {
   let last = m.games[m.games.length - 1]
+  // Eine "?"-Markierung am Ende wird zuerst zurückgenommen.
+  if (last && last.gaps && last.gaps.length && last.gaps[last.gaps.length - 1] === last.pts.length) {
+    last.gaps.pop()
+    return
+  }
   if (last && last.pts.length === 0) {
     m.games.pop()
     last = m.games[m.games.length - 1]
   }
   if (last && last.pts.length) {
+    const wasGap = metaAt(last, last.pts.length - 1).kind === 'gap'
     last.pts.pop()
+    // "Spiel für …" hat mehrere Punkte auf einmal ergänzt — alle zusammen zurücknehmen.
+    while (wasGap && last.pts.length && metaAt(last, last.pts.length - 1).kind === 'gap') last.pts.pop()
     if (last.meta) last.meta.length = Math.min(last.meta.length, last.pts.length)
+    if (last.gaps) last.gaps = last.gaps.filter((i) => i <= last.pts.length)
   }
   ensureGame(m)
 }
@@ -119,7 +156,9 @@ export function labels(g) {
   let k = 0
   let o = 0
   const out = []
+  const marker = (i) => (g.gaps || []).filter((x) => x === i).forEach(() => out.push({ cls: 'q', txt: '?', sup: '' }))
   g.pts.forEach((p, i) => {
+    marker(i)
     if (p) k++
     else o++
     const finished = i === g.pts.length - 1 && isOver(g)
@@ -137,8 +176,11 @@ export function labels(g) {
         txt = 'V−'
       }
     }
-    out.push({ cls, txt, sup: { df: 'DF', rf: 'RF', w: 'W' }[metaAt(g, i).kind] || '' })
+    const kind = metaAt(g, i).kind
+    if (kind === 'gap') out.push({ cls: 'q', txt: '?', sup: '' })
+    else out.push({ cls, txt, sup: { df: 'DF', rf: 'RF', w: 'W', ue: 'UE' }[kind] || '' })
   })
+  marker(g.pts.length)
   return out
 }
 
@@ -150,9 +192,12 @@ export function stats(m) {
     let o = 0
     g.pts.forEach((p, pi) => {
       const deuceBefore = !g.tb && k >= 3 && o >= 3
-      seq.push({ won: p, srv: g.tb ? null : g.server, all: srvAt(g, pi), meta: metaAt(g, pi), deuce: deuceBefore, set: d.setOfGame[gi] })
+      const pointMeta = metaAt(g, pi)
       if (p) k++
       else o++
+      // Ergänzte Punkte (Spiel ohne Mitschrift) zählen nicht in die Auswertung.
+      if (pointMeta.kind === 'gap') return
+      seq.push({ won: p, srv: g.tb ? null : g.server, all: srvAt(g, pi), meta: metaAt(g, pi), deuce: deuceBefore, set: d.setOfGame[gi] })
     })
   })
   const won = seq.filter((p) => p.won).length
@@ -211,6 +256,9 @@ export function stats(m) {
     // Winner gehört dem, der den Punkt gewonnen hat.
     wK: cnt((p) => p.meta.kind === 'w' && p.won),
     wG: cnt((p) => p.meta.kind === 'w' && !p.won),
+    // Unforced Error gehört dem, der den Punkt verliert.
+    ueK: cnt((p) => p.meta.kind === 'ue' && !p.won),
+    ueG: cnt((p) => p.meta.kind === 'ue' && p.won),
   }
   return { err, total: seq.length, won, afterLost, afterLostWon, best, dz: dz.length, dzw, own: own.length, ownW, op: op.length, opW, hold, holdN, brk, brkN, perSet }
 }

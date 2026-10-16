@@ -4,6 +4,7 @@ import TrainingFocusRow from '../components/TrainingFocusRow'
 import { deleteEntry, listEntries } from '../lib/trainingFocusApi'
 import { useToast } from '../lib/ToastContext'
 import { useOrg } from '../lib/OrgContext'
+import { useNavigate } from 'react-router-dom'
 
 export default function TrainingFocusList({ onOpenEntry, onNewEntry }) {
   const { t } = useTranslation()
@@ -11,6 +12,7 @@ export default function TrainingFocusList({ onOpenEntry, onNewEntry }) {
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const toast = useToast()
+  const navigate = useNavigate()
 
   useEffect(() => {
     let cancelled = false
@@ -54,9 +56,14 @@ export default function TrainingFocusList({ onOpenEntry, onNewEntry }) {
         <span style={{ fontSize: 13, color: 'var(--text-soft)', fontWeight: 600 }}>
           {loading ? t('common.loading') : `${entries.length} ${entries.length === 1 ? t('trainingsfokus.countEntry') : t('trainingsfokus.countEntries')}`}
         </span>
-        <button className="btn btn-primary" onClick={onNewEntry}>
-          {t('trainingsfokus.newEntry')}
-        </button>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button className="btn btn-outline" onClick={() => navigate('/app/trainingsfokus/mental')}>
+            {t('trainingsfokus.mentalFolder')}
+          </button>
+          <button className="btn btn-primary" onClick={onNewEntry}>
+            {t('trainingsfokus.newEntry')}
+          </button>
+        </div>
       </div>
 
       {!loading && entries.length === 0 && (

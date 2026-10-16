@@ -178,6 +178,10 @@ export default function TrainingFocusEditor({ entryId, onBack }) {
             <AutoTextarea value={record.gut || ''} onChange={(e) => updateField('gut', e.target.value)} />
           </div>
           <div className="qgroup">
+            <label className="qlabel">{t('trainingsfokus.mentalAnalysis')}</label>
+            <AutoTextarea value={record.mental_analyse || ''} onChange={(e) => updateField('mental_analyse', e.target.value)} />
+          </div>
+          <div className="qgroup">
             <label className="qlabel">{t('trainingsfokus.whatToImprove')}</label>
             <AutoTextarea value={record.verbessern || ''} onChange={(e) => updateField('verbessern', e.target.value)} />
           </div>

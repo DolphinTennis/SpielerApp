@@ -52,7 +52,7 @@ function statsHtml(m, own, other) {
         ${kpi(pct(s.opW, s.op), 'Punkte bei gegnerischem Aufschlag', `Breaks: ${s.brk} von ${s.brkN}`)}
       </tr>
     </table>
-    <h3 style="font-size:14px;color:#1C63B7;margin:16px 0 4px;">Fehler und Winner</h3>
+    <h3 style="font-size:14px;color:#1C63B7;margin:16px 0 4px;">Fehler, Winner und Unforced Errors</h3>
     <table style="width:100%;border-collapse:collapse;page-break-inside:avoid;">
       <tr><th style="${TH}"></th><th style="${TH}text-align:right;">${esc(own)}</th><th style="${TH}text-align:right;">${esc(other)}</th></tr>
       <tr><td style="${TD}">Doppelfehler</td><td style="${TD}text-align:right;"><b>${e.dfK}</b></td><td style="${TD}text-align:right;"><b>${e.dfG}</b></td></tr>
@@ -60,6 +60,7 @@ function statsHtml(m, own, other) {
       <tr><td style="${TD}">1. Aufschlagfehler<div style="font-size:10.5px;color:#5B6875;">1. Aufschlag: ${inField(e.f1K, e.srvK)} (${esc(own)}) · ${inField(e.f1G, e.srvG)} (${esc(other)})</div></td>
         <td style="${TD}text-align:right;"><b>${e.f1K}</b> von ${e.srvK}</td><td style="${TD}text-align:right;"><b>${e.f1G}</b> von ${e.srvG}</td></tr>
       <tr><td style="${TD}">Winner</td><td style="${TD}text-align:right;"><b>${e.wK}</b></td><td style="${TD}text-align:right;"><b>${e.wG}</b></td></tr>
+      <tr><td style="${TD}">Unforced Error</td><td style="${TD}text-align:right;"><b>${e.ueK}</b></td><td style="${TD}text-align:right;"><b>${e.ueG}</b></td></tr>
     </table>
     <h3 style="font-size:14px;color:#1C63B7;margin:16px 0 0;">Punkte pro Satz</h3>${setBars}`
 }
@@ -69,7 +70,7 @@ function sequenceHtml(g) {
   if (!labs.length) return '–'
   return labs
     .map((l) => {
-      const color = l.cls === 'w' ? '#3f6a0a' : l.cls === 'l' ? '#c0392b' : '#1C63B7'
+      const color = l.cls === 'w' ? '#3f6a0a' : l.cls === 'l' ? '#c0392b' : l.cls === 'q' ? '#8a949e' : '#1C63B7'
       return `<span style="color:${color};font-weight:700;">${l.txt}${l.sup ? `<sup style="font-size:7px;">${l.sup}</sup>` : ''}</span>`
     })
     .join(' ')
@@ -112,7 +113,7 @@ function protocolHtml(m, own, other) {
     .join('')
   return `
     <h2 style="font-size:17px;border-bottom:1px solid #D7DEE6;padding-bottom:4px;margin-top:26px;">Punktprotokoll</h2>
-    <p style="font-size:11px;color:#5B6875;margin:4px 0 0;">● ${esc(own)} schlägt auf &nbsp; ○ ${esc(other)} schlägt auf &nbsp;·&nbsp; DF Doppelfehler, RF Returnfehler, W Winner</p>
+    <p style="font-size:11px;color:#5B6875;margin:4px 0 0;">● ${esc(own)} schlägt auf &nbsp; ○ ${esc(other)} schlägt auf &nbsp;·&nbsp; DF Doppelfehler, RF Returnfehler, W Winner, UE Unforced Error, ? nicht mitgeschrieben</p>
     ${tables}`
 }
 

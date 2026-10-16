@@ -87,7 +87,7 @@
         "unlinked": "Unlinked.",
         "linkFailed": "That did not work.",
         "hintTitle": "From the point protocol:",
-        "hintText": "{{won}} of points won, {{deuce}} at deuce/advantage. Own errors: {{df}} double faults, {{f1}} 1st-serve faults; opponent's return errors: {{rf}}; own winners: {{winners}}.",
+        "hintText": "{{won}} of points won, {{deuce}} at deuce/advantage. Own errors: {{df}} double faults, {{f1}} 1st-serve faults, {{ue}} unforced errors; opponent's return errors: {{rf}}; own winners: {{winners}}.",
         "printNeedsProtocol": "To print, first link a point protocol (tab “Point analysis”)."
       },
       "printForm3": "🖨️ Point analysis as PDF"
@@ -385,7 +385,13 @@
     "validationDateMissing": "Please pick a date — the entry cannot be saved without one.",
     "validationRange": "{{label}}: the value must be between {{min}} and {{max}}.",
     "saveFailedDetail": "Save failed: {{detail}}",
-    "validationInteger": "{{label}}: whole numbers only, no decimals."
+    "validationInteger": "{{label}}: whole numbers only, no decimals.",
+    "mentalAnalysis": "Mental analysis",
+    "mentalFolder": "🧠 Mental training focus",
+    "mentalTitle": "Mental training focus",
+    "mentalSubtitle": "Date, mental energy and mental analysis from all training focus entries of {{name}}.",
+    "mentalEmptyTitle": "Nothing filed yet.",
+    "mentalEmptyDesc": "As soon as a training focus has “Mental energy” or a “Mental analysis”, it appears here."
   },
   "trainingGoals": {
     "trainingTitle": "Goals for the next training",
@@ -712,7 +718,7 @@
     "firstServeHint": "{{name}} is serving · then record the point as usual",
     "pointOf": "point {{name}}",
     "winnerHint": "Point won with a winning shot",
-    "detailsHint": "Double fault, return error and winner count as the point right away – one tap is enough.",
+    "detailsHint": "Double fault, return error, winner and unforced error count as the point right away – one tap is enough.",
     "undo": "Undo",
     "gameObservation": "Observation for this game",
     "legendOwn": "{{name}} serves",
@@ -750,6 +756,12 @@
     "linkedInfo": "There is a match analysis for this protocol.",
     "openAnalysis": "Open match analysis",
     "transferInfo": "No match analysis yet.",
-    "transfer": "Transfer to match analysis"
+    "transfer": "Transfer to match analysis",
+    "unforcedError": "Unforced error",
+    "gapTitle": "Lost track?",
+    "gapMark": "Mark a gap",
+    "gapMarkHint": "Puts a “?” in the protocol – the score does not change.",
+    "gameFor": "Game {{name}}",
+    "gameForHint": "Ends the game; missing points do not count in the analysis"
   }
 }

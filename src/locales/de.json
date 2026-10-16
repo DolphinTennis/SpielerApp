@@ -87,7 +87,7 @@
         "unlinked": "Verknüpfung gelöst.",
         "linkFailed": "Das hat nicht geklappt.",
         "hintTitle": "Aus dem Punktprotokoll:",
-        "hintText": "{{won}} der Punkte gewonnen, {{deuce}} bei Einstand/Vorteil. Eigene Fehler: {{df}} Doppelfehler, {{f1}} 1.-Aufschlag-Fehler; Returnfehler des Gegners: {{rf}}; eigene Winner: {{winners}}.",
+        "hintText": "{{won}} der Punkte gewonnen, {{deuce}} bei Einstand/Vorteil. Eigene Fehler: {{df}} Doppelfehler, {{f1}} 1.-Aufschlag-Fehler, {{ue}} Unforced Errors; Returnfehler des Gegners: {{rf}}; eigene Winner: {{winners}}.",
         "printNeedsProtocol": "Zum Drucken zuerst ein Punktprotokoll verknüpfen (Tab „Punktanalyse“)."
       },
       "printForm3": "🖨️ Punktanalyse als PDF"
@@ -385,7 +385,13 @@
     "validationDateMissing": "Bitte ein Datum angeben — ohne Datum lässt sich der Eintrag nicht speichern.",
     "validationRange": "{{label}}: Der Wert muss zwischen {{min}} und {{max}} liegen.",
     "saveFailedDetail": "Speichern fehlgeschlagen: {{detail}}",
-    "validationInteger": "{{label}}: Nur ganze Zahlen ohne Nachkommastellen."
+    "validationInteger": "{{label}}: Nur ganze Zahlen ohne Nachkommastellen.",
+    "mentalAnalysis": "Mentale Analyse",
+    "mentalFolder": "🧠 Mentaler Trainingsfokus",
+    "mentalTitle": "Mentaler Trainingsfokus",
+    "mentalSubtitle": "Datum, mentale Energie und mentale Analyse aus allen Trainingsfokus-Einträgen von {{name}}.",
+    "mentalEmptyTitle": "Noch nichts abgelegt.",
+    "mentalEmptyDesc": "Sobald ein Trainingsfokus „Energie mental“ oder eine „Mentale Analyse“ enthält, erscheint er hier."
   },
   "trainingGoals": {
     "trainingTitle": "Ziele fürs nächste Training",
@@ -712,7 +718,7 @@
     "firstServeHint": "{{name}} schlägt auf · Punkt danach ganz normal erfassen",
     "pointOf": "Punkt {{name}}",
     "winnerHint": "Punkt mit einem Gewinnschlag",
-    "detailsHint": "Doppelfehler, Returnfehler und Winner zählen gleich als Punkt – ein Tippen genügt.",
+    "detailsHint": "Doppelfehler, Returnfehler, Winner und Unforced Error zählen gleich als Punkt – ein Tippen genügt.",
     "undo": "Rückgängig",
     "gameObservation": "Beobachtung zu diesem Spiel",
     "legendOwn": "{{name}} schlägt auf",
@@ -750,6 +756,12 @@
     "linkedInfo": "Zu diesem Protokoll gibt es eine Matchanalyse.",
     "openAnalysis": "Zur Matchanalyse",
     "transferInfo": "Noch keine Matchanalyse dazu.",
-    "transfer": "In Matchanalyse übernehmen"
+    "transfer": "In Matchanalyse übernehmen",
+    "unforcedError": "Unforced Error",
+    "gapTitle": "Nicht aufgepasst?",
+    "gapMark": "Lücke markieren",
+    "gapMarkHint": "Setzt ein „?“ ins Protokoll – der Spielstand ändert sich nicht.",
+    "gameFor": "Spiel {{name}}",
+    "gameForHint": "Beendet das Spiel, fehlende Punkte zählen nicht in die Auswertung"
   }
 }

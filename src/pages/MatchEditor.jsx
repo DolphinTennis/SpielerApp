@@ -354,6 +354,7 @@ export default function MatchEditor({ matchId, onBack }) {
               rf: ppStats.err.rfG,
               f1: ppStats.err.f1K,
               winners: ppStats.err.wK,
+              ue: ppStats.err.ueK,
             })}
           </div>
         )}

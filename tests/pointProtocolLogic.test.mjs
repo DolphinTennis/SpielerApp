@@ -130,3 +130,37 @@ test('beendete Spiele sind abgeschlossen, das Match endet nach zwei Satzgewinnen
   assert.equal(m.games.length, n)
   assert.equal(isOver(m.games.at(-1)), true)
 })
+
+import { markGap, finishGame } from '../src/lib/pointProtocolLogic.js'
+
+test('Unforced Error zählt für den, der den Punkt verliert', () => {
+  const m = base()
+  addPoint(m, false, { kind: 'ue' }) // k macht UE, Punkt an g
+  addPoint(m, true, { kind: 'ue' })  // g macht UE, Punkt an k
+  const { err } = stats(m)
+  assert.equal(err.ueK, 1)
+  assert.equal(err.ueG, 1)
+})
+
+test('"?" ändert den Spielstand nicht und lässt sich zurücknehmen', () => {
+  const m = base()
+  play(m, '+')
+  markGap(m)
+  assert.equal(score(m.games[0]).k, 1)
+  assert.ok(labels(m.games[0]).some((l) => l.txt === '?'))
+  undoPoint(m)
+  assert.equal(m.games[0].gaps.length, 0)
+  assert.equal(m.games[0].pts.length, 1)
+})
+
+test('Spiel für eine Seite ergänzt fehlende Punkte, zählt nicht in die Auswertung und lässt sich als Ganzes zurücknehmen', () => {
+  const m = base()
+  play(m, '+-')                    // 1:1 im ersten Spiel
+  finishGame(m, false)             // Gegner gewinnt das Spiel
+  assert.equal(m.games.length, 2)
+  assert.equal(derive(m).cur.b, 1)
+  assert.equal(stats(m).total, 2)  // nur die zwei echten Punkte
+  undoPoint(m)
+  assert.equal(m.games.length, 1)
+  assert.equal(m.games[0].pts.length, 2)
+})
