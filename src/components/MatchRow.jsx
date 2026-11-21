@@ -12,9 +12,13 @@ export default function MatchRow({ match, hasProtocol, onClick, onDelete }) {
           <span>📅 {formatDate(match.datum)}</span>
           <span>🏆 {match.turnier || '–'}</span>
         </div>
+        {(hasProtocol || match.filed) && (
+          <div className="match-tags">
+            {hasProtocol && <span className="filed-tag pp-analysis-tag">{t('matchanalyse.list.pointAnalysis')}</span>}
+            {match.filed && <span className="filed-tag">{t('matchanalyse.list.filed')}</span>}
+          </div>
+        )}
       </div>
-      {hasProtocol && <span className="filed-tag pp-analysis-tag">{t('matchanalyse.list.pointAnalysis')}</span>}
-      {match.filed && <span className="filed-tag">{t('matchanalyse.list.filed')}</span>}
       <button
         type="button"
         className="row-delete"

@@ -68,7 +68,14 @@
   gap: 12px;
   flex-wrap: wrap;
 }
+.match-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
 .filed-tag {
+  white-space: nowrap;
   font-size: 10.5px;
   font-family: 'IBM Plex Mono', monospace;
   text-transform: uppercase;
@@ -282,3 +289,9 @@
 .mental-line { display: flex; gap: 12px; padding: 4px 0; font-size: 14px; }
 .mental-label { flex: 0 0 120px; font: 600 11px 'IBM Plex Mono', monospace; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-soft); padding-top: 3px; }
 .mental-text span:last-child { white-space: pre-wrap; line-height: 1.5; min-width: 0; overflow-wrap: anywhere; }
+
+@media (max-width: 640px) {
+  .match-row { gap: 10px; padding: 12px; }
+  .score-chip { min-width: 64px; padding: 8px; font-size: 13px; }
+  .match-meta .opp { overflow-wrap: anywhere; }
+}

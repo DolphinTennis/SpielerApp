@@ -125,9 +125,13 @@ export default function Punktprotokoll({ onOpen }) {
                   <span>📅 {formatDate(p.match_date)}</span>
                   {p.place && <span>📍 {p.place}</span>}
                 </div>
+                {(p.match_id || (!over && res)) && (
+                  <div className="match-tags">
+                    {p.match_id && <span className="filed-tag">{t('punktprotokoll.linked')}</span>}
+                    {!over && res && <span className="filed-tag">{t('punktprotokoll.runningTag')}</span>}
+                  </div>
+                )}
               </div>
-              {p.match_id && <span className="filed-tag">{t('punktprotokoll.linked')}</span>}
-              {!over && res && <span className="filed-tag">{t('punktprotokoll.runningTag')}</span>}
               <button type="button" className="row-delete" title={t('punktprotokoll.deleteTitle')} onClick={(e) => { e.stopPropagation(); handleDelete(p) }}>🗑️</button>
             </div>
           )
