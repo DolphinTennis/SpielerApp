@@ -764,6 +764,7 @@
     "gameFor": "Game {{name}}",
     "gameForHint": "Ends the game; missing points do not count in the analysis",
     "ace": "Ace",
-    "aceHint": "Serve the opponent cannot touch – point for the server"
+    "aceHint": "Serve the opponent cannot touch – point for the server",
+    "firstServerHint": "Changes the serve retroactively for all games so far. Points and analysis adjust accordingly."
   }
 }

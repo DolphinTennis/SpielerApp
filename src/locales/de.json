@@ -764,6 +764,7 @@
     "gameFor": "Spiel {{name}}",
     "gameForHint": "Beendet das Spiel, fehlende Punkte zählen nicht in die Auswertung",
     "ace": "Ass",
-    "aceHint": "Aufschlag, den der Gegner nicht berührt – Punkt für den Aufschläger"
+    "aceHint": "Aufschlag, den der Gegner nicht berührt – Punkt für den Aufschläger",
+    "firstServerHint": "Ändert den Aufschlag rückwirkend für alle bisherigen Spiele. Punkte und Auswertung passen sich an."
   }
 }

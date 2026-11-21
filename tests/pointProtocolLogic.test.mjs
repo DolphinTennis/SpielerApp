@@ -177,3 +177,18 @@ test('Ass gehört dem Aufschläger und zählt als sein Punkt', () => {
   assert.equal(err.aceK, 1)
   assert.equal(err.aceG, 1)
 })
+
+test('Aufschläger nachträglich drehen: Aufschlag-Statistik und Aufschlagwechsel stimmen weiter', () => {
+  const m = base()                 // k schlägt zuerst auf
+  winGame(m)                       // Spiel 1 (k) an k
+  play(m, '++')                    // Spiel 2 (g schlägt auf), 2:0 für k
+  const before = stats(m)
+  m.firstServer = 'g'
+  m.games.forEach((g) => { g.server = g.server === 'k' ? 'g' : 'k' })
+  const after = stats(m)
+  assert.equal(m.games[0].server, 'g')
+  assert.equal(m.games[1].server, 'k')
+  assert.equal(before.own, 4)      // 4 Punkte bei eigenem Aufschlag (Spiel 1)
+  assert.equal(after.own, 2)       // jetzt zählen die 2 Punkte aus Spiel 2
+  assert.equal(pointServer(m.games[1]), 'k')
+})

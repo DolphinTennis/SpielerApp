@@ -153,6 +153,20 @@ export default function PunktprotokollMatch({ protocolId, onBack, onOpenMatch })
     }
   }
 
+  // Wer zuerst aufschlägt, lässt sich auch nach dem Start ändern: der Aufschlag
+  // wechselt von Spiel zu Spiel, also wird er in allen bisherigen Spielen
+  // gedreht (Tiebreaks eingeschlossen) und die Voreinstellung mitgeführt.
+  async function handleFirstServer(who) {
+    if (who === row.first_server) return
+    mutate((m) => {
+      m.firstServer = who
+      m.games.forEach((g) => {
+        g.server = g.server === 'k' ? 'g' : 'k'
+      })
+    })
+    await saveHead({ first_server: who })
+  }
+
   async function saveHead(patch) {
     try {
       setRow(await updateProtocol(protocolId, patch))
@@ -266,6 +280,12 @@ export default function PunktprotokollMatch({ protocolId, onBack, onOpenMatch })
 
       <details className="pp-card pp-head-edit">
         <summary>{t('punktprotokoll.editDetails')}</summary>
+        <label className="pp-l">{t('punktprotokoll.firstServerLabel')}</label>
+        <div className="pp-seg">
+          <button type="button" className={row.first_server === 'k' ? 'on' : ''} onClick={() => handleFirstServer('k')}>{names.own}</button>
+          <button type="button" className={row.first_server === 'g' ? 'on' : ''} onClick={() => handleFirstServer('g')}>{names.other}</button>
+        </div>
+        <p className="pp-dhint">{t('punktprotokoll.firstServerHint')}</p>
         <label className="pp-l">{t('punktprotokoll.opponentLabel')}</label>
         <input className="pp-input" type="text" defaultValue={row.opponent} onBlur={(e) => e.target.value !== row.opponent && saveHead({ opponent: e.target.value })} />
         <label className="pp-l">{t('punktprotokoll.dateLabel')}</label>
