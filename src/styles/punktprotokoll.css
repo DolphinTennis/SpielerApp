@@ -138,3 +138,5 @@
 .pp .pp-q, .pp-sheet-seq .pp-q { color: var(--text-soft); font-weight: 700; }
 .pp .pp-gapcard .pp-gapbtn { width: 100%; }
 .pp .pp-gapcard .pp-row2 { margin-top: 10px; }
+
+.pp .pp-acebtn { width: 100%; margin-top: 10px; }

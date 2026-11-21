@@ -762,6 +762,8 @@
     "gapMark": "Lücke markieren",
     "gapMarkHint": "Setzt ein „?“ ins Protokoll – der Spielstand ändert sich nicht.",
     "gameFor": "Spiel {{name}}",
-    "gameForHint": "Beendet das Spiel, fehlende Punkte zählen nicht in die Auswertung"
+    "gameForHint": "Beendet das Spiel, fehlende Punkte zählen nicht in die Auswertung",
+    "ace": "Ass",
+    "aceHint": "Aufschlag, den der Gegner nicht berührt – Punkt für den Aufschläger"
   }
 }

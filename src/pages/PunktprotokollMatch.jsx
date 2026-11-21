@@ -217,6 +217,7 @@ export default function PunktprotokollMatch({ protocolId, onBack, onOpenMatch })
                   <button type="button" className="pp-dbtn" onClick={doubleFault}><b>{t('punktprotokoll.doubleFault')}</b><small>{serverName} → {t('punktprotokoll.pointOf', { name: returnerName })}</small></button>
                   <button type="button" className="pp-dbtn" onClick={returnError}><b>{t('punktprotokoll.returnError')}</b><small>{returnerName} → {t('punktprotokoll.pointOf', { name: serverName })}</small></button>
                 </div>
+                <button type="button" className="pp-dbtn pp-acebtn" onClick={() => point(server === 'k', { kind: 'ace' })}><b>{t('punktprotokoll.ace')} {serverName}</b><small>{t('punktprotokoll.aceHint')}</small></button>
                 <div className="pp-row2">
                   <button type="button" className="pp-dbtn" onClick={() => point(true, { kind: 'w', ...(f1 ? { f1: true } : {}) })}><b>{t('punktprotokoll.winner')} {names.own}</b><small>{t('punktprotokoll.winnerHint')}</small></button>
                   <button type="button" className="pp-dbtn" onClick={() => point(false, { kind: 'w', ...(f1 ? { f1: true } : {}) })}><b>{t('punktprotokoll.winner')} {names.other}</b><small>{t('punktprotokoll.winnerHint')}</small></button>

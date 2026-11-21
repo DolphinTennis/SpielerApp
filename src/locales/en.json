@@ -762,6 +762,8 @@
     "gapMark": "Mark a gap",
     "gapMarkHint": "Puts a “?” in the protocol – the score does not change.",
     "gameFor": "Game {{name}}",
-    "gameForHint": "Ends the game; missing points do not count in the analysis"
+    "gameForHint": "Ends the game; missing points do not count in the analysis",
+    "ace": "Ace",
+    "aceHint": "Serve the opponent cannot touch – point for the server"
   }
 }

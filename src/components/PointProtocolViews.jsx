@@ -168,6 +168,7 @@ export function ErrorCard({ s, own, other }) {
             <td><b>{e.f1K}</b><small>{t('punktprotokoll.ofN', { n: e.srvK })}</small></td>
             <td><b>{e.f1G}</b><small>{t('punktprotokoll.ofN', { n: e.srvG })}</small></td>
           </tr>
+          <tr><td>{t('punktprotokoll.ace')}</td><td><b>{e.aceK}</b></td><td><b>{e.aceG}</b></td></tr>
           <tr><td>{t('punktprotokoll.winner')}</td><td><b>{e.wK}</b></td><td><b>{e.wG}</b></td></tr>
           <tr><td>{t('punktprotokoll.unforcedError')}</td><td><b>{e.ueK}</b></td><td><b>{e.ueG}</b></td></tr>
         </tbody>

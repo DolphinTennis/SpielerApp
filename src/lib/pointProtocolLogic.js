@@ -7,7 +7,7 @@
 // pts[i] === true heißt: 'k' hat den Punkt gewonnen. tb ist 0 (normales Spiel),
 // 7 (Tiebreak im Satz) oder 10 (Champions-Tiebreak statt 3. Satz).
 // meta[i].kind: 'df' Doppelfehler, 'rf' Returnfehler, 'w' Winner,
-// 'ue' Unforced Error (der Punkt geht an den Gegner des Fehlerverursachers),
+// 'ace' Ass (Punkt für den Aufschläger), 'ue' Unforced Error (der Punkt geht an den Gegner des Fehlerverursachers),
 // 'gap' ersatzweise ergänzter Punkt (nicht mitgeschrieben, siehe finishGame);
 // meta[i].f1: der 1. Aufschlag war ein Fehler.
 // g.gaps: Stellen im Spiel (Index in pts), an denen "?" markiert wurde.
@@ -178,7 +178,7 @@ export function labels(g) {
     }
     const kind = metaAt(g, i).kind
     if (kind === 'gap') out.push({ cls: 'q', txt: '?', sup: '' })
-    else out.push({ cls, txt, sup: { df: 'DF', rf: 'RF', w: 'W', ue: 'UE' }[kind] || '' })
+    else out.push({ cls, txt, sup: { df: 'DF', rf: 'RF', w: 'W', ue: 'UE', ace: 'A' }[kind] || '' })
   })
   marker(g.pts.length)
   return out
@@ -256,6 +256,9 @@ export function stats(m) {
     // Winner gehört dem, der den Punkt gewonnen hat.
     wK: cnt((p) => p.meta.kind === 'w' && p.won),
     wG: cnt((p) => p.meta.kind === 'w' && !p.won),
+    // Ass gehört dem Aufschläger (er gewinnt den Punkt).
+    aceK: cnt((p) => p.meta.kind === 'ace' && p.all === 'k'),
+    aceG: cnt((p) => p.meta.kind === 'ace' && p.all === 'g'),
     // Unforced Error gehört dem, der den Punkt verliert.
     ueK: cnt((p) => p.meta.kind === 'ue' && !p.won),
     ueG: cnt((p) => p.meta.kind === 'ue' && p.won),

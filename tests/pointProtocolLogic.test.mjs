@@ -164,3 +164,16 @@ test('Spiel für eine Seite ergänzt fehlende Punkte, zählt nicht in die Auswer
   assert.equal(m.games.length, 1)
   assert.equal(m.games[0].pts.length, 2)
 })
+
+test('Ass gehört dem Aufschläger und zählt als sein Punkt', () => {
+  const m = base()                          // k schlägt auf
+  addPoint(m, true, { kind: 'ace' })        // Ass k
+  play(m, '++-')
+  const g1 = m.games[0]
+  assert.equal(labels(g1)[0].sup, 'A')
+  // zweites Spiel: g schlägt auf, Ass g (Punkt für g)
+  addPoint(m, false, { kind: 'ace' })
+  const { err } = stats(m)
+  assert.equal(err.aceK, 1)
+  assert.equal(err.aceG, 1)
+})
